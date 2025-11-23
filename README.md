@@ -1,5 +1,13 @@
 # Chukfi CMS
 
+[![Release](https://img.shields.io/github/v/release/Native-Consulting-Services/chukfi-cms?include_prereleases&style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/Native-Consulting-Services/chukfi-cms/ci.yml?branch=main&style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Use this template](https://img.shields.io/badge/Use%20this-Template-blue?style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/generate)
+[![Contributors](https://img.shields.io/github/contributors/Native-Consulting-Services/chukfi-cms?style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/graphs/contributors)
+
+> **🚀 Template Repository**: Use this template to create your own CMS! Click "Use this template" above to get started.
+
 > **✅ Ready for Development**: Chukfi CMS is fully functional with zero external dependencies. Complete project structure, authentication, database schema, and admin UI are ready. **5-minute setup** from clone to running!
 
 An open-source, self-hosted content management system built as a monorepo with Astro frontend and Go backend.
@@ -43,7 +51,11 @@ An open-source, self-hosted content management system built as a monorepo with A
 #### 1. **Clone Repository**
 
 ```bash
-git clone https://github.com/your-org/chukfi-cms
+# Option A: Use GitHub template (recommended)
+# Click "Use this template" button above, then clone your new repo
+
+# Option B: Clone directly (for contributing)
+git clone https://github.com/Native-Consulting-Services/chukfi-cms.git
 cd chukfi-cms
 ```
 
@@ -397,11 +409,39 @@ Custom field types can be added by:
 
 ## Contributing
 
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Quick Contributing Steps
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+
+### Community
+- 🐛 [Report bugs](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=bug_report.md)
+- 💡 [Request features](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=feature_request.md)
+- ❓ [Ask questions](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=question.md)
+- 📖 [View documentation](https://github.com/Native-Consulting-Services/chukfi-cms/blob/main/DEVELOPMENT.md)
+
+## 📦 Releases
+
+### Download Latest Release
+Visit the [Releases page](https://github.com/Native-Consulting-Services/chukfi-cms/releases) for:
+- 📁 **Source code** archives
+- 🔧 **Pre-compiled binaries** for Linux, Windows, macOS
+- 📋 **Release notes** with changelogs
+- 🚀 **Migration guides** for updates
+
+### Supported Platforms
+- **Linux**: AMD64, ARM64
+- **Windows**: AMD64
+- **macOS**: AMD64 (Intel), ARM64 (Apple Silicon)
+
+### Release Schedule
+- 🎯 **Major releases** (v1.0, v2.0): New features, breaking changes
+- 🔧 **Minor releases** (v1.1, v1.2): New features, backwards compatible
+- 🐛 **Patch releases** (v1.0.1, v1.0.2): Bug fixes only
 
 ## License
 
