@@ -412,6 +412,7 @@ Custom field types can be added by:
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Quick Contributing Steps
+
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Commit changes: `git commit -m 'Add amazing feature'`
@@ -419,6 +420,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 5. Open a Pull Request
 
 ### Community
+
 - 🐛 [Report bugs](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=bug_report.md)
 - 💡 [Request features](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=feature_request.md)
 - ❓ [Ask questions](https://github.com/Native-Consulting-Services/chukfi-cms/issues/new?template=question.md)
@@ -427,18 +429,22 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 ## 📦 Releases
 
 ### Download Latest Release
+
 Visit the [Releases page](https://github.com/Native-Consulting-Services/chukfi-cms/releases) for:
+
 - 📁 **Source code** archives
 - 🔧 **Pre-compiled binaries** for Linux, Windows, macOS
 - 📋 **Release notes** with changelogs
 - 🚀 **Migration guides** for updates
 
 ### Supported Platforms
+
 - **Linux**: AMD64, ARM64
 - **Windows**: AMD64
 - **macOS**: AMD64 (Intel), ARM64 (Apple Silicon)
 
 ### Release Schedule
+
 - 🎯 **Major releases** (v1.0, v2.0): New features, breaking changes
 - 🔧 **Minor releases** (v1.1, v1.2): New features, backwards compatible
 - 🐛 **Patch releases** (v1.0.1, v1.0.2): Bug fixes only

@@ -29,15 +29,17 @@ func main() {
 
 	// Get configuration from environment
 	port := getEnv("PORT", "8080")
-	dbURL := getEnv("DATABASE_URL", "postgres://chukfi:password@localhost:5432/chukfi_cms?sslmode=disable")
+	dbURL := getEnv("DATABASE_URL", "sqlite://./data/chukfi.db")
 	jwtSecret := getEnv("JWT_SECRET", "your-secret-key")
 
 	// Initialize database
+	log.Printf("Connecting to database: %s", dbURL)
 	database, err := db.NewDB(dbURL)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer database.Close()
+	log.Println("Database connection established successfully")
 
 	// Initialize auth service
 	authService := auth.NewService(jwtSecret, database)

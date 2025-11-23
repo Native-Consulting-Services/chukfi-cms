@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Initial project scaffolding
 - Pure Go SQLite backend with modernc.org/sqlite
 - Astro + React + Tailwind CSS frontend
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zero external dependencies setup
 
 ### Features
+
 - 🏗️ Collection-based content management
 - 👥 Role-based access control (RBAC)
 - 📝 Draft/published states with versioning
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🎨 Modern admin dashboard UI
 
 ### Technical
+
 - Pure Go implementation (no CGO required)
 - SQLite database with automatic schema creation
 - 5-minute setup from clone to running
@@ -37,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - TBD
 
 ### Added
+
 - Initial stable release
 - Complete CMS functionality
 - Production-ready authentication

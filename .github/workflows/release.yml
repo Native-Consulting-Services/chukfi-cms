@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -11,147 +11,147 @@ permissions:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
-    - name: Install frontend dependencies
-      run: |
-        cd frontend
-        npm ci
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
 
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
 
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        go mod tidy
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          go mod tidy
 
-    - name: Build backend binaries
-      run: |
-        cd backend
-        mkdir -p dist
-        
-        # Build for different platforms
-        GOOS=linux GOARCH=amd64 go build -o dist/chukfi-cms-linux-amd64 cmd/server/main.go
-        GOOS=linux GOARCH=arm64 go build -o dist/chukfi-cms-linux-arm64 cmd/server/main.go
-        GOOS=windows GOARCH=amd64 go build -o dist/chukfi-cms-windows-amd64.exe cmd/server/main.go
-        GOOS=darwin GOARCH=amd64 go build -o dist/chukfi-cms-darwin-amd64 cmd/server/main.go
-        GOOS=darwin GOARCH=arm64 go build -o dist/chukfi-cms-darwin-arm64 cmd/server/main.go
+      - name: Build backend binaries
+        run: |
+          cd backend
+          mkdir -p dist
 
-    - name: Create release archives
-      run: |
-        mkdir -p release
-        
-        # Create source archive
-        tar -czf release/chukfi-cms-source.tar.gz \
-          --exclude='.git' \
-          --exclude='node_modules' \
-          --exclude='backend/dist' \
-          --exclude='backend/data' \
-          --exclude='backend/bin' \
-          --exclude='frontend/dist' \
-          --exclude='frontend/node_modules' \
-          .
-        
-        # Create binary archives
-        cd backend/dist
-        for binary in chukfi-cms-*; do
-          if [[ "$binary" == *.exe ]]; then
-            zip "../../release/${binary%.exe}.zip" "$binary"
+          # Build for different platforms
+          GOOS=linux GOARCH=amd64 go build -o dist/chukfi-cms-linux-amd64 cmd/server/main.go
+          GOOS=linux GOARCH=arm64 go build -o dist/chukfi-cms-linux-arm64 cmd/server/main.go
+          GOOS=windows GOARCH=amd64 go build -o dist/chukfi-cms-windows-amd64.exe cmd/server/main.go
+          GOOS=darwin GOARCH=amd64 go build -o dist/chukfi-cms-darwin-amd64 cmd/server/main.go
+          GOOS=darwin GOARCH=arm64 go build -o dist/chukfi-cms-darwin-arm64 cmd/server/main.go
+
+      - name: Create release archives
+        run: |
+          mkdir -p release
+
+          # Create source archive
+          tar -czf release/chukfi-cms-source.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='backend/dist' \
+            --exclude='backend/data' \
+            --exclude='backend/bin' \
+            --exclude='frontend/dist' \
+            --exclude='frontend/node_modules' \
+            .
+
+          # Create binary archives
+          cd backend/dist
+          for binary in chukfi-cms-*; do
+            if [[ "$binary" == *.exe ]]; then
+              zip "../../release/${binary%.exe}.zip" "$binary"
+            else
+              tar -czf "../../release/$binary.tar.gz" "$binary"
+            fi
+          done
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the tag name
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" $LAST_TAG..HEAD)
           else
-            tar -czf "../../release/$binary.tar.gz" "$binary"
+            COMMITS=$(git log --pretty=format:"- %s")
           fi
-        done
 
-    - name: Generate changelog
-      id: changelog
-      run: |
-        # Get the tag name
-        TAG_NAME=${GITHUB_REF#refs/tags/}
-        
-        # Get commits since last tag
-        LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-        if [ -n "$LAST_TAG" ]; then
-          COMMITS=$(git log --pretty=format:"- %s" $LAST_TAG..HEAD)
-        else
-          COMMITS=$(git log --pretty=format:"- %s")
-        fi
-        
-        # Create changelog
-        cat > CHANGELOG.md << EOF
-        # Release $TAG_NAME
-        
-        ## Changes
-        $COMMITS
-        
-        ## Installation
-        
-        ### Quick Start (Recommended)
-        \`\`\`bash
-        # Clone the template repository
-        git clone https://github.com/${{ github.repository }}.git my-cms
-        cd my-cms
-        
-        # Install dependencies
-        cd frontend && npm install && cd ../backend && go mod tidy && cd ..
-        
-        # Start development
-        cd backend && mkdir -p data && go run cmd/migrate/main.go up && go run cmd/server/main.go
-        \`\`\`
-        
-        ### Binary Installation
-        1. Download the appropriate binary for your platform
-        2. Extract the archive
-        3. Run the binary
-        
-        ### Supported Platforms
-        - Linux (AMD64, ARM64)
-        - Windows (AMD64)
-        - macOS (AMD64, ARM64 - Apple Silicon)
-        
-        ## What's Included
-        - ✅ Complete CMS with admin dashboard
-        - ✅ Pure Go SQLite backend (no CGO required)
-        - ✅ Astro + React + Tailwind frontend
-        - ✅ JWT authentication with RBAC
-        - ✅ Collection-based content management
-        - ✅ Zero external dependencies
-        
-        ## Documentation
-        - [Installation Guide](https://github.com/${{ github.repository }}#-fresh-installation-guide)
-        - [Development Workflow](https://github.com/${{ github.repository }}#-daily-development-workflow)
-        - [API Documentation](https://github.com/${{ github.repository }}#api-documentation)
-        
-        EOF
-        
-        echo "changelog_file=CHANGELOG.md" >> $GITHUB_OUTPUT
+          # Create changelog
+          cat > CHANGELOG.md << EOF
+          # Release $TAG_NAME
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          release/*
-        body_path: CHANGELOG.md
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-        tag_name: ${{ github.ref_name }}
-        name: Chukfi CMS ${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ## Changes
+          $COMMITS
+
+          ## Installation
+
+          ### Quick Start (Recommended)
+          \`\`\`bash
+          # Clone the template repository
+          git clone https://github.com/${{ github.repository }}.git my-cms
+          cd my-cms
+
+          # Install dependencies
+          cd frontend && npm install && cd ../backend && go mod tidy && cd ..
+
+          # Start development
+          cd backend && mkdir -p data && go run cmd/migrate/main.go up && go run cmd/server/main.go
+          \`\`\`
+
+          ### Binary Installation
+          1. Download the appropriate binary for your platform
+          2. Extract the archive
+          3. Run the binary
+
+          ### Supported Platforms
+          - Linux (AMD64, ARM64)
+          - Windows (AMD64)
+          - macOS (AMD64, ARM64 - Apple Silicon)
+
+          ## What's Included
+          - ✅ Complete CMS with admin dashboard
+          - ✅ Pure Go SQLite backend (no CGO required)
+          - ✅ Astro + React + Tailwind frontend
+          - ✅ JWT authentication with RBAC
+          - ✅ Collection-based content management
+          - ✅ Zero external dependencies
+
+          ## Documentation
+          - [Installation Guide](https://github.com/${{ github.repository }}#-fresh-installation-guide)
+          - [Development Workflow](https://github.com/${{ github.repository }}#-daily-development-workflow)
+          - [API Documentation](https://github.com/${{ github.repository }}#api-documentation)
+
+          EOF
+
+          echo "changelog_file=CHANGELOG.md" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/*
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          tag_name: ${{ github.ref_name }}
+          name: Chukfi CMS ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

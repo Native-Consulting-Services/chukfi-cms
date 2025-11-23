@@ -1,10 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: '[FEATURE] '
-labels: 'enhancement'
-assignees: ''
-
+title: "[FEATURE] "
+labels: "enhancement"
+assignees: ""
 ---
 
 **Is your feature request related to a problem? Please describe.**
@@ -21,6 +20,7 @@ Add any other context or screenshots about the feature request here.
 
 **Implementation suggestions**
 If you have ideas about how this could be implemented, please share them:
+
 - Frontend changes needed
 - Backend changes needed
 - Database schema changes

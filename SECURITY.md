@@ -62,21 +62,25 @@ Please include as much information as possible:
 ## Common Security Considerations
 
 ### Authentication
+
 - JWT tokens have configurable expiration times
 - Password hashing uses bcrypt with appropriate cost
 - Session management follows security best practices
 
 ### Authorization
+
 - Role-based access control (RBAC) system
 - Permission checks on all protected routes
 - Input validation on all API endpoints
 
 ### Database Security
+
 - SQLite file permissions should be properly configured
 - Database queries use parameterized statements
 - No sensitive data logged in plain text
 
 ### Frontend Security
+
 - XSS protection through proper input sanitization
 - CSRF protection for state-changing operations
 - Secure cookie configuration

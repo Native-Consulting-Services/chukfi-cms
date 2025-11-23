@@ -19,11 +19,13 @@ Thank you for your interest in contributing to Chukfi CMS! This document provide
 ## 📋 Development Workflow
 
 ### Prerequisites
+
 - Go 1.21+
 - Node.js 18+
 - Git
 
 ### Setup
+
 ```bash
 # Install dependencies
 cd frontend && npm install && cd ../backend && go mod tidy && cd ..
@@ -35,6 +37,7 @@ cd backend && mkdir -p data && go run cmd/migrate/main.go up
 ```
 
 ### Testing
+
 ```bash
 # Frontend
 cd frontend && npm run build && npx astro check
@@ -46,23 +49,27 @@ cd backend && go test ./... && go build cmd/server/main.go
 ## 🎯 Contribution Areas
 
 ### 🎨 Frontend (Astro + React + Tailwind)
+
 - **Location**: `frontend/src/`
 - **Components**: React components for admin UI
 - **Pages**: Astro pages and layouts
 - **Styles**: Tailwind CSS utilities
 
 ### 🔧 Backend (Go + SQLite)
+
 - **Location**: `backend/internal/`
 - **API**: REST endpoints and handlers
 - **Auth**: JWT authentication and RBAC
 - **Database**: SQLite operations and migrations
 
 ### 📚 Documentation
+
 - **README.md**: Installation and usage guides
 - **DEVELOPMENT.md**: Detailed development setup
 - **API docs**: Endpoint documentation
 
 ### 🧪 Testing & CI
+
 - **Frontend tests**: Component and build tests
 - **Backend tests**: Unit and integration tests
 - **GitHub Actions**: CI/CD workflows
@@ -70,19 +77,23 @@ cd backend && go test ./... && go build cmd/server/main.go
 ## 📝 Coding Standards
 
 ### Go Code
+
 - Follow standard Go conventions (`gofmt`, `golint`)
 - Use meaningful variable and function names
 - Add comments for complex logic
 - Handle errors appropriately
 
 ### JavaScript/TypeScript
+
 - Use TypeScript for type safety
 - Follow Astro and React best practices
 - Use Tailwind CSS for styling
 - Keep components small and focused
 
 ### Git Commits
+
 Use conventional commit messages:
+
 ```
 type(scope): description
 
@@ -119,6 +130,7 @@ Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md).
 ## 🔀 Pull Request Process
 
 1. **Create a branch** from `main`:
+
    ```bash
    git checkout -b feature/your-feature
    ```
@@ -126,17 +138,19 @@ Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md).
 2. **Make your changes** following coding standards
 
 3. **Test your changes**:
+
    ```bash
    # Frontend
    cd frontend && npm run build
-   
-   # Backend  
+
+   # Backend
    cd backend && go test ./... && go build cmd/server/main.go
    ```
 
 4. **Update documentation** if needed
 
 5. **Create pull request** with:
+
    - Clear title and description
    - Link to related issues
    - Screenshots for UI changes
@@ -145,6 +159,7 @@ Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md).
 6. **Respond to review feedback** promptly
 
 ### PR Requirements
+
 - [ ] Code follows project conventions
 - [ ] Tests pass locally
 - [ ] Documentation updated
@@ -167,6 +182,7 @@ chukfi-cms/
 ```
 
 ### Key Design Principles
+
 - **Zero external dependencies** for easy setup
 - **Pure Go SQLite** for database (no CGO)
 - **Collection-based** content management
@@ -193,6 +209,7 @@ By contributing, you agree that your contributions will be licensed under the sa
 ## 🎉 Recognition
 
 Contributors are recognized in:
+
 - GitHub contributor graph
 - Release notes (for significant contributions)
 - Special thanks in documentation
