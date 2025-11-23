@@ -120,7 +120,7 @@ jobs:
           # Start server in background
           nohup ./bin/server > server.log 2>&1 &
           SERVER_PID=$!
-          
+
           # Wait for server to start
           echo "Waiting for server to start..."
           for i in {1..30}; do
@@ -131,12 +131,12 @@ jobs:
             echo "Attempt $i: Server not ready yet, waiting..."
             sleep 2
           done
-          
+
           # Test health endpoint
           echo "Testing health endpoint..."
           response=$(curl -s http://localhost:8080/health)
           echo "Response: $response"
-          
+
           if [[ "$response" == *"ok"* ]]; then
             echo "✅ Health check passed"
           else
@@ -146,6 +146,6 @@ jobs:
             kill $SERVER_PID || true
             exit 1
           fi
-          
+
           # Cleanup
           kill $SERVER_PID || true

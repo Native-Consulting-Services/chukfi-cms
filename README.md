@@ -1,4 +1,23 @@
-# Chukfi CMS
+<div align="center">
+  <img src="./assets/branding/logo.jpg" alt="Chukfi CMS Logo" width="200" height="200" />
+  
+  # Chukfi CMS
+  
+  **Chukfi** is the Choctaw word for **rabbit**, a symbol of speed, agility, and quick thinking.<br>
+  Chukfi CMS embraces those qualities by providing a fast, modern, open-source CMS built with<br>
+  **Astro**, **React**, and **Go**.
+</div>
+
+- ⚡ Fast Go backend
+- 🐇 Agile Astro + React admin dashboard
+- 🛡 Role-based access control
+- 📚 Collection-based schema system (Payload-style)
+- 📦 Media uploads and libraries
+- 🌱 Open-source and community-driven
+
+Chukfi CMS is built to run — fast, simple, and clever.
+
+<div align="center">
 
 [![Release](https://img.shields.io/github/v/release/Native-Consulting-Services/chukfi-cms?include_prereleases&style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/Native-Consulting-Services/chukfi-cms/ci.yml?branch=main&style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/actions/workflows/ci.yml)
@@ -6,11 +25,27 @@
 [![Use this template](https://img.shields.io/badge/Use%20this-Template-blue?style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/generate)
 [![Contributors](https://img.shields.io/github/contributors/Native-Consulting-Services/chukfi-cms?style=flat-square)](https://github.com/Native-Consulting-Services/chukfi-cms/graphs/contributors)
 
+</div>
+
 > **🚀 Template Repository**: Use this template to create your own CMS! Click "Use this template" above to get started.
 
 > **✅ Ready for Development**: Chukfi CMS is fully functional with zero external dependencies. Complete project structure, authentication, database schema, and admin UI are ready. **5-minute setup** from clone to running!
 
 An open-source, self-hosted content management system built as a monorepo with Astro frontend and Go backend.
+
+## 📸 Screenshots
+
+<div align="center">
+  
+  *Screenshots coming soon - Admin dashboard, collection management, and media library interfaces*
+  
+  <!-- Uncomment when screenshots are ready:
+  <img src="./assets/screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800" />
+  <br><br>
+  <img src="./assets/screenshots/collection-editor.png" alt="Collection Editor" width="800" />
+  -->
+  
+</div>
 
 ## ✨ Key Advantages
 
@@ -228,6 +263,10 @@ chukfi-cms/
 
 ```
 chukfi-cms/
+├── assets/                # Brand & marketing assets
+│   ├── branding/          # Logos, brand guide, favicon
+│   ├── screenshots/       # Product screenshots
+│   └── social/            # Social media assets
 ├── frontend/              # Astro + React frontend
 │   ├── src/
 │   │   ├── components/    # React components

@@ -7,7 +7,7 @@ Thank you for your interest in contributing to Chukfi CMS! This document provide
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/your-username/chukfi-cms.git
+   git clone https://github.com/Native-Consulting-Services/chukfi-cms.git
    cd chukfi-cms
    ```
 3. **Set up development environment** following the [README.md](README.md#-fresh-installation-guide)
