@@ -1,0 +1,64 @@
+---
+import Layout from './Layout.astro';
+import SidebarNav from '../components/SidebarNav.tsx';
+import UserMenu from '../components/UserMenu.tsx';
+
+export interface Props {
+  title: string;
+  currentPage?: string;
+}
+
+const { title, currentPage } = Astro.props;
+---
+
+<Layout title={title}>
+  <div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <div class="hidden md:flex md:w-64 md:flex-col">
+      <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+        <div class="flex items-center flex-shrink-0 px-4">
+          <img class="w-8 h-8" src="/favicon.svg" alt="Chukfi CMS" />
+          <h1 class="ml-3 text-xl font-semibold text-gray-900">Chukfi CMS</h1>
+        </div>
+        <div class="mt-5 flex-grow flex flex-col">
+          <nav class="flex-1 px-2 pb-4">
+            <SidebarNav currentPage={currentPage} client:load />
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+      <!-- Top navigation -->
+      <div class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+        <div class="flex-1 px-4 flex justify-between">
+          <div class="flex-1 flex">
+            <!-- Mobile menu button -->
+            <button class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden">
+              <span class="sr-only">Open sidebar</span>
+              <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+            </button>
+            <div class="flex-1 flex items-center px-4">
+              <h1 class="text-2xl font-semibold text-gray-900">{title}</h1>
+            </div>
+          </div>
+          <div class="ml-4 flex items-center md:ml-6">
+            <UserMenu client:load />
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 relative overflow-y-auto focus:outline-none">
+        <div class="py-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <slot />
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</Layout>
