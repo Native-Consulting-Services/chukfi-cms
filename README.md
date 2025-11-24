@@ -127,7 +127,6 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for deta
 - 💡 **[GitHub Discussions](https://github.com/Native-Consulting-Services/chukfi-cms/discussions)** - Q&A and announcements
 - 🐛 **[Issues](https://github.com/Native-Consulting-Services/chukfi-cms/issues)** - Bug reports and feature requests
 - 🔒 **[Security Policy](SECURITY.md)** - Report security vulnerabilities
-- 📧 **[Contact](mailto:support@chukfi-cms.org)** - Direct support
 
 ## 📄 License
 

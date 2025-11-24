@@ -1,14 +1,10 @@
+// @ts-check
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  integrations: [
-    react(),
-    tailwind({
-      applyBaseStyles: false,
-    }),
-  ],
+  integrations: [react()],
   server: {
     port: 4321,
     host: true,
@@ -17,6 +13,7 @@ export default defineConfig({
     assets: "_astro",
   },
   vite: {
+    plugins: [tailwindcss()],
     define: {
       "import.meta.env.API_URL": JSON.stringify(
         process.env.API_URL || "http://localhost:8080"

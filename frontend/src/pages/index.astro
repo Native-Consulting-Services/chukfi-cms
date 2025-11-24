@@ -2,70 +2,166 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Chukfi CMS">
-  <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="flex justify-center">
-        <img class="w-12 h-12" src="/favicon.svg" alt="Chukfi CMS" />
+<Layout title="Chukfi CMS - Modern Content Management">
+  <!-- Navigation -->
+  <nav class="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <img class="h-8 w-8" src="/favicon.svg" alt="Chukfi CMS">
+            <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Chukfi CMS</span>
+          </div>
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="#features" class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium">Features</a>
+            <a href="/blog" class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium">Blog</a>
+            <a href="/docs" class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium">Documentation</a>
+            <a href="/about" class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium">About</a>
+            <a href="/contact" class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium">Contact</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <!-- Dark/Light Mode Switch -->
+          <button id="theme-toggle" class="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white p-2" title="Toggle dark/light mode">
+            <svg id="theme-toggle-dark-icon" class="h-5 w-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
+            <svg id="theme-toggle-light-icon" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <a href="/admin" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+            <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+            </svg>
+            Admin Login
+          </a>
+        </div>
       </div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Welcome to Chukfi CMS
-      </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        A modern, open-source content management system
-      </p>
     </div>
+  </nav>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Getting Started</h3>
-            <div class="space-y-4">
-              <a 
-                href="/admin" 
-                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Access Admin Dashboard
-              </a>
-              
-              <div class="relative">
-                <div class="absolute inset-0 flex items-center">
-                  <div class="w-full border-t border-gray-300" />
-                </div>
-                <div class="relative flex justify-center text-sm">
-                  <span class="px-2 bg-white text-gray-500">Features</span>
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 dark:from-amber-800 dark:via-orange-700 dark:to-red-800 relative overflow-hidden">
+    <!-- Native Pattern Background -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="choctaw-diamond-pattern" patternUnits="userSpaceOnUse" width="40" height="60">
+            <!-- Large diamond -->
+            <path d="M20 0L40 30L20 60L0 30L20 0Z" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#choctaw-diamond-pattern)" />
+      </svg>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
+      <div class="text-center">
+        <!-- Chukfi (Rabbit) Symbol -->
+        <div class="flex justify-center mb-8">
+          <div class="relative">
+            <svg class="w-20 h-20 text-yellow-200" fill="currentColor" viewBox="0 0 100 100">
+              <!-- Stylized Rabbit/Chukfi -->
+              <path d="M50 15 C40 10, 35 20, 35 30 C35 35, 40 40, 45 40 L55 40 C60 40, 65 35, 65 30 C65 20, 60 10, 50 15 Z" />
+              <ellipse cx="42" cy="25" rx="3" ry="8" />
+              <ellipse cx="58" cy="25" rx="3" ry="8" />
+              <circle cx="50" cy="45" r="15" />
+              <ellipse cx="50" cy="75" rx="12" ry="18" />
+              <circle cx="45" cy="38" r="1.5" fill="#8B4513" />
+              <circle cx="55" cy="38" r="1.5" fill="#8B4513" />
+              <path d="M48 42 Q50 44 52 42" stroke="#8B4513" stroke-width="1" fill="none" />
+            </svg>
+            <!-- Geometric accent -->
+            <div class="absolute -top-2 -right-2 w-6 h-6 border-2 border-yellow-300 rotate-45"></div>
+          </div>
+        </div>
+        
+        <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+          <span class="block">Chukfi CMS</span>
+          <span class="block text-yellow-300">Swift. Agile. Powerful.</span>
+        </h1>
+        <p class="mt-3 max-w-md mx-auto text-base text-orange-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          Named after the Choctaw word for rabbit, Chukfi embodies the speed and agility needed for modern content management. 
+          <span class="block mt-2 text-yellow-200 font-medium">"Like the rabbit, swift in movement and clever in adaptation."</span>
+        </p>
+        <div class="mt-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-12">
+          <div class="rounded-md shadow">
+            <a href="#demo" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-orange-600 bg-white hover:bg-orange-50 dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-gray-700 md:py-4 md:text-lg md:px-10">
+              <span class="mr-2">🏃</span> View Demo
+            </a>
+          </div>
+          <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+            <a href="/admin" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 md:py-4 md:text-lg md:px-10">
+              <span class="mr-2">⚡</span> Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cultural Heritage Section -->
+  <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 py-16 border-t-4 border-amber-600 dark:border-amber-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+        <div>
+          <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+            <span class="block text-amber-700 dark:text-amber-400">Chukfi</span>
+            <span class="block text-gray-700 dark:text-gray-300">The Spirit of Agility</span>
+          </h2>
+          <p class="mt-3 text-lg text-gray-600 dark:text-gray-300">
+            In Choctaw tradition, the rabbit (Chukfi) represents intelligence, quick thinking, and adaptability. 
+            These qualities embody the essence of modern web development - the need for rapid iteration, 
+            smart solutions, and flexible architecture.
+          </p>
+          <div class="mt-6">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white">
+                  <span class="text-xl">🐇</span>
                 </div>
               </div>
-
-              <div class="grid grid-cols-1 gap-4">
-                <div class="flex items-center p-3 border rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                  <span class="text-sm text-gray-700">Collection-based content management</span>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Swift Performance</h3>
+                <p class="mt-1 text-base text-gray-600 dark:text-gray-300">
+                  Like the quick rabbit, Chukfi CMS delivers lightning-fast content management.
+                </p>
+              </div>
+            </div>
+            <div class="mt-6 flex items-start">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white">
+                  <span class="text-xl">🧠</span>
                 </div>
-                
-                <div class="flex items-center p-3 border rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                  </svg>
-                  <span class="text-sm text-gray-700">Role-based access control</span>
-                </div>
-                
-                <div class="flex items-center p-3 border rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-sm text-gray-700">Media library & file uploads</span>
-                </div>
-                
-                <div class="flex items-center p-3 border rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span class="text-sm text-gray-700">Draft/published states</span>
-                </div>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Intelligent Design</h3>
+                <p class="mt-1 text-base text-gray-600 dark:text-gray-300">
+                  Smart architecture that adapts to your content needs with clever solutions.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 lg:mt-0">
+          <div class="relative">
+            <!-- Decorative Native Pattern -->
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg transform rotate-3"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+              <div class="text-center">
+                <!-- Traditional geometric pattern -->
+                <svg class="mx-auto h-24 w-24 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 100 100">
+                  <polygon points="50,10 70,30 50,50 30,30" />
+                  <polygon points="50,50 70,70 50,90 30,70" />
+                  <polygon points="10,30 30,50 10,70 10,30" />
+                  <polygon points="90,30 90,70 70,50" />
+                  <circle cx="50" cy="50" r="8" fill="white" class="dark:fill-gray-800" />
+                </svg>
+                <h3 class="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Honoring Heritage</h3>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">
+                  Built with respect for Choctaw culture and the wisdom embedded in traditional knowledge systems.
+                </p>
               </div>
             </div>
           </div>
@@ -73,4 +169,252 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
   </div>
+
+  <!-- Features Section -->
+  <div id="features" class="py-24 bg-white dark:bg-gray-900 relative">
+    <!-- Subtle geometric border -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 dark:from-amber-600 dark:via-orange-600 dark:to-red-600"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-amber-700 dark:text-amber-400 font-semibold tracking-wide uppercase">Features</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Everything you need to manage content
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
+          Powerful features designed with the agility of Chukfi - swift, intelligent, and adaptive.
+        </p>
+      </div>
+
+      <div class="mt-20">
+        <div class="grid grid-cols-1 gap-12 lg:grid-cols-3">
+          <!-- Collection-Based Architecture -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">Collection-Based</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              Define custom content types with flexible field configurations. Perfect for blogs, portfolios, e-commerce, and more.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+
+          <!-- Role-Based Access Control -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">Secure Access Control</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              Granular permissions system with role-based access control. Manage who can create, edit, and publish content.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+
+          <!-- Developer Friendly -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">Developer Friendly</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              RESTful APIs, GraphQL support, and modern tech stack. Built with Go backend and React frontend.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+
+          <!-- Media Management -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">Media Library</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              Upload, organize, and manage files with our powerful media library. Support for images, documents, and more.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+
+          <!-- Content Workflows -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">Content Workflows</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              Draft, review, and publish content with built-in workflow management. Version control and publishing schedules.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+
+          <!-- Performance -->
+          <div class="text-center group">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-amber-600 dark:bg-amber-500 text-white mx-auto group-hover:bg-amber-700 dark:group-hover:bg-amber-600 transition-colors">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">High Performance</h3>
+            <p class="mt-2 text-base text-gray-500 dark:text-gray-300">
+              Built for speed with Go backend, efficient database queries, and optimized frontend rendering.
+            </p>
+            <div class="mt-4 w-16 h-1 bg-gradient-to-r from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 mx-auto rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Section -->
+  <div id="demo" class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-amber-700 dark:text-amber-400 font-semibold tracking-wide uppercase">Demo Content</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          See Chukfi in action
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
+          Explore sample content created with our collection-based system - swift and adaptable like the rabbit.
+        </p>
+      </div>
+
+      <div class="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <!-- Blog Sample -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-950 overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-blue-500 dark:border-blue-400">
+          <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 relative">
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <span class="text-4xl">📝</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Blog</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Stories and insights sharing wisdom across communities.</p>
+            <a href="/blog" class="text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium text-sm flex items-center">
+              View Blog <span class="ml-1">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Portfolio Sample -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-950 overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-green-500 dark:border-green-400">
+          <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 relative">
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <span class="text-4xl">🎨</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Portfolio</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Showcase of creative works and cultural expressions.</p>
+            <a href="/portfolio" class="text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium text-sm flex items-center">
+              View Portfolio <span class="ml-1">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Products Sample -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-950 overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-yellow-500 dark:border-yellow-400">
+          <div class="h-48 bg-gradient-to-br from-yellow-400 to-orange-500 relative">
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <span class="text-4xl">🛍️</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Products</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Marketplace for artisan crafts and cultural goods.</p>
+            <a href="/products" class="text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium text-sm flex items-center">
+              View Products <span class="ml-1">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Documentation Sample -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-950 overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-purple-500 dark:border-purple-400">
+          <div class="h-48 bg-gradient-to-br from-purple-400 to-indigo-600 relative">
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <span class="text-4xl">📚</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Documentation</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Comprehensive guides honoring traditional knowledge.</p>
+            <a href="/docs" class="text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium text-sm flex items-center">
+              View Docs <span class="ml-1">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="bg-gradient-to-r from-amber-700 via-orange-600 to-red-600 dark:from-amber-800 dark:via-orange-700 dark:to-red-800 relative">
+    <!-- Traditional pattern overlay -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 200 200" fill="none">
+        <pattern id="cta-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+          <path d="M10 2L18 10L10 18L2 10L10 2Z" stroke="currentColor" stroke-width="1" fill="none" />
+        </pattern>
+        <rect width="200" height="200" fill="url(#cta-pattern)" />
+      </svg>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between relative">
+      <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+        <span class="block">Ready to embrace the spirit of Chukfi?</span>
+        <span class="block text-yellow-200">Swift, intelligent content management awaits.</span>
+      </h2>
+      <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+        <div class="inline-flex rounded-md shadow">
+          <a href="/admin" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-amber-700 bg-white hover:bg-yellow-50 dark:bg-gray-800 dark:text-amber-400 dark:hover:bg-gray-700 transition-colors">
+            <span class="mr-2">🐇</span> Start Your Journey
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center">
+            <img class="h-8 w-8" src="/favicon.svg" alt="Chukfi CMS">
+            <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Chukfi CMS</span>
+          </div>
+          <p class="mt-2 text-gray-500 dark:text-gray-400">Modern, open-source content management system built for developers and content creators.</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Product</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#features" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Features</a></li>
+            <li><a href="/admin" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Admin</a></li>
+            <li><a href="/docs" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Documentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Demo</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="/blog" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Blog</a></li>
+            <li><a href="/portfolio" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Portfolio</a></li>
+            <li><a href="/products" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Products</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+        <p class="text-base text-gray-400 dark:text-gray-500 text-center">&copy; {new Date().getFullYear()} Chukfi CMS. Open-source software.</p>
+      </div>
+    </div>
+  </footer>
 </Layout>
