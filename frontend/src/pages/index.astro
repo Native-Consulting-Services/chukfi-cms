@@ -30,29 +30,96 @@ import Layout from '../layouts/Layout.astro';
               <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
             </svg>
           </button>
-          <a href="/admin" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
-            <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Desktop Admin Login -->
+          <a href="/admin" class="hidden md:inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-900 bg-amber-500 hover:bg-amber-600 dark:text-gray-900 dark:bg-amber-400 dark:hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+            <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
             </svg>
             Admin Login
           </a>
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-button" class="md:hidden text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white p-2" title="Open menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden">
+      <div class="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+        <a href="#features" class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-md">Features</a>
+        <a href="/blog" class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-md">Blog</a>
+        <a href="/docs" class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-md">Documentation</a>
+        <a href="/about" class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-md">About</a>
+        <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 rounded-md">Contact</a>
+        <a href="/admin" class="block px-3 py-2 text-base font-medium text-gray-900 bg-amber-500 hover:bg-amber-600 dark:text-gray-900 dark:bg-amber-400 dark:hover:bg-amber-500 rounded-md">
+          <span class="flex items-center">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+            </svg>
+            Admin Login
+          </span>
+        </a>
       </div>
     </div>
   </nav>
 
+  <script type="module">
+    // Mobile menu toggle - optimized to prevent forced reflows
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      // Track menu state
+      let isMenuOpen = false;
+
+      // Toggle menu
+      mobileMenuButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        isMenuOpen = !isMenuOpen;
+        mobileMenu.classList.toggle('hidden', !isMenuOpen);
+      });
+
+      // Close menu when clicking outside (using event delegation)
+      document.addEventListener('click', (event) => {
+        if (!isMenuOpen) return;
+        
+        const target = event.target;
+        // Check if click is outside both menu and button
+        if (target !== mobileMenuButton && 
+            !mobileMenuButton.contains(target) && 
+            target !== mobileMenu && 
+            !mobileMenu.contains(target)) {
+          isMenuOpen = false;
+          mobileMenu.classList.add('hidden');
+        }
+      });
+
+      // Close menu when clicking menu links
+      mobileMenu.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target.tagName === 'A' || target.closest('a')) {
+          isMenuOpen = false;
+          mobileMenu.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+
   <!-- Hero Section -->
   <div class="bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 dark:from-amber-800 dark:via-orange-700 dark:to-red-800 relative overflow-hidden">
     <!-- Native Pattern Background -->
-    <div class="absolute inset-0 opacity-10">
-      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+    <div class="absolute inset-0 opacity-10" aria-hidden="true">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" focusable="false">
         <defs>
           <pattern id="choctaw-diamond-pattern" patternUnits="userSpaceOnUse" width="40" height="60">
-            <!-- Large diamond -->
-            <path d="M20 0L40 30L20 60L0 30L20 0Z" fill="currentColor" />
+            <path d="M20 0L40 30L20 60L0 30Z" fill="currentColor"/>
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#choctaw-diamond-pattern)" />
+        <rect width="100%" height="100%" fill="url(#choctaw-diamond-pattern)"/>
       </svg>
     </div>
     
@@ -61,18 +128,12 @@ import Layout from '../layouts/Layout.astro';
         <!-- Chukfi (Rabbit) Symbol -->
         <div class="flex justify-center mb-8">
           <div class="relative">
-            <svg class="w-20 h-20 text-yellow-200" fill="currentColor" viewBox="0 0 100 100">
-              <!-- Stylized Rabbit/Chukfi -->
-              <path d="M50 15 C40 10, 35 20, 35 30 C35 35, 40 40, 45 40 L55 40 C60 40, 65 35, 65 30 C65 20, 60 10, 50 15 Z" />
-              <ellipse cx="42" cy="25" rx="3" ry="8" />
-              <ellipse cx="58" cy="25" rx="3" ry="8" />
-              <circle cx="50" cy="45" r="15" />
-              <ellipse cx="50" cy="75" rx="12" ry="18" />
-              <circle cx="45" cy="38" r="1.5" fill="#8B4513" />
-              <circle cx="55" cy="38" r="1.5" fill="#8B4513" />
-              <path d="M48 42 Q50 44 52 42" stroke="#8B4513" stroke-width="1" fill="none" />
+            <svg class="w-20 h-20 text-yellow-200" fill="currentColor" viewBox="0 0 100 100" aria-label="Chukfi rabbit symbol">
+              <path d="M50 15C40 10 35 20 35 30c0 5 5 10 10 10h10c5 0 10-5 10-10 0-10-5-20-15-15zm-8 10a3 8 0 100 0 3 8 0 000 0zm16 0a3 8 0 100 0 3 8 0 000 0zM50 45a15 15 0 100 0 15 15 0 000 0zm0 30c-7 0-12 8-12 18s5 18 12 18 12-8 12-18-5-18-12-18z"/>
+              <circle cx="45" cy="38" r="1.5" fill="#8B4513"/>
+              <circle cx="55" cy="38" r="1.5" fill="#8B4513"/>
+              <path d="M48 42Q50 44 52 42" stroke="#8B4513" stroke-width="1" fill="none"/>
             </svg>
-            <!-- Geometric accent -->
             <div class="absolute -top-2 -right-2 w-6 h-6 border-2 border-yellow-300 rotate-45"></div>
           </div>
         </div>
@@ -393,27 +454,27 @@ import Layout from '../layouts/Layout.astro';
             <img class="h-8 w-8" src="/favicon.svg" alt="Chukfi CMS">
             <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Chukfi CMS</span>
           </div>
-          <p class="mt-2 text-gray-500 dark:text-gray-400">Modern, open-source content management system built for developers and content creators.</p>
+          <p class="mt-2 text-gray-600 dark:text-gray-300">Modern, open-source content management system built for developers and content creators.</p>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Product</h3>
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wider uppercase">Product</h3>
           <ul class="mt-4 space-y-4">
-            <li><a href="#features" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Features</a></li>
-            <li><a href="/admin" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Admin</a></li>
-            <li><a href="/docs" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Documentation</a></li>
+            <li><a href="#features" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Features</a></li>
+            <li><a href="/admin" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Admin</a></li>
+            <li><a href="/docs" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Documentation</a></li>
           </ul>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Demo</h3>
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wider uppercase">Demo</h3>
           <ul class="mt-4 space-y-4">
-            <li><a href="/blog" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Blog</a></li>
-            <li><a href="/portfolio" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Portfolio</a></li>
-            <li><a href="/products" class="text-base text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Products</a></li>
+            <li><a href="/blog" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Blog</a></li>
+            <li><a href="/portfolio" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Portfolio</a></li>
+            <li><a href="/products" class="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Products</a></li>
           </ul>
         </div>
       </div>
       <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-        <p class="text-base text-gray-400 dark:text-gray-500 text-center">&copy; {new Date().getFullYear()} Chukfi CMS. Open-source software.</p>
+        <p class="text-base text-gray-600 dark:text-gray-400 text-center">&copy; {new Date().getFullYear()} Chukfi CMS. Open-source software.</p>
       </div>
     </div>
   </footer>

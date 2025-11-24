@@ -11,6 +11,7 @@ export default defineConfig({
   },
   build: {
     assets: "_astro",
+    inlineStylesheets: "always",
   },
   vite: {
     plugins: [tailwindcss()],
@@ -18,6 +19,9 @@ export default defineConfig({
       "import.meta.env.API_URL": JSON.stringify(
         process.env.API_URL || "http://localhost:8080"
       ),
+    },
+    build: {
+      cssCodeSplit: false,
     },
   },
 });
