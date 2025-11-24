@@ -3,7 +3,7 @@
   
   # Chukfi CMS
   
-  **Chukfi** is the Choctaw word for **rabbit**, a symbol of speed, agility, and quick thinking.<br>
+  **Chukfi** (chook-fee) is the Choctaw word for **rabbit**, a symbol of speed, agility, and quick thinking.<br>
   Chukfi CMS embraces those qualities by providing a fast, modern, open-source CMS built with<br>
   **Astro**, **React**, and **Go**.
 </div>
