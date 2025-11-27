@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
-  ViewColumnsIcon,
   Squares2X2Icon,
   ListBulletIcon,
   TrashIcon,
@@ -11,7 +9,6 @@ import {
   PhotoIcon,
   ArrowDownTrayIcon,
   EyeIcon,
-  ShareIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
 
@@ -36,113 +33,6 @@ interface MediaFile {
   created_at: string;
   updated_at: string;
 }
-
-// Mock data - replace with actual API call
-const mockMediaFiles: MediaFile[] = [
-  {
-    id: "1",
-    name: "hero-banner.jpg",
-    type: "image",
-    mimeType: "image/jpeg",
-    size: 2458240,
-    url: "/media/hero-banner.jpg",
-    thumbnailUrl: "/media/thumbs/hero-banner.jpg",
-    uploadedAt: "2024-11-20T10:30:00Z",
-    uploadedBy: "John Doe",
-    tags: ["banner", "homepage"],
-    alt: "Hero banner for homepage",
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: "2",
-    name: "product-catalog.pdf",
-    type: "document",
-    mimeType: "application/pdf",
-    size: 5242880,
-    url: "/media/product-catalog.pdf",
-    uploadedAt: "2024-11-19T14:22:00Z",
-    uploadedBy: "Jane Smith",
-    tags: ["catalog", "products"],
-  },
-  {
-    id: "3",
-    name: "team-photo.jpg",
-    type: "image",
-    mimeType: "image/jpeg",
-    size: 3145728,
-    url: "/media/team-photo.jpg",
-    thumbnailUrl: "/media/thumbs/team-photo.jpg",
-    uploadedAt: "2024-11-18T16:45:00Z",
-    uploadedBy: "Mike Johnson",
-    tags: ["team", "about"],
-    alt: "Company team photo",
-    width: 1600,
-    height: 1200,
-  },
-  {
-    id: "4",
-    name: "logo-variations.zip",
-    type: "document",
-    mimeType: "application/zip",
-    size: 1048576,
-    url: "/media/logo-variations.zip",
-    uploadedAt: "2024-11-17T11:20:00Z",
-    uploadedBy: "Sarah Wilson",
-    tags: ["branding", "logos"],
-  },
-  {
-    id: "5",
-    name: "product-demo.mp4",
-    type: "video",
-    mimeType: "video/mp4",
-    size: 15728640,
-    url: "/media/product-demo.mp4",
-    thumbnailUrl: "/media/thumbs/product-demo.jpg",
-    uploadedAt: "2024-11-16T09:15:00Z",
-    uploadedBy: "John Doe",
-    tags: ["demo", "product"],
-  },
-  {
-    id: "6",
-    name: "testimonial-bg.png",
-    type: "image",
-    mimeType: "image/png",
-    size: 987654,
-    url: "/media/testimonial-bg.png",
-    thumbnailUrl: "/media/thumbs/testimonial-bg.png",
-    uploadedAt: "2024-11-15T13:30:00Z",
-    uploadedBy: "Jane Smith",
-    tags: ["background", "testimonials"],
-    alt: "Testimonial section background",
-    width: 1200,
-    height: 800,
-  },
-  {
-    id: "7",
-    name: "user-manual.docx",
-    type: "document",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    size: 2097152,
-    url: "/media/user-manual.docx",
-    uploadedAt: "2024-11-14T10:45:00Z",
-    uploadedBy: "Mike Johnson",
-    tags: ["documentation", "manual"],
-  },
-  {
-    id: "8",
-    name: "feature-icons.svg",
-    type: "image",
-    mimeType: "image/svg+xml",
-    size: 65536,
-    url: "/media/feature-icons.svg",
-    uploadedAt: "2024-11-13T15:20:00Z",
-    uploadedBy: "Sarah Wilson",
-    tags: ["icons", "ui"],
-    alt: "Feature section icons",
-  },
-];
 
 const formatFileSize = (bytes: number) => {
   if (bytes === 0) return "0 Bytes";
@@ -285,7 +175,6 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
     setUploading(false);
     loadMediaFiles(); // Reload the list
   };
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Filter and sort media files
   const filteredFiles = mediaFiles
