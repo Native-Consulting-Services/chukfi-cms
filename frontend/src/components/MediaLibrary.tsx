@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -12,22 +12,29 @@ import {
   ArrowDownTrayIcon,
   EyeIcon,
   ShareIcon,
+  ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
+
+interface MediaLibraryProps {
+  onStatsUpdate?: (stats: {
+    total: number;
+    images: number;
+    documents: number;
+    storageUsed: number;
+  }) => void;
+}
 
 interface MediaFile {
   id: string;
-  name: string;
+  filename: string;
   type: "image" | "document" | "video" | "audio";
-  mimeType: string;
+  mime_type: string;
   size: number;
   url: string;
-  thumbnailUrl?: string;
-  uploadedAt: string;
-  uploadedBy: string;
-  tags: string[];
-  alt?: string;
-  width?: number;
-  height?: number;
+  uploaded_by: string;
+  uploader_name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Mock data - replace with actual API call
@@ -153,10 +160,10 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const getFileIcon = (type: string, mimeType: string) => {
-  if (type === "image") {
+const getFileIcon = (mimeType: string) => {
+  if (mimeType.startsWith("image/")) {
     return <PhotoIcon className="h-8 w-8 text-green-500" />;
-  } else if (type === "video") {
+  } else if (mimeType.startsWith("video/")) {
     return (
       <div className="h-8 w-8 text-purple-500">
         <svg fill="currentColor" viewBox="0 0 24 24">
@@ -171,27 +178,121 @@ const getFileIcon = (type: string, mimeType: string) => {
   }
 };
 
+const getFileType = (mimeType: string): MediaFile["type"] => {
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("video/")) return "video";
+  if (mimeType.startsWith("audio/")) return "audio";
+  return "document";
+};
+
 type ViewMode = "grid" | "list";
 type FilterType = "all" | "image" | "document" | "video" | "audio";
 
-export default function MediaLibrary() {
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>(mockMediaFiles);
+export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterType, setFilterType] = useState<FilterType>("all");
-  const [sortField, setSortField] = useState<keyof MediaFile>("uploadedAt");
+  const [sortField, setSortField] = useState<keyof MediaFile>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+
+  // Load media files from API
+  useEffect(() => {
+    loadMediaFiles();
+  }, []);
+
+  // Update stats when media files change
+  useEffect(() => {
+    const stats = {
+      total: mediaFiles.length,
+      images: mediaFiles.filter((f) => f.type === "image").length,
+      documents: mediaFiles.filter((f) => f.type === "document").length,
+      storageUsed: mediaFiles.reduce((total, file) => total + file.size, 0),
+    };
+
+    // Dispatch event for stats component
+    const event = new CustomEvent("mediaStatsUpdate", { detail: stats });
+    window.dispatchEvent(event);
+
+    // Call callback if provided
+    if (onStatsUpdate) {
+      onStatsUpdate(stats);
+    }
+  }, [mediaFiles, onStatsUpdate]);
+
+  const loadMediaFiles = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("chukfi_auth_token");
+      const response = await fetch("http://localhost:8080/api/v1/media", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to load media files");
+      }
+
+      const data = await response.json();
+      // Transform API response to include type field
+      const filesWithType = data.map((file: any) => ({
+        ...file,
+        type: getFileType(file.mime_type),
+      }));
+      setMediaFiles(filesWithType);
+    } catch (error) {
+      console.error("Error loading media files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const token = localStorage.getItem("chukfi_auth_token");
+
+    for (const file of Array.from(files)) {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("http://localhost:8080/api/v1/media", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        alert(`Failed to upload ${file.name}`);
+      }
+    }
+
+    setUploading(false);
+    loadMediaFiles(); // Reload the list
+  };
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Filter and sort media files
   const filteredFiles = mediaFiles
     .filter((file) => {
-      const matchesSearch =
-        file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        file.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      const matchesSearch = file.filename
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
       const matchesType = filterType === "all" || file.type === filterType;
       return matchesSearch && matchesType;
     })
@@ -209,6 +310,17 @@ export default function MediaLibrary() {
       return 0;
     });
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedFiles = filteredFiles.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, sortField, sortDirection]);
+
   const handleSelectFile = (fileId: string) => {
     const newSelection = new Set(selectedFiles);
     if (newSelection.has(fileId)) {
@@ -220,27 +332,69 @@ export default function MediaLibrary() {
   };
 
   const handleSelectAll = () => {
-    if (selectedFiles.size === filteredFiles.length) {
+    if (selectedFiles.size === paginatedFiles.length) {
       setSelectedFiles(new Set());
     } else {
-      setSelectedFiles(new Set(filteredFiles.map((f) => f.id)));
+      setSelectedFiles(new Set(paginatedFiles.map((f) => f.id)));
     }
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (
       selectedFiles.size > 0 &&
       confirm(`Delete ${selectedFiles.size} selected file(s)?`)
     ) {
-      setMediaFiles(mediaFiles.filter((f) => !selectedFiles.has(f.id)));
+      const token = localStorage.getItem("chukfi_auth_token");
+
+      for (const fileId of Array.from(selectedFiles)) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/v1/media/${fileId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to delete file");
+          }
+        } catch (error) {
+          console.error("Delete error:", error);
+        }
+      }
+
       setSelectedFiles(new Set());
+      loadMediaFiles(); // Reload the list
     }
   };
 
-  const handleDeleteFile = (fileId: string) => {
+  const handleDeleteFile = async (fileId: string) => {
     const file = mediaFiles.find((f) => f.id === fileId);
-    if (file && confirm(`Delete "${file.name}"?`)) {
-      setMediaFiles(mediaFiles.filter((f) => f.id !== fileId));
+    if (file && confirm(`Delete "${file.filename}"?`)) {
+      try {
+        const token = localStorage.getItem("chukfi_auth_token");
+        const response = await fetch(
+          `http://localhost:8080/api/v1/media/${fileId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete file");
+        }
+
+        loadMediaFiles(); // Reload the list
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert("Failed to delete file");
+      }
     }
   };
 
@@ -289,12 +443,24 @@ export default function MediaLibrary() {
             }}
             className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           >
-            <option value="uploadedAt-desc">Newest First</option>
-            <option value="uploadedAt-asc">Oldest First</option>
-            <option value="name-asc">Name A-Z</option>
-            <option value="name-desc">Name Z-A</option>
+            <option value="created_at-desc">Newest First</option>
+            <option value="created_at-asc">Oldest First</option>
+            <option value="filename-asc">Name A-Z</option>
+            <option value="filename-desc">Name Z-A</option>
             <option value="size-desc">Largest First</option>
             <option value="size-asc">Smallest First</option>
+          </select>
+
+          {/* Items per page */}
+          <select
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          >
+            <option value={25}>25 per page</option>
+            <option value={50}>50 per page</option>
+            <option value={100}>100 per page</option>
+            <option value={200}>200 per page</option>
           </select>
 
           {/* View mode toggle */}
@@ -351,7 +517,7 @@ export default function MediaLibrary() {
       {/* Media grid/list */}
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {filteredFiles.map((file) => (
+          {paginatedFiles.map((file) => (
             <div
               key={file.id}
               className={`group relative rounded-lg border p-3 hover:shadow-md transition-all duration-200 ${
@@ -372,14 +538,14 @@ export default function MediaLibrary() {
 
               {/* File preview */}
               <div className="aspect-square mb-3 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                {file.thumbnailUrl ? (
+                {file.mime_type.startsWith("image/") ? (
                   <img
-                    src={file.thumbnailUrl}
-                    alt={file.alt || file.name}
+                    src={file.url}
+                    alt={file.filename}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  getFileIcon(file.type, file.mimeType)
+                  getFileIcon(file.mime_type)
                 )}
               </div>
 
@@ -387,18 +553,13 @@ export default function MediaLibrary() {
               <div>
                 <h4
                   className="text-sm font-medium text-gray-900 truncate"
-                  title={file.name}
+                  title={file.filename}
                 >
-                  {file.name}
+                  {file.filename}
                 </h4>
                 <p className="text-xs text-gray-500">
                   {formatFileSize(file.size)}
                 </p>
-                {file.width && file.height && (
-                  <p className="text-xs text-gray-400">
-                    {file.width} × {file.height}
-                  </p>
-                )}
               </div>
 
               {/* Actions overlay */}
@@ -441,8 +602,8 @@ export default function MediaLibrary() {
                   <input
                     type="checkbox"
                     checked={
-                      filteredFiles.length > 0 &&
-                      selectedFiles.size === filteredFiles.length
+                      paginatedFiles.length > 0 &&
+                      selectedFiles.size === paginatedFiles.length
                     }
                     onChange={handleSelectAll}
                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
@@ -484,7 +645,7 @@ export default function MediaLibrary() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {filteredFiles.map((file) => (
+              {paginatedFiles.map((file) => (
                 <tr
                   key={file.id}
                   className={selectedFiles.has(file.id) ? "bg-indigo-50" : ""}
@@ -500,27 +661,22 @@ export default function MediaLibrary() {
                   <td className="whitespace-nowrap py-4 pl-4 pr-3">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
-                        {file.thumbnailUrl ? (
+                        {file.mime_type.startsWith("image/") ? (
                           <img
-                            src={file.thumbnailUrl}
-                            alt={file.alt || file.name}
+                            src={file.url}
+                            alt={file.filename}
                             className="h-10 w-10 rounded object-cover"
                           />
                         ) : (
                           <div className="h-10 w-10 flex items-center justify-center">
-                            {getFileIcon(file.type, file.mimeType)}
+                            {getFileIcon(file.mime_type)}
                           </div>
                         )}
                       </div>
                       <div className="ml-4">
                         <div className="font-medium text-gray-900">
-                          {file.name}
+                          {file.filename}
                         </div>
-                        {file.width && file.height && (
-                          <div className="text-gray-500 text-sm">
-                            {file.width} × {file.height}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </td>
@@ -533,10 +689,10 @@ export default function MediaLibrary() {
                     {formatFileSize(file.size)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {formatDate(file.uploadedAt)}
+                    {formatDate(file.created_at)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {file.uploadedBy}
+                    {file.uploader_name}
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <div className="flex items-center justify-end gap-2">
@@ -575,35 +731,154 @@ export default function MediaLibrary() {
       )}
 
       {/* Empty state */}
-      {filteredFiles.length === 0 && (
+      {loading ? (
         <div className="text-center py-12">
-          <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No files found
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || filterType !== "all"
-              ? "Try adjusting your search or filter criteria."
-              : "Get started by uploading your first file."}
-          </p>
-          {!searchTerm && filterType === "all" && (
-            <div className="mt-6">
-              <button
-                type="button"
-                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-              >
-                <PhotoIcon className="mr-2 h-4 w-4" />
-                Upload Files
-              </button>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <p className="mt-2 text-sm text-gray-500">Loading media files...</p>
+        </div>
+      ) : (
+        filteredFiles.length === 0 && (
+          <div className="text-center py-12">
+            <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No files found
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {searchTerm || filterType !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "Get started by uploading your first file."}
+            </p>
+            {!searchTerm && filterType === "all" && (
+              <div className="mt-6">
+                <label className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer">
+                  <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
+                  Upload Files
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleUpload}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+        )
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+          <div className="flex flex-1 justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() =>
+                setCurrentPage(Math.min(totalPages, currentPage + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+                <span className="font-medium">
+                  {Math.min(endIndex, filteredFiles.length)}
+                </span>{" "}
+                of <span className="font-medium">{filteredFiles.length}</span>{" "}
+                results
+              </p>
             </div>
-          )}
+            <div>
+              <nav
+                className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                aria-label="Pagination"
+              >
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="sr-only">Previous</span>
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 7) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 4) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 6 + i;
+                  } else {
+                    pageNum = currentPage - 3 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                        currentPage === pageNum
+                          ? "z-10 bg-indigo-600 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="sr-only">Next</span>
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Results info */}
       <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
         <div>
-          Showing {filteredFiles.length} of {mediaFiles.length} files
+          Showing {startIndex + 1}-{Math.min(endIndex, filteredFiles.length)} of{" "}
+          {filteredFiles.length} filtered ({mediaFiles.length} total)
         </div>
         <div>
           Total storage:{" "}

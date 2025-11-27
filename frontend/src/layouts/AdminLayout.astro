@@ -12,7 +12,36 @@ const { title, currentPage } = Astro.props;
 ---
 
 <Layout title={title}>
-  <div class="flex h-screen bg-gray-100">
+  <!-- Authentication Check -->
+  <style>
+    /* Hide admin content until auth check completes */
+    #admin-content {
+      opacity: 0;
+      visibility: hidden;
+    }
+    #admin-content.auth-verified {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.15s ease-in;
+    }
+  </style>
+  
+  <script type="module">
+    // Check if user is authenticated before rendering
+    const authToken = localStorage.getItem('chukfi_auth_token');
+    if (!authToken) {
+      // Redirect to login page if not authenticated
+      window.location.replace('/login');
+    } else {
+      // User is authenticated, show content
+      const adminContent = document.getElementById('admin-content');
+      if (adminContent) {
+        adminContent.classList.add('auth-verified');
+      }
+    }
+  </script>
+
+  <div id="admin-content" class="flex h-screen bg-gray-100">
     <!-- Sidebar -->
     <div class="hidden md:flex md:w-64 md:flex-col">
       <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">

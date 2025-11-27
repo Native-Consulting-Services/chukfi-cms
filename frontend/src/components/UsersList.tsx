@@ -1,199 +1,285 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AddUserButton from "./AddUserButton";
+import { usePermissions } from "../lib/usePermissions";
 
 interface User {
-  id: number;
-  name: string;
+  id: string;
   email: string;
-  role: string;
-  status: "active" | "pending" | "inactive";
-  lastLogin: string;
-  avatar?: string;
-  permissions?: string[];
+  displayName: string;
+  createdAt: string;
+  updatedAt: string;
+  roles?: Role[];
 }
 
 interface Role {
   id: string;
   name: string;
-  permissions: string[];
+  description?: string;
 }
 
+const API_URL = "http://localhost:8080";
+
 export default function UsersList() {
+  const { canCreate, canUpdate, canDelete } = usePermissions();
+  const [mounted, setMounted] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+  const [selectedRoleId, setSelectedRoleId] = useState<string>("");
+  const [formError, setFormError] = useState("");
+  const [formLoading, setFormLoading] = useState(false);
 
-  // Mock data
-  const users: User[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Admin",
-      status: "active",
-      lastLogin: "2 hours ago",
-      // avatar: "/avatars/john.jpg",
-      permissions: ["full_access"],
-    },
-    {
-      id: 2,
-      name: "Sarah Wilson",
-      email: "sarah@example.com",
-      role: "Editor",
-      status: "active",
-      lastLogin: "1 day ago",
-      permissions: ["create_content", "edit_content", "publish_content"],
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      role: "Author",
-      status: "active",
-      lastLogin: "3 days ago",
-      permissions: ["create_content", "edit_own_content"],
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      email: "emily@example.com",
-      role: "Editor",
-      status: "pending",
-      lastLogin: "Never",
-      permissions: ["create_content", "edit_content"],
-    },
-    {
-      id: 5,
-      name: "Robert Brown",
-      email: "robert@example.com",
-      role: "Author",
-      status: "inactive",
-      lastLogin: "2 weeks ago",
-      permissions: ["create_content"],
-    },
-    {
-      id: 6,
-      name: "Lisa Anderson",
-      email: "lisa@example.com",
-      role: "Viewer",
-      status: "active",
-      lastLogin: "5 hours ago",
-      permissions: ["read_content"],
-    },
-    {
-      id: 7,
-      name: "David Martinez",
-      email: "david@example.com",
-      role: "Editor",
-      status: "active",
-      lastLogin: "6 hours ago",
-      permissions: ["create_content", "edit_content", "publish_content"],
-    },
-    {
-      id: 8,
-      name: "Jennifer Taylor",
-      email: "jennifer@example.com",
-      role: "Author",
-      status: "pending",
-      lastLogin: "Never",
-      permissions: ["create_content", "edit_own_content"],
-    },
-  ];
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const roles: Role[] = [
-    { id: "admin", name: "Admin", permissions: ["full_access"] },
-    {
-      id: "editor",
-      name: "Editor",
-      permissions: [
-        "create_content",
-        "edit_content",
-        "publish_content",
-        "manage_media",
-      ],
-    },
-    {
-      id: "author",
-      name: "Author",
-      permissions: ["create_content", "edit_own_content", "upload_media"],
-    },
-    { id: "viewer", name: "Viewer", permissions: ["read_content"] },
-  ];
+  // Fetch users and roles from API
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
 
-  // Filter users based on search and filters
+    // Listen for refresh event from AddUserButton
+    const handleRefresh = () => {
+      fetchUsers();
+    };
+
+    window.addEventListener("refreshUsers", handleRefresh);
+    return () => window.removeEventListener("refreshUsers", handleRefresh);
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("chukfi_auth_token");
+      console.log("Fetching users, token:", token ? "exists" : "missing");
+
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
+      console.log("Calling API:", `${API_URL}/api/v1/users`);
+      const response = await fetch(`${API_URL}/api/v1/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+
+      const data = await response.json();
+      console.log("Received data:", data);
+      setUsers(data.users || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem("chukfi_auth_token");
+      if (!token) return;
+
+      const response = await fetch(`${API_URL}/api/v1/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableRoles(data.roles || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch roles:", err);
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setSelectedRoleId(
+      user.roles && user.roles.length > 0 ? user.roles[0].id : ""
+    );
+    setShowEditModal(true);
+    setFormError("");
+  };
+
+  const handleUpdateUserRole = async () => {
+    if (!editingUser) return;
+
+    setFormError("");
+    setFormLoading(true);
+
+    try {
+      const token = localStorage.getItem("chukfi_auth_token");
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      // Update user role
+      const response = await fetch(
+        `${API_URL}/api/v1/users/${editingUser.id}/roles`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roleId: selectedRoleId || null,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to update user role");
+      }
+
+      // Close modal and refresh
+      setShowEditModal(false);
+      setEditingUser(null);
+      await fetchUsers();
+    } catch (err) {
+      setFormError(
+        err instanceof Error ? err.message : "Failed to update role"
+      );
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("chukfi_auth_token");
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      // Refresh user list
+      await fetchUsers();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete user");
+    }
+  };
+
+  // Filter users based on search
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole =
-      filterRole === "all" || user.role.toLowerCase() === filterRole;
-    const matchesStatus =
-      filterStatus === "all" || user.status === filterStatus;
 
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch;
   });
 
-  const handleSelectUser = (userId: number) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
-    );
-  };
-
   const handleSelectAll = () => {
-    setSelectedUsers(
-      selectedUsers.length === filteredUsers.length
-        ? []
-        : filteredUsers.map((user) => user.id)
-    );
+    if (selectedUsers.length === filteredUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(filteredUsers.map((u) => u.id));
+    }
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusClasses = {
-      active: "bg-green-100 text-green-800",
-      pending: "bg-yellow-100 text-yellow-800",
-      inactive: "bg-gray-100 text-gray-800",
-    };
+  const getRoleBadge = (roles: Role[] = []) => {
+    if (roles.length === 0)
+      return <span className="text-xs text-gray-500">No roles</span>;
+
+    const role = roles[0];
+    const lowerName = role.name.toLowerCase();
+
+    let badgeClass = "bg-gray-100 text-gray-800";
+
+    // Match the colors from RolesList
+    if (lowerName.includes("super admin")) {
+      badgeClass = "bg-purple-100 text-purple-800";
+    } else if (lowerName.includes("admin")) {
+      badgeClass = "bg-red-100 text-red-800";
+    } else if (lowerName.includes("editor")) {
+      badgeClass = "bg-blue-100 text-blue-800";
+    } else if (
+      lowerName.includes("author") ||
+      lowerName.includes("contributor")
+    ) {
+      badgeClass = "bg-green-100 text-green-800";
+    } else if (lowerName.includes("viewer") || lowerName.includes("reader")) {
+      badgeClass = "bg-gray-100 text-gray-800";
+    }
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[status as keyof typeof statusClasses]}`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}
       >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {role.name}
       </span>
     );
   };
 
-  const getRoleBadge = (role: string) => {
-    const roleClasses = {
-      admin: "bg-purple-100 text-purple-800",
-      editor: "bg-blue-100 text-blue-800",
-      author: "bg-indigo-100 text-indigo-800",
-      viewer: "bg-gray-100 text-gray-800",
-    };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClasses[role.toLowerCase() as keyof typeof roleClasses]}`}
-      >
-        {role}
-      </span>
-    );
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    if (days === 0) return "Today";
+    if (days === 1) return "Yesterday";
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString();
   };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
-      {/* Search and filters */}
-      <div className="sm:flex sm:items-center sm:space-x-4 mb-6">
+      {/* Error display */}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="flex">
+            <svg
+              className="h-5 w-5 text-red-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="ml-3 text-sm text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Search and Actions Header */}
+      <div className="sm:flex sm:items-center sm:justify-between mb-6">
         <div className="flex-1 min-w-0">
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -220,138 +306,89 @@ export default function UsersList() {
             />
           </div>
         </div>
-
-        <div className="mt-3 sm:mt-0">
-          <select
-            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            <option value="all">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-            <option value="author">Author</option>
-            <option value="viewer">Viewer</option>
-          </select>
-        </div>
-
-        <div className="mt-3 sm:mt-0">
-          <select
-            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        {mounted && canCreate("users") && (
+          <div className="mt-4 sm:mt-0 sm:ml-4">
+            <AddUserButton />
+          </div>
+        )}
       </div>
 
-      {/* Bulk actions */}
-      {selectedUsers.length > 0 && (
-        <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-md p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-sm text-indigo-700 font-medium">
-                {selectedUsers.length} user{selectedUsers.length > 1 ? "s" : ""}{" "}
-                selected
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-indigo-300 text-xs font-medium rounded text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Change Role
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Deactivate
-              </button>
-            </div>
-          </div>
+      {/* Loading state */}
+      {loading && (
+        <div className="text-center py-12">
+          <svg
+            className="animate-spin h-8 w-8 text-indigo-600 mx-auto"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="mt-2 text-sm text-gray-500">Loading users...</p>
         </div>
       )}
 
       {/* Users table */}
-      <div className="bg-white overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
-                <input
-                  type="checkbox"
-                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  checked={
-                    selectedUsers.length === filteredUsers.length &&
-                    filteredUsers.length > 0
-                  }
-                  onChange={handleSelectAll}
-                />
-              </th>
-              <th
-                scope="col"
-                className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
-              >
-                User
-              </th>
-              <th
-                scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-              >
-                Role
-              </th>
-              <th
-                scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-              >
-                Status
-              </th>
-              <th
-                scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-              >
-                Last Login
-              </th>
-              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span className="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className={
-                    selectedUsers.includes(user.id) ? "bg-gray-50" : undefined
-                  }
+      {!loading && (
+        <div className="bg-white overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-300">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
+                  <input
+                    type="checkbox"
+                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    checked={
+                      selectedUsers.length === filteredUsers.length &&
+                      filteredUsers.length > 0
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th
+                  scope="col"
+                  className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
                 >
-                  <td className="relative px-7 sm:w-12 sm:px-6">
-                    <input
-                      type="checkbox"
-                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={() => handleSelectUser(user.id)}
-                    />
-                  </td>
-                  <td className="whitespace-nowrap py-4 pr-3 text-sm">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        {user.avatar ? (
-                          <img
-                            className="h-10 w-10 rounded-full"
-                            src={user.avatar}
-                            alt={user.name}
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  User
+                </th>
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Role
+                </th>
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Created
+                </th>
+                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
                             <svg
-                              className="h-6 w-6 text-gray-400"
+                              className="h-6 w-6 text-indigo-600"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -364,139 +401,203 @@ export default function UsersList() {
                               />
                             </svg>
                           </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="font-medium text-gray-900">
+                            {user.displayName}
+                          </div>
+                          <div className="text-gray-500">{user.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {getRoleBadge(user.roles)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {formatDate(user.createdAt)}
+                    </td>
+                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <div className="flex justify-end items-center space-x-2">
+                        {mounted && canUpdate("users") && (
+                          <button
+                            type="button"
+                            onClick={() => handleEditUser(user)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                            title="Edit user"
+                          >
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </button>
+                        )}
+                        {mounted && canDelete("users") && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Delete user"
+                          >
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
                         )}
                       </div>
-                      <div className="ml-4">
-                        <div className="font-medium text-gray-900">
-                          {user.name}
-                        </div>
-                        <div className="text-gray-500">{user.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {getRoleBadge(user.role)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {getStatusBadge(user.status)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {user.lastLogin}
-                  </td>
-                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <div className="flex justify-end items-center space-x-2">
-                      <button
-                        type="button"
-                        className="text-indigo-600 hover:text-indigo-900"
-                        title="Edit user"
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="text-green-600 hover:text-green-900"
-                        title="View permissions"
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2L3.257 9.257a6 6 0 018.486-8.486L18 7.257z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="text-red-600 hover:text-red-900"
-                        title="Remove user"
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-6 py-14 text-center text-sm text-gray-500"
+                  >
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      No users found
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {searchTerm ||
+                      filterRole !== "all" ||
+                      filterStatus !== "all"
+                        ? "Try adjusting your search or filter criteria."
+                        : "Get started by inviting team members."}
+                    </p>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-14 text-center text-sm text-gray-500"
-                >
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
-                    No users found
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {searchTerm ||
-                    filterRole !== "all" ||
-                    filterStatus !== "all"
-                      ? "Try adjusting your search or filter criteria."
-                      : "Get started by inviting team members."}
-                  </p>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Results summary */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-gray-700">
+      {!loading && (
+        <div className="mt-4 text-sm text-gray-700">
           Showing <span className="font-medium">{filteredUsers.length}</span> of{" "}
           <span className="font-medium">{users.length}</span> users
         </div>
+      )}
 
-        {filteredUsers.length > 0 && (
-          <div className="text-sm text-gray-500">
-            {selectedUsers.length > 0 && (
-              <span>{selectedUsers.length} selected</span>
-            )}
+      {/* Edit User Modal */}
+      {showEditModal && editingUser && (
+        <div className="fixed z-50 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div
+              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+              onClick={() => setShowEditModal(false)}
+            ></div>
+
+            <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+              <div>
+                <div className="mt-3 text-center sm:mt-0 sm:text-left">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Edit User Role
+                  </h3>
+                  <div className="mt-4">
+                    <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                      <div className="text-sm">
+                        <div className="font-medium text-gray-900">
+                          {editingUser.displayName}
+                        </div>
+                        <div className="text-gray-500">{editingUser.email}</div>
+                      </div>
+                    </div>
+
+                    {formError && (
+                      <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
+                        <p className="text-sm text-red-800">{formError}</p>
+                      </div>
+                    )}
+
+                    <div className="space-y-4">
+                      <div>
+                        <label
+                          htmlFor="role"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Role
+                        </label>
+                        <select
+                          id="role"
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          value={selectedRoleId}
+                          onChange={(e) => setSelectedRoleId(e.target.value)}
+                        >
+                          <option value="">No role assigned</option>
+                          {availableRoles.map((role) => (
+                            <option key={role.id} value={role.id}>
+                              {role.name}
+                              {role.description && ` - ${role.description}`}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-2 text-sm text-gray-500">
+                          Only one role can be assigned per user.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                      <button
+                        type="button"
+                        disabled={formLoading}
+                        onClick={handleUpdateUserRole}
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {formLoading ? "Updating..." : "Update Role"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={formLoading}
+                        onClick={() => {
+                          setShowEditModal(false);
+                          setEditingUser(null);
+                        }}
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -83,13 +83,15 @@ func (db *DB) initSQLiteTables() error {
 	INSERT OR IGNORE INTO roles (id, name, description) 
 	VALUES ('admin-role-id', 'Admin', 'Full access to all system functionality');
 
-	-- Insert default admin user if not exists (password: admin123)
-	INSERT OR IGNORE INTO users (id, email, password_hash, display_name)
+	-- Insert or replace default admin user (password: admin123)
+	INSERT OR REPLACE INTO users (id, email, password_hash, display_name, created_at, updated_at)
 	VALUES (
 		'admin-user-id',
 		'admin@chukfi.com',
-		'$2a$14$K.6OY0YgON3X.LDuVoKh5u0YDQDt8tQrOvT9iXJ8P0Ws5ZJHwKhOW',
-		'Admin User'
+		'$2a$14$vAvE/LgiKxrECFOf7dy0q.2FJ8EEl9Gqc6tBdbya/X6Z/38PozM6a',
+		'Admin User',
+		CURRENT_TIMESTAMP,
+		CURRENT_TIMESTAMP
 	);
 
 	-- Assign admin role to admin user if not exists

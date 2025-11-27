@@ -66,32 +66,46 @@ func main() {
 
 // Simple SQLite schema runner
 func runSQLiteSchema(db *sql.DB, direction string) error {
-	var filename string
-	switch direction {
-	case "up":
-		filename = "migrations/001_initial_schema_sqlite.up.sql"
-	case "down":
-		filename = "migrations/001_initial_schema_sqlite.down.sql"
-	default:
-		log.Printf("invalid direction: %s", direction)
-		return nil
+	// List of all migrations in order
+	migrations := []string{
+		"001_initial_schema_sqlite",
+		"002_add_user_profile_fields",
+		"003_add_media_fields",
 	}
 
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return err
+	suffix := ".up.sql"
+	if direction == "down" {
+		suffix = ".down.sql"
+		// Reverse order for down migrations
+		for i := len(migrations)/2 - 1; i >= 0; i-- {
+			opp := len(migrations) - 1 - i
+			migrations[i], migrations[opp] = migrations[opp], migrations[i]
+		}
 	}
 
-	// Execute each statement
-	statements := strings.Split(string(content), ";")
-	for _, stmt := range statements {
-		stmt = strings.TrimSpace(stmt)
-		if stmt == "" || strings.HasPrefix(stmt, "--") {
+	for _, migration := range migrations {
+		filename := "migrations/" + migration + suffix
+		
+		content, err := os.ReadFile(filename)
+		if err != nil {
+			log.Printf("Skipping migration %s: %v", migration, err)
 			continue
 		}
-		
-		if _, err := db.Exec(stmt); err != nil {
-			log.Printf("Statement executed: %s", strings.Split(stmt, "\n")[0])
+
+		log.Printf("Running migration: %s", migration)
+
+		// Execute each statement
+		statements := strings.Split(string(content), ";")
+		for _, stmt := range statements {
+			stmt = strings.TrimSpace(stmt)
+			if stmt == "" || strings.HasPrefix(stmt, "--") {
+				continue
+			}
+			
+			if _, err := db.Exec(stmt); err != nil {
+				log.Printf("Error executing statement: %v", err)
+				log.Printf("Statement: %s", stmt)
+			}
 		}
 	}
 

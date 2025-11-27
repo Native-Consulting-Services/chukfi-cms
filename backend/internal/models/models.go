@@ -11,6 +11,8 @@ type User struct {
 	Email        string     `json:"email" db:"email"`
 	PasswordHash string     `json:"-" db:"password_hash"`
 	DisplayName  string     `json:"displayName" db:"display_name"`
+	Name         string     `json:"name" db:"name"`
+	Avatar       string     `json:"avatar" db:"avatar"`
 	CreatedAt    time.Time  `json:"createdAt" db:"created_at"`
 	UpdatedAt    time.Time  `json:"updatedAt" db:"updated_at"`
 	Roles        []Role     `json:"roles,omitempty"`

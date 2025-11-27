@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import EditPermissionsModal from "./EditPermissionsModal";
+import { usePermissions } from "../lib/usePermissions";
 
 interface Permission {
   id: string;
@@ -8,231 +10,86 @@ interface Permission {
 }
 
 interface Role {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  type: "system" | "custom";
-  userCount: number;
-  permissions: string[];
-  color: string;
   createdAt: string;
   updatedAt: string;
 }
 
+const API_URL = "http://localhost:8080";
+
 export default function RolesList() {
+  const { canUpdate, canDelete } = usePermissions();
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
-  const [showPermissions, setShowPermissions] = useState<number | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [editingPermissions, setEditingPermissions] = useState<Role | null>(
+    null
+  );
+  const [deletingRole, setDeletingRole] = useState<Role | null>(null);
 
-  // Mock permissions data
-  const permissions: Permission[] = [
-    {
-      id: "read_content",
-      name: "Read Content",
-      description: "View published content",
-      category: "Content",
-    },
-    {
-      id: "create_content",
-      name: "Create Content",
-      description: "Create new content items",
-      category: "Content",
-    },
-    {
-      id: "edit_content",
-      name: "Edit Content",
-      description: "Edit existing content",
-      category: "Content",
-    },
-    {
-      id: "delete_content",
-      name: "Delete Content",
-      description: "Delete content items",
-      category: "Content",
-    },
-    {
-      id: "publish_content",
-      name: "Publish Content",
-      description: "Publish and unpublish content",
-      category: "Content",
-    },
-    {
-      id: "edit_own_content",
-      name: "Edit Own Content",
-      description: "Edit only own content items",
-      category: "Content",
-    },
-    {
-      id: "upload_media",
-      name: "Upload Media",
-      description: "Upload files to media library",
-      category: "Media",
-    },
-    {
-      id: "manage_media",
-      name: "Manage Media",
-      description: "Full media library management",
-      category: "Media",
-    },
-    {
-      id: "view_users",
-      name: "View Users",
-      description: "View user listings",
-      category: "Users",
-    },
-    {
-      id: "create_users",
-      name: "Create Users",
-      description: "Invite and create new users",
-      category: "Users",
-    },
-    {
-      id: "edit_users",
-      name: "Edit Users",
-      description: "Edit user details and roles",
-      category: "Users",
-    },
-    {
-      id: "delete_users",
-      name: "Delete Users",
-      description: "Delete user accounts",
-      category: "Users",
-    },
-    {
-      id: "manage_roles",
-      name: "Manage Roles",
-      description: "Create and edit roles",
-      category: "System",
-    },
-    {
-      id: "manage_settings",
-      name: "Manage Settings",
-      description: "Access system settings",
-      category: "System",
-    },
-    {
-      id: "view_analytics",
-      name: "View Analytics",
-      description: "Access analytics and reports",
-      category: "Analytics",
-    },
-    {
-      id: "full_access",
-      name: "Full Access",
-      description: "Complete system access",
-      category: "System",
-    },
-  ];
+  useEffect(() => {
+    fetchRoles();
 
-  // Mock roles data
-  const roles: Role[] = [
-    {
-      id: 1,
-      name: "Super Admin",
-      description: "Complete system access with all permissions",
-      type: "system",
-      userCount: 2,
-      permissions: ["full_access"],
-      color: "purple",
-      createdAt: "2024-01-01",
-      updatedAt: "2024-01-01",
-    },
-    {
-      id: 2,
-      name: "Admin",
-      description: "Administrative access with most permissions",
-      type: "system",
-      userCount: 3,
-      permissions: [
-        "create_content",
-        "edit_content",
-        "delete_content",
-        "publish_content",
-        "manage_media",
-        "view_users",
-        "create_users",
-        "edit_users",
-        "manage_settings",
-      ],
-      color: "red",
-      createdAt: "2024-01-01",
-      updatedAt: "2024-01-15",
-    },
-    {
-      id: 3,
-      name: "Editor",
-      description: "Content management and publishing permissions",
-      type: "system",
-      userCount: 5,
-      permissions: [
-        "read_content",
-        "create_content",
-        "edit_content",
-        "publish_content",
-        "upload_media",
-        "manage_media",
-      ],
-      color: "blue",
-      createdAt: "2024-01-01",
-      updatedAt: "2024-02-01",
-    },
-    {
-      id: 4,
-      name: "Author",
-      description: "Create and edit own content",
-      type: "system",
-      userCount: 8,
-      permissions: [
-        "read_content",
-        "create_content",
-        "edit_own_content",
-        "upload_media",
-      ],
-      color: "indigo",
-      createdAt: "2024-01-01",
-      updatedAt: "2024-01-20",
-    },
-    {
-      id: 5,
-      name: "Content Moderator",
-      description: "Review and moderate user-generated content",
-      type: "custom",
-      userCount: 3,
-      permissions: [
-        "read_content",
-        "edit_content",
-        "delete_content",
-        "view_users",
-      ],
-      color: "green",
-      createdAt: "2024-02-15",
-      updatedAt: "2024-03-01",
-    },
-    {
-      id: 6,
-      name: "Viewer",
-      description: "Read-only access to content",
-      type: "system",
-      userCount: 12,
-      permissions: ["read_content"],
-      color: "gray",
-      createdAt: "2024-01-01",
-      updatedAt: "2024-01-01",
-    },
-  ];
+    // Listen for refresh event from CreateRoleButton
+    const handleRefresh = () => {
+      fetchRoles();
+    };
 
-  // Filter roles based on search and type
+    window.addEventListener("refreshRoles", handleRefresh);
+    return () => window.removeEventListener("refreshRoles", handleRefresh);
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("chukfi_auth_token");
+      console.log("Fetching roles, token:", token ? "exists" : "missing");
+
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
+      console.log("Calling API:", `${API_URL}/api/v1/roles`);
+      const response = await fetch(`${API_URL}/api/v1/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch roles");
+      }
+
+      const data = await response.json();
+      console.log("Received data:", data);
+      setRoles(data.roles || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load roles");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter roles based on search
   const filteredRoles = roles.filter((role) => {
     const matchesSearch =
       role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "all" || role.type === filterType;
+      (role.description &&
+        role.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesSearch && matchesType;
+    return matchesSearch;
   });
 
-  const handleSelectRole = (roleId: number) => {
+  const handleSelectRole = (roleId: string) => {
     setSelectedRoles((prev) =>
       prev.includes(roleId)
         ? prev.filter((id) => id !== roleId)
@@ -248,57 +105,126 @@ export default function RolesList() {
     );
   };
 
-  const getTypeBadge = (type: string) => {
-    const typeClasses = {
-      system: "bg-green-100 text-green-800",
-      custom: "bg-blue-100 text-blue-800",
+  const handleDeleteRole = async (role: Role) => {
+    try {
+      const token = localStorage.getItem("chukfi_auth_token");
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/roles/${role.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to delete role");
+      }
+
+      setDeletingRole(null);
+      fetchRoles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete role");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getRoleIcon = (roleName: string) => {
+    const lowerName = roleName.toLowerCase();
+
+    // Super Admin - Crown
+    if (lowerName.includes("super admin")) {
+      return {
+        bg: "bg-purple-100",
+        color: "text-purple-600",
+        path: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
+      };
+    }
+
+    // Admin - Key
+    if (lowerName.includes("admin")) {
+      return {
+        bg: "bg-red-100",
+        color: "text-red-600",
+        path: "M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z",
+      };
+    }
+
+    // Editor - Pencil
+    if (lowerName.includes("editor")) {
+      return {
+        bg: "bg-blue-100",
+        color: "text-blue-600",
+        path: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+      };
+    }
+
+    // Author - Document with pen
+    if (lowerName.includes("author") || lowerName.includes("contributor")) {
+      return {
+        bg: "bg-green-100",
+        color: "text-green-600",
+        path: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+      };
+    }
+
+    // Viewer - Eye
+    if (lowerName.includes("viewer") || lowerName.includes("reader")) {
+      return {
+        bg: "bg-gray-100",
+        color: "text-gray-600",
+        path: "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z",
+      };
+    }
+
+    // Default - Shield
+    return {
+      bg: "bg-indigo-100",
+      color: "text-indigo-600",
+      path: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
     };
+  };
 
+  if (loading) {
     return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeClasses[type as keyof typeof typeClasses]}`}
-      >
-        {type.charAt(0).toUpperCase() + type.slice(1)}
-      </span>
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <p className="mt-2 text-sm text-gray-500">Loading roles...</p>
+        </div>
+      </div>
     );
-  };
-
-  const getRoleBadge = (role: Role) => {
-    const colorClasses = {
-      purple: "bg-purple-100 text-purple-800",
-      red: "bg-red-100 text-red-800",
-      blue: "bg-blue-100 text-blue-800",
-      indigo: "bg-indigo-100 text-indigo-800",
-      green: "bg-green-100 text-green-800",
-      gray: "bg-gray-100 text-gray-800",
-    };
-
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClasses[role.color as keyof typeof colorClasses]}`}
-      >
-        {role.name}
-      </span>
-    );
-  };
-
-  const getPermissionsByCategory = (permissionIds: string[]) => {
-    const rolePermissions = permissions.filter((p) =>
-      permissionIds.includes(p.id)
-    );
-    const grouped = rolePermissions.reduce(
-      (acc, perm) => {
-        if (!acc[perm.category]) acc[perm.category] = [];
-        acc[perm.category].push(perm);
-        return acc;
-      },
-      {} as Record<string, Permission[]>
-    );
-    return grouped;
-  };
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
+      {/* Error display */}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="flex">
+            <svg
+              className="h-5 w-5 text-red-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="ml-3 text-sm text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
+
       {/* Search and filters */}
       <div className="sm:flex sm:items-center sm:space-x-4 mb-6">
         <div className="flex-1 min-w-0">
@@ -327,47 +253,7 @@ export default function RolesList() {
             />
           </div>
         </div>
-
-        <div className="mt-3 sm:mt-0">
-          <select
-            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-          >
-            <option value="all">All Types</option>
-            <option value="system">System Roles</option>
-            <option value="custom">Custom Roles</option>
-          </select>
-        </div>
       </div>
-
-      {/* Bulk actions */}
-      {selectedRoles.length > 0 && (
-        <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-md p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-sm text-indigo-700 font-medium">
-                {selectedRoles.length} role{selectedRoles.length > 1 ? "s" : ""}{" "}
-                selected
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-indigo-300 text-xs font-medium rounded text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Duplicate
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Roles table */}
       <div className="bg-white overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -395,19 +281,13 @@ export default function RolesList() {
                 scope="col"
                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               >
-                Type
+                Description
               </th>
               <th
                 scope="col"
                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               >
-                Users
-              </th>
-              <th
-                scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-              >
-                Permissions
+                Created
               </th>
               <th
                 scope="col"
@@ -423,98 +303,68 @@ export default function RolesList() {
           <tbody className="divide-y divide-gray-200 bg-white">
             {filteredRoles.length > 0 ? (
               filteredRoles.map((role) => (
-                <React.Fragment key={role.id}>
-                  <tr
-                    className={
-                      selectedRoles.includes(role.id) ? "bg-gray-50" : undefined
-                    }
-                  >
-                    <td className="relative px-7 sm:w-12 sm:px-6">
-                      <input
-                        type="checkbox"
-                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        checked={selectedRoles.includes(role.id)}
-                        onChange={() => handleSelectRole(role.id)}
-                      />
-                    </td>
-                    <td className="whitespace-nowrap py-4 pr-3 text-sm">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0">
-                          <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                            <svg
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium text-gray-900">
-                              {role.name}
-                            </div>
-                            {getRoleBadge(role)}
-                          </div>
-                          <div className="text-gray-500 text-sm">
-                            {role.description}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {getTypeBadge(role.type)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <span className="font-medium">{role.userCount}</span>{" "}
-                      users
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <button
-                        type="button"
-                        className="text-indigo-600 hover:text-indigo-900 font-medium"
-                        onClick={() =>
-                          setShowPermissions(
-                            showPermissions === role.id ? null : role.id
-                          )
-                        }
-                      >
-                        {role.permissions.length} permission
-                        {role.permissions.length !== 1 ? "s" : ""}
-                        <svg
-                          className={`ml-1 h-4 w-4 inline transform transition-transform ${showPermissions === role.id ? "rotate-180" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {new Date(role.updatedAt).toLocaleDateString()}
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <div className="flex justify-end items-center space-x-2">
-                        <button
-                          type="button"
-                          className="text-indigo-600 hover:text-indigo-900"
-                          title="Edit role"
+                <tr
+                  key={role.id}
+                  className={
+                    selectedRoles.includes(role.id) ? "bg-gray-50" : undefined
+                  }
+                >
+                  <td className="relative px-7 sm:w-12 sm:px-6">
+                    <input
+                      type="checkbox"
+                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      checked={selectedRoles.includes(role.id)}
+                      onChange={() => handleSelectRole(role.id)}
+                    />
+                  </td>
+                  <td className="whitespace-nowrap py-4 pr-3 text-sm">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0">
+                        <div
+                          className={`h-10 w-10 rounded-lg ${getRoleIcon(role.name).bg} flex items-center justify-center`}
                         >
                           <svg
-                            className="h-4 w-4"
+                            className={`h-5 w-5 ${getRoleIcon(role.name).color}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d={getRoleIcon(role.name).path}
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="font-medium text-gray-900">
+                          {role.name}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {role.description || "-"}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {formatDate(role.createdAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {formatDate(role.updatedAt)}
+                  </td>
+                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <div className="flex justify-end items-center space-x-2">
+                      {canUpdate("roles") && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingPermissions(role)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                          title="Edit permissions"
+                        >
+                          <svg
+                            className="h-5 w-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -527,13 +377,16 @@ export default function RolesList() {
                             />
                           </svg>
                         </button>
+                      )}
+                      {canDelete("roles") && (
                         <button
                           type="button"
-                          className="text-green-600 hover:text-green-900"
-                          title="Duplicate role"
+                          onClick={() => setDeletingRole(role)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete role"
                         >
                           <svg
-                            className="h-4 w-4"
+                            className="h-5 w-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -542,71 +395,19 @@ export default function RolesList() {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
                         </button>
-                        {role.type === "custom" && (
-                          <button
-                            type="button"
-                            className="text-red-600 hover:text-red-900"
-                            title="Delete role"
-                          >
-                            <svg
-                              className="h-4 w-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                  {/* Permissions dropdown */}
-                  {showPermissions === role.id && (
-                    <tr>
-                      <td colSpan={7} className="px-7 py-4 bg-gray-50">
-                        <div className="space-y-4">
-                          <h4 className="text-sm font-medium text-gray-900">
-                            Permissions for {role.name}
-                          </h4>
-                          {Object.entries(
-                            getPermissionsByCategory(role.permissions)
-                          ).map(([category, perms]) => (
-                            <div key={category} className="space-y-2">
-                              <h5 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
-                                {category}
-                              </h5>
-                              <div className="flex flex-wrap gap-2">
-                                {perms.map((perm) => (
-                                  <span
-                                    key={perm.id}
-                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                                  >
-                                    {perm.name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
+                      )}
+                    </div>
+                  </td>
+                </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-6 py-14 text-center text-sm text-gray-500"
                 >
                   <svg
@@ -626,9 +427,9 @@ export default function RolesList() {
                     No roles found
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">
-                    {searchTerm || filterType !== "all"
-                      ? "Try adjusting your search or filter criteria."
-                      : "Get started by creating custom roles."}
+                    {searchTerm
+                      ? "Try adjusting your search criteria."
+                      : "Get started by creating roles."}
                   </p>
                 </td>
               </tr>
@@ -638,20 +439,84 @@ export default function RolesList() {
       </div>
 
       {/* Results summary */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-gray-700">
+      {!loading && (
+        <div className="mt-4 text-sm text-gray-700">
           Showing <span className="font-medium">{filteredRoles.length}</span> of{" "}
           <span className="font-medium">{roles.length}</span> roles
         </div>
+      )}
 
-        {filteredRoles.length > 0 && (
-          <div className="text-sm text-gray-500">
-            {selectedRoles.length > 0 && (
-              <span>{selectedRoles.length} selected</span>
-            )}
+      {/* Edit Permissions Modal */}
+      {editingPermissions && (
+        <EditPermissionsModal
+          role={editingPermissions}
+          onClose={() => setEditingPermissions(null)}
+          onSave={() => {
+            setEditingPermissions(null);
+            fetchRoles();
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingRole && (
+        <div className="fixed z-50 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div
+              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+              onClick={() => setDeletingRole(null)}
+            ></div>
+
+            <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <svg
+                    className="h-6 w-6 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Delete Role
+                  </h3>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete the role{" "}
+                      <strong>{deletingRole.name}</strong>? This action cannot
+                      be undone and will remove all associated permissions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteRole(deletingRole)}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingRole(null)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

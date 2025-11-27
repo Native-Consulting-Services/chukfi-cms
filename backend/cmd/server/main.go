@@ -14,6 +14,7 @@ import (
 	"chukfi-cms/backend/internal/db"
 	"chukfi-cms/backend/internal/handlers"
 	"chukfi-cms/backend/internal/middleware"
+	"chukfi-cms/backend/internal/storage"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -44,10 +45,22 @@ func main() {
 	// Initialize auth service
 	authService := auth.NewService(jwtSecret, database)
 
+	// Initialize storage
+	storageConfig := storage.Config{
+		Type:     "local",
+		LocalPath: "./uploads",
+		BaseURL:  fmt.Sprintf("http://localhost:%s/uploads", port),
+	}
+	storageBackend, err := storage.NewStorage(storageConfig)
+	if err != nil {
+		log.Fatal("Failed to initialize storage:", err)
+	}
+
 	// Initialize handlers
 	h := &handlers.Handler{
 		DB:          database,
 		AuthService: authService,
+		Storage:     storageBackend,
 	}
 
 	// Setup router
@@ -62,7 +75,7 @@ func main() {
 
 	// CORS configuration
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:4321", "http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:4321", "http://localhost:4322", "http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -76,6 +89,10 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, `{"status":"ok","service":"chukfi-cms"}`)
 	})
+
+	// Serve uploaded files
+	fileServer := http.FileServer(http.Dir("."))
+	r.Handle("/uploads/*", http.StripPrefix("/", fileServer))
 
 	// API routes
 	r.Route("/api/v1", func(r chi.Router) {
@@ -98,8 +115,11 @@ func main() {
 				r.With(middleware.RequirePermission("users", "create")).Post("/", h.CreateUser)
 				r.Route("/{id}", func(r chi.Router) {
 					r.Get("/", h.GetUser)
+					r.With(middleware.RequirePermission("users", "update")).Put("/", h.UpdateUser)
 					r.With(middleware.RequirePermission("users", "update")).Patch("/", h.UpdateUser)
 					r.With(middleware.RequirePermission("users", "delete")).Delete("/", h.DeleteUser)
+					r.With(middleware.RequirePermission("users", "update")).Put("/roles", h.UpdateUserRoles)
+					r.Put("/password", h.ChangePassword) // Users can change their own password
 				})
 			})
 
@@ -112,6 +132,12 @@ func main() {
 					r.Get("/", h.GetRole)
 					r.With(middleware.RequirePermission("roles", "update")).Patch("/", h.UpdateRole)
 					r.With(middleware.RequirePermission("roles", "delete")).Delete("/", h.DeleteRole)
+					
+					// Permissions for this role
+					r.Route("/permissions", func(r chi.Router) {
+						r.Get("/", h.GetRolePermissions)
+						r.With(middleware.RequirePermission("roles", "update")).Put("/", h.UpdateRolePermissions)
+					})
 				})
 			})
 

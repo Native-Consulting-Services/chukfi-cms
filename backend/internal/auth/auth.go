@@ -103,13 +103,13 @@ func (s *Service) ValidateToken(tokenString string) (*Claims, error) {
 func (s *Service) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	query := `
-		SELECT id, email, password_hash, display_name, created_at, updated_at
+		SELECT id, email, password_hash, display_name, COALESCE(name, display_name) as name, COALESCE(avatar, '') as avatar, created_at, updated_at
 		FROM users 
-		WHERE email = $1
+		WHERE email = ?
 	`
 	err := s.db.QueryRow(query, email).Scan(
 		&user.ID, &user.Email, &user.PasswordHash, 
-		&user.DisplayName, &user.CreatedAt, &user.UpdatedAt,
+		&user.DisplayName, &user.Name, &user.Avatar, &user.CreatedAt, &user.UpdatedAt,
 	)
 	
 	if err != nil {
@@ -125,13 +125,13 @@ func (s *Service) GetUserByEmail(email string) (models.User, error) {
 func (s *Service) GetUserByID(id uuid.UUID) (models.User, error) {
 	var user models.User
 	query := `
-		SELECT id, email, password_hash, display_name, created_at, updated_at
+		SELECT id, email, password_hash, display_name, COALESCE(name, display_name) as name, COALESCE(avatar, '') as avatar, created_at, updated_at
 		FROM users 
-		WHERE id = $1
+		WHERE id = ?
 	`
 	err := s.db.QueryRow(query, id).Scan(
 		&user.ID, &user.Email, &user.PasswordHash, 
-		&user.DisplayName, &user.CreatedAt, &user.UpdatedAt,
+		&user.DisplayName, &user.Name, &user.Avatar, &user.CreatedAt, &user.UpdatedAt,
 	)
 	
 	if err != nil {
@@ -149,7 +149,7 @@ func (s *Service) getUserRoles(userID uuid.UUID) ([]models.Role, error) {
 		SELECT r.id, r.name, r.description, r.created_at, r.updated_at
 		FROM roles r
 		JOIN user_roles ur ON r.id = ur.role_id
-		WHERE ur.user_id = $1
+		WHERE ur.user_id = ?
 	`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
@@ -164,10 +164,56 @@ func (s *Service) getUserRoles(userID uuid.UUID) ([]models.Role, error) {
 		if err != nil {
 			return nil, err
 		}
+		
+		// Load permissions for this role
+		role.Permissions, _ = s.getRolePermissions(role.ID)
+		
 		roles = append(roles, role)
 	}
 
 	return roles, nil
+}
+
+func (s *Service) getRolePermissions(roleID uuid.UUID) ([]models.Permission, error) {
+	query := `
+		SELECT id, role_id, collection, can_create, can_read, can_update, can_delete, created_at, updated_at
+		FROM permissions
+		WHERE role_id = ?
+		ORDER BY collection
+	`
+	rows, err := s.db.Query(query, roleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var permissions []models.Permission
+	for rows.Next() {
+		var perm models.Permission
+		var idStr, roleIDStr string
+		err := rows.Scan(
+			&idStr,
+			&roleIDStr,
+			&perm.Collection,
+			&perm.CanCreate,
+			&perm.CanRead,
+			&perm.CanUpdate,
+			&perm.CanDelete,
+			&perm.CreatedAt,
+			&perm.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		
+		// Parse UUIDs
+		perm.ID, _ = uuid.Parse(idStr)
+		perm.RoleID, _ = uuid.Parse(roleIDStr)
+		
+		permissions = append(permissions, perm)
+	}
+
+	return permissions, nil
 }
 
 func (s *Service) getUserRoleNames(userID uuid.UUID) []string {
@@ -188,7 +234,7 @@ func (s *Service) HasPermission(userID uuid.UUID, collection, action string) boo
 		SELECT p.can_create, p.can_read, p.can_update, p.can_delete
 		FROM permissions p
 		JOIN user_roles ur ON p.role_id = ur.role_id
-		WHERE ur.user_id = $1 AND p.collection = $2
+		WHERE ur.user_id = ? AND p.collection = ?
 	`
 	rows, err := s.db.Query(query, userID, collection)
 	if err != nil {

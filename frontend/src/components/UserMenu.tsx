@@ -1,13 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 
 const UserMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState({
+    name: "Admin User",
+    email: "admin@example.com",
+    avatar: "",
+  });
 
-  // Mock user data - in real app this would come from context/state
-  const user = {
-    name: 'Admin User',
-    email: 'admin@example.com',
-    avatar: null,
+  const loadUserData = () => {
+    const storedUser = localStorage.getItem("chukfi_user");
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser({
+          name: userData.name || userData.displayName || "Admin User",
+          email: userData.email || "admin@example.com",
+          avatar: userData.avatar || "https://avatar.iran.liara.run/public",
+        });
+      } catch (e) {
+        console.error("Failed to parse user data:", e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadUserData();
+
+    // Listen for profile updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "chukfi_user") {
+        loadUserData();
+      }
+    };
+
+    const handleRefreshUser = () => {
+      loadUserData();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("refreshUser", handleRefreshUser);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("refreshUser", handleRefreshUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem("chukfi_auth_token");
+    localStorage.removeItem("chukfi_user");
+    // Redirect to home page
+    window.location.href = "/";
   };
 
   return (
@@ -20,17 +65,25 @@ const UserMenu: React.FC = () => {
         aria-haspopup="true"
       >
         <span className="sr-only">Open user menu</span>
-        <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center">
-          <span className="text-sm font-medium text-white">
-            {user.name.charAt(0)}
-          </span>
-        </div>
+        {user.avatar ? (
+          <img
+            className="h-8 w-8 rounded-full object-cover"
+            src={user.avatar}
+            alt={user.name}
+          />
+        ) : (
+          <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center">
+            <span className="text-sm font-medium text-white">
+              {user.name.charAt(0)}
+            </span>
+          </div>
+        )}
         <span className="hidden md:block ml-3 text-gray-700 text-sm font-medium">
           {user.name}
         </span>
         <svg
           className={`hidden md:block ml-2 h-5 w-5 text-gray-400 transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
+            isOpen ? "rotate-180" : ""
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -57,29 +110,26 @@ const UserMenu: React.FC = () => {
               <p className="text-sm font-medium text-gray-900">{user.name}</p>
               <p className="text-xs text-gray-500">{user.email}</p>
             </div>
-            
+
             <a
               href="/admin/profile"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Your Profile
             </a>
-            
+
             <a
               href="/admin/settings"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Settings
             </a>
-            
+
             <div className="border-t border-gray-200">
               <button
                 type="button"
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={() => {
-                  // Handle logout
-                  console.log('Logging out...');
-                }}
+                onClick={handleLogout}
               >
                 Sign out
               </button>

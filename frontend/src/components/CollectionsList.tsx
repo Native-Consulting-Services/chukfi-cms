@@ -187,20 +187,9 @@ export default function CollectionsList() {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      {/* Header and filters */}
-      <div className="sm:flex sm:items-center py-6 border-b border-gray-200">
-        <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold text-gray-900">Collections</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            A list of all collections in your CMS including their name,
-            description, and document counts.
-          </p>
-        </div>
-      </div>
-
+    <div className="p-6">
       {/* Search and filters */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         {/* Search */}
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
