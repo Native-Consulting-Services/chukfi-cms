@@ -71,10 +71,10 @@ export default function BlogPostsTrash() {
         try {
           const parsedPosts: BlogPost[] = JSON.parse(stored);
           const postToRestore = parsedPosts.find((p) => p.id === postId);
-          const updatedPosts = parsedPosts.map((p) => {
+          const updatedPosts = allPosts.map((p) => {
             if (p.id === postId) {
               const { deletedAt, ...rest } = p;
-              return rest;
+              return rest as BlogPost;
             }
             return p;
           });
@@ -82,7 +82,9 @@ export default function BlogPostsTrash() {
             "chukfi_blog_posts",
             JSON.stringify(updatedPosts),
           );
-          setDeletedPosts(updatedPosts.filter((p) => p.deletedAt));
+          setDeletedPosts(
+            updatedPosts.filter((p) => p.deletedAt) as BlogPost[],
+          );
           window.dispatchEvent(new CustomEvent("blogPostsUpdated"));
 
           // Log restore activity to backend
@@ -195,15 +197,15 @@ export default function BlogPostsTrash() {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50">
+    <div className="rounded-lg bg-white shadow dark:bg-gray-800 dark:shadow-gray-900/50">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Trash
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Posts are automatically deleted after 30 days
             </p>
           </div>
@@ -211,9 +213,9 @@ export default function BlogPostsTrash() {
             <button
               type="button"
               onClick={handleEmptyTrash}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30"
+              className="inline-flex items-center rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="mr-2 h-4 w-4" />
               Empty Trash
             </button>
           )}
@@ -221,7 +223,7 @@ export default function BlogPostsTrash() {
       </div>
 
       {/* Search and stats */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
             <input
@@ -229,7 +231,7 @@ export default function BlogPostsTrash() {
               placeholder="Search deleted posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -243,7 +245,7 @@ export default function BlogPostsTrash() {
       {filteredPosts.length === 0 ? (
         <div className="px-6 py-12">
           <div className="text-center">
-            <div className="flex justify-center mb-4">
+            <div className="mb-4 flex justify-center">
               <svg
                 className="h-16 w-16 text-gray-400 dark:text-gray-600"
                 fill="none"
@@ -258,7 +260,7 @@ export default function BlogPostsTrash() {
                 ></path>
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
               Trash is empty
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
@@ -269,13 +271,13 @@ export default function BlogPostsTrash() {
       ) : (
         <div className="px-6 py-6">
           {/* Desktop: Table view */}
-          <div className="hidden lg:block overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-gray-700 rounded-lg">
+          <div className="ring-opacity-5 hidden overflow-hidden rounded-lg ring-1 shadow ring-black lg:block dark:ring-gray-700">
             <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700/50">
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:pl-6"
+                    className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-white"
                   >
                     Title
                   </th>
@@ -291,12 +293,12 @@ export default function BlogPostsTrash() {
                   >
                     Days Remaining
                   </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-6">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-gray-800">
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-gray-800">
                 {filteredPosts.map((post) => {
                   const daysRemaining = getDaysRemaining(post.deletedAt!);
                   return (
@@ -304,12 +306,12 @@ export default function BlogPostsTrash() {
                       key={post.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
                     >
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                      <td className="py-4 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-6">
                         <div className="flex items-center gap-2">
                           {post.featured && (
                             <span>
                               <Star
-                                className="h-4 w-4 text-yellow-500 fill-yellow-500"
+                                className="h-4 w-4 fill-yellow-500 text-yellow-500"
                                 aria-label="Featured"
                               />
                             </span>
@@ -318,16 +320,16 @@ export default function BlogPostsTrash() {
                             <div className="font-medium text-gray-900 dark:text-white">
                               {post.title}
                             </div>
-                            <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">
+                            <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                               /{post.slug}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {formatDate(post.deletedAt)}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm">
+                      <td className="px-3 py-4 text-sm whitespace-nowrap">
                         <span
                           className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                             daysRemaining <= 7
@@ -338,12 +340,12 @@ export default function BlogPostsTrash() {
                           {daysRemaining} {daysRemaining === 1 ? "day" : "days"}
                         </span>
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             type="button"
                             onClick={() => handleRestore(post.id)}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                            className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                             title="Restore"
                           >
                             <RotateCcw className="h-5 w-5" />
@@ -351,7 +353,7 @@ export default function BlogPostsTrash() {
                           <button
                             type="button"
                             onClick={() => handlePermanentDelete(post.id)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                             title="Delete Permanently"
                           >
                             <Trash2 className="h-5 w-5" />
@@ -366,34 +368,34 @@ export default function BlogPostsTrash() {
           </div>
 
           {/* Mobile/Tablet: Card view */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
             {filteredPosts.map((post) => {
               const daysRemaining = getDaysRemaining(post.deletedAt!);
               return (
                 <div
                   key={post.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow ring-1 ring-black ring-opacity-5 dark:ring-gray-700 p-5"
+                  className="ring-opacity-5 rounded-lg bg-white p-5 ring-1 shadow ring-black transition-shadow hover:shadow-md dark:bg-gray-800 dark:ring-gray-700"
                 >
                   {/* Header: Title and Featured Star */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-base font-semibold text-gray-900 dark:text-white">
                         {post.title}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                      <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
                         /{post.slug}
                       </p>
                     </div>
                     {post.featured && (
                       <Star
-                        className="h-5 w-5 text-yellow-500 fill-yellow-500 flex-shrink-0"
+                        className="h-5 w-5 flex-shrink-0 fill-yellow-500 text-yellow-500"
                         aria-label="Featured"
                       />
                     )}
                   </div>
 
                   {/* Metadata */}
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       Deleted {formatDate(post.deletedAt)}
                     </span>
@@ -413,11 +415,11 @@ export default function BlogPostsTrash() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 border-t border-gray-200 pt-3 dark:border-gray-700">
                     <button
                       type="button"
                       onClick={() => handleRestore(post.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-md transition-colors"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
                     >
                       <RotateCcw className="h-4 w-4" />
                       Restore
@@ -425,7 +427,7 @@ export default function BlogPostsTrash() {
                     <button
                       type="button"
                       onClick={() => handlePermanentDelete(post.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                     >
                       <Trash2 className="h-4 w-4" />
                       Delete
