@@ -19,7 +19,7 @@ export function usePermissions() {
   const [permissions, setPermissions] = useState<UserPermissions>({});
   const [isSuper, setIsSuper] = useState(false);
   const [accessibleCollections, setAccessibleCollections] = useState<string[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function usePermissions() {
     accessibleCollections,
     hasPermission: (
       collection: string,
-      action: "create" | "read" | "update" | "delete"
+      action: "create" | "read" | "update" | "delete",
     ) => hasPermission(collection, action),
     canAccess: (collection: string) => canAccess(collection),
     canCreate: (collection: string) => canCreate(collection),

@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"chukfi-cms/backend/internal/activity"
 	"chukfi-cms/backend/internal/auth"
 	"chukfi-cms/backend/internal/db"
 	"chukfi-cms/backend/internal/handlers"
@@ -56,11 +57,15 @@ func main() {
 		log.Fatal("Failed to initialize storage:", err)
 	}
 
+	// Initialize activity logger
+	activityLogger := activity.NewLogger(database.DB)
+
 	// Initialize handlers
 	h := &handlers.Handler{
-		DB:          database,
-		AuthService: authService,
-		Storage:     storageBackend,
+		DB:             database,
+		AuthService:    authService,
+		Storage:        storageBackend,
+		ActivityLogger: activityLogger,
 	}
 
 	// Setup router
@@ -173,6 +178,12 @@ func main() {
 					r.Get("/", h.GetMediaItem)
 					r.With(middleware.RequirePermission("media", "delete")).Delete("/", h.DeleteMedia)
 				})
+			})
+
+			// Activity Logs
+			r.Route("/activity", func(r chi.Router) {
+				r.Get("/", h.GetActivityLogs)
+				r.Post("/", h.CreateActivityLog)
 			})
 		})
 	})

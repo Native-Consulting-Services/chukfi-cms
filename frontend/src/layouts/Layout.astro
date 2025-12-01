@@ -9,7 +9,7 @@ const { title } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-gray-100 dark:bg-gray-900">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Chukfi CMS - Open-source Content Management System" />
@@ -27,9 +27,80 @@ const { title } = Astro.props;
           document.documentElement.classList.add('dark');
         }
       })();
+
+      // Initialize default collections
+      (function() {
+        const defaultCollections = [
+          {
+            name: "Pages",
+            slug: "pages",
+            status: "active",
+            description: "Static pages for your website (About, Contact, etc.)",
+            icon: "📄",
+            documents: [],
+          },
+          {
+            name: "Media",
+            slug: "media",
+            status: "active",
+            description: "Images and videos for your content",
+            icon: "🖼️",
+            documents: [],
+          },
+          {
+            name: "Documents",
+            slug: "documents",
+            status: "active",
+            description: "Downloadable files (PDFs, Word docs, spreadsheets, etc.)",
+            icon: "📎",
+            documents: [],
+          },
+          {
+            name: "Blog Posts",
+            slug: "blog-posts",
+            status: "active",
+            description: "Blog articles and posts",
+            icon: "📝",
+            documents: [],
+          },
+        ];
+
+        const stored = localStorage.getItem("chukfi_collections");
+        let collections = [];
+
+        if (stored) {
+          try {
+            collections = JSON.parse(stored);
+          } catch (e) {
+            collections = [];
+          }
+        }
+
+        let hasChanges = false;
+
+        defaultCollections.forEach((defaultCol) => {
+          const exists = collections.some((col) => col.slug === defaultCol.slug);
+          
+          if (!exists) {
+            const now = new Date().toISOString();
+            collections.push({
+              ...defaultCol,
+              id: defaultCol.slug + "-" + Date.now(),
+              createdAt: now,
+              updatedAt: now,
+            });
+            hasChanges = true;
+          }
+        });
+
+        if (hasChanges) {
+          localStorage.setItem("chukfi_collections", JSON.stringify(collections));
+          window.dispatchEvent(new CustomEvent("collectionsStorageUpdated"));
+        }
+      })();
     </script>
   </head>
-  <body>
+  <body class="bg-gray-100 dark:bg-gray-900">
     <slot />
     
     <script>

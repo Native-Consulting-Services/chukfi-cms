@@ -35,13 +35,13 @@ export default function MediaStats({
 
     window.addEventListener(
       "mediaStatsUpdate",
-      handleStatsUpdate as EventListener
+      handleStatsUpdate as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         "mediaStatsUpdate",
-        handleStatsUpdate as EventListener
+        handleStatsUpdate as EventListener,
       );
     };
   }, []);
@@ -49,10 +49,10 @@ export default function MediaStats({
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {/* Total Files */}
-      <div className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6">
+      <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow dark:shadow-gray-900/50 sm:px-6 sm:py-6">
         <div>
           <div className="absolute">
-            <div className="rounded-md bg-indigo-500 p-3">
+            <div className="rounded-md bg-indigo-500 dark:bg-indigo-600 p-3">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -68,20 +68,20 @@ export default function MediaStats({
               </svg>
             </div>
           </div>
-          <p className="ml-16 truncate text-sm font-medium text-gray-500">
+          <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">
             Total Files
           </p>
-          <p className="ml-16 text-2xl font-semibold text-gray-900">
+          <p className="ml-16 text-2xl font-semibold text-gray-900 dark:text-white">
             {stats.total}
           </p>
         </div>
       </div>
 
       {/* Images */}
-      <div className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6">
+      <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow dark:shadow-gray-900/50 sm:px-6 sm:py-6">
         <div>
           <div className="absolute">
-            <div className="rounded-md bg-green-500 p-3">
+            <div className="rounded-md bg-green-500 dark:bg-green-600 p-3">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -97,20 +97,20 @@ export default function MediaStats({
               </svg>
             </div>
           </div>
-          <p className="ml-16 truncate text-sm font-medium text-gray-500">
+          <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">
             Images
           </p>
-          <p className="ml-16 text-2xl font-semibold text-gray-900">
+          <p className="ml-16 text-2xl font-semibold text-gray-900 dark:text-white">
             {stats.images}
           </p>
         </div>
       </div>
 
       {/* Documents */}
-      <div className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6">
+      <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow dark:shadow-gray-900/50 sm:px-6 sm:py-6">
         <div>
           <div className="absolute">
-            <div className="rounded-md bg-yellow-500 p-3">
+            <div className="rounded-md bg-yellow-500 dark:bg-yellow-600 p-3">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -126,20 +126,20 @@ export default function MediaStats({
               </svg>
             </div>
           </div>
-          <p className="ml-16 truncate text-sm font-medium text-gray-500">
+          <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">
             Documents
           </p>
-          <p className="ml-16 text-2xl font-semibold text-gray-900">
+          <p className="ml-16 text-2xl font-semibold text-gray-900 dark:text-white">
             {stats.documents}
           </p>
         </div>
       </div>
 
       {/* Storage Used */}
-      <div className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6">
+      <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow dark:shadow-gray-900/50 sm:px-6 sm:py-6">
         <div>
           <div className="absolute">
-            <div className="rounded-md bg-purple-500 p-3">
+            <div className="rounded-md bg-purple-500 dark:bg-purple-600 p-3">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -155,10 +155,10 @@ export default function MediaStats({
               </svg>
             </div>
           </div>
-          <p className="ml-16 truncate text-sm font-medium text-gray-500">
+          <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">
             Storage Used
           </p>
-          <p className="ml-16 text-2xl font-semibold text-gray-900">
+          <p className="ml-16 text-2xl font-semibold text-gray-900 dark:text-white">
             {formatFileSize(stats.storageUsed)}
           </p>
         </div>

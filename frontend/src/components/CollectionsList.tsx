@@ -1,10 +1,5 @@
-import { useState } from "react";
-import {
-  ChevronRightIcon,
-  PencilIcon,
-  TrashIcon,
-  DocumentDuplicateIcon,
-} from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
+import * as LucideIcons from "lucide-react";
 
 interface Collection {
   id: string;
@@ -15,6 +10,8 @@ interface Collection {
   createdAt: string;
   updatedAt: string;
   status: "active" | "disabled";
+  icon?: string;
+  color?: string;
 }
 
 // Mock data - replace with actual API call
@@ -28,6 +25,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-01-15T10:30:00Z",
     updatedAt: "2024-11-20T14:22:00Z",
     status: "active",
+    icon: "FileText",
+    color: "blue",
   },
   {
     id: "2",
@@ -38,6 +37,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-01-15T10:30:00Z",
     updatedAt: "2024-11-18T09:15:00Z",
     status: "active",
+    icon: "FileCode",
+    color: "purple",
   },
   {
     id: "3",
@@ -48,6 +49,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-02-03T16:45:00Z",
     updatedAt: "2024-11-22T11:30:00Z",
     status: "active",
+    icon: "ShoppingCart",
+    color: "green",
   },
   {
     id: "4",
@@ -58,6 +61,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-02-10T12:20:00Z",
     updatedAt: "2024-10-15T13:45:00Z",
     status: "active",
+    icon: "Users",
+    color: "indigo",
   },
   {
     id: "5",
@@ -68,6 +73,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-03-01T08:10:00Z",
     updatedAt: "2024-11-19T16:20:00Z",
     status: "active",
+    icon: "MessageSquare",
+    color: "amber",
   },
   {
     id: "6",
@@ -78,6 +85,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-03-15T14:30:00Z",
     updatedAt: "2024-11-21T10:10:00Z",
     status: "disabled",
+    icon: "Calendar",
+    color: "rose",
   },
   {
     id: "7",
@@ -88,6 +97,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-01-15T10:30:00Z",
     updatedAt: "2024-11-23T12:05:00Z",
     status: "active",
+    icon: "Image",
+    color: "cyan",
   },
   {
     id: "8",
@@ -98,6 +109,8 @@ const mockCollections: Collection[] = [
     createdAt: "2024-01-15T10:30:00Z",
     updatedAt: "2024-11-20T15:30:00Z",
     status: "active",
+    icon: "Settings",
+    color: "gray",
   },
 ];
 
@@ -119,14 +132,132 @@ const formatDateTime = (dateString: string) => {
   });
 };
 
+const getIconComponent = (iconName?: string) => {
+  if (!iconName) return LucideIcons.Folder;
+  const IconComponent = (LucideIcons as any)[iconName];
+  return IconComponent || LucideIcons.Folder;
+};
+
+const getColorHex = (colorName?: string): string => {
+  const colorMap: Record<string, string> = {
+    gray: "#6b7280",
+    red: "#ef4444",
+    orange: "#f97316",
+    amber: "#f59e0b",
+    yellow: "#eab308",
+    lime: "#84cc16",
+    green: "#22c55e",
+    emerald: "#10b981",
+    teal: "#14b8a6",
+    cyan: "#06b6d4",
+    sky: "#0ea5e9",
+    blue: "#3b82f6",
+    indigo: "#6366f1",
+    violet: "#8b5cf6",
+    purple: "#a855f7",
+    fuchsia: "#d946ef",
+    pink: "#ec4899",
+    rose: "#f43f5e",
+  };
+  return colorMap[colorName || "indigo"] || "#6366f1";
+};
+
 export default function CollectionsList() {
-  const [collections, setCollections] = useState<Collection[]>(mockCollections);
+  const [collections, setCollections] = useState<Collection[]>(() => {
+    // Initialize from localStorage or use mock data
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("chukfi_collections");
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error("Failed to parse stored collections", e);
+        }
+      }
+    }
+    return mockCollections;
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Collection>("updatedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "disabled"
   >("all");
+
+  // Save to localStorage whenever collections change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("chukfi_collections", JSON.stringify(collections));
+      // Dispatch event after saving to ensure other components get fresh data
+      window.dispatchEvent(new CustomEvent("collectionsStorageUpdated"));
+    }
+  }, [collections]);
+
+  // Listen for new collection events
+  useEffect(() => {
+    const handleNewCollection = (event: CustomEvent) => {
+      const newCollectionData = event.detail;
+      const newCollection: Collection = {
+        id: Date.now().toString(),
+        name: newCollectionData.name,
+        displayName: newCollectionData.displayName,
+        description: newCollectionData.description,
+        documentCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "active",
+        icon: newCollectionData.icon,
+        color: newCollectionData.color,
+      };
+      setCollections((prev) => [...prev, newCollection]);
+    };
+
+    const handleCollectionUpdate = (event: CustomEvent) => {
+      const updatedData = event.detail;
+      setCollections((prev) =>
+        prev.map((col) =>
+          col.id === updatedData.id
+            ? {
+                ...col,
+                displayName: updatedData.displayName,
+                description: updatedData.description,
+                icon: updatedData.icon,
+                color: updatedData.color,
+                status: updatedData.status,
+                updatedAt: new Date().toISOString(),
+              }
+            : col,
+        ),
+      );
+    };
+
+    window.addEventListener(
+      "newCollectionCreated" as any,
+      handleNewCollection as any,
+    );
+    window.addEventListener(
+      "collectionUpdated" as any,
+      handleCollectionUpdate as any,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "newCollectionCreated" as any,
+        handleNewCollection as any,
+      );
+      window.removeEventListener(
+        "collectionUpdated" as any,
+        handleCollectionUpdate as any,
+      );
+    };
+  }, []);
+
+  // Scroll to top when new collection is added
+  useEffect(() => {
+    if (collections.length > mockCollections.length) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [collections.length]);
 
   // Filter and sort collections
   const filteredCollections = collections
@@ -166,24 +297,19 @@ export default function CollectionsList() {
   const handleDeleteCollection = (id: string) => {
     if (
       confirm(
-        "Are you sure you want to delete this collection? This action cannot be undone."
+        "Are you sure you want to delete this collection? This action cannot be undone.",
       )
     ) {
       setCollections(collections.filter((c) => c.id !== id));
     }
   };
 
-  const handleDuplicateCollection = (collection: Collection) => {
-    const newCollection: Collection = {
-      ...collection,
-      id: Date.now().toString(),
-      name: `${collection.name}_copy`,
-      displayName: `${collection.displayName} (Copy)`,
-      documentCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setCollections([...collections, newCollection]);
+  const handleEditCollection = (collection: Collection) => {
+    window.dispatchEvent(
+      new CustomEvent("openEditCollectionModal", {
+        detail: collection,
+      }),
+    );
   };
 
   return (
@@ -198,7 +324,7 @@ export default function CollectionsList() {
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
-                className="h-5 w-5 text-gray-400"
+                className="h-5 w-5 text-gray-400 dark:text-gray-500"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -216,7 +342,7 @@ export default function CollectionsList() {
               placeholder="Search collections..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
           </div>
         </div>
@@ -228,7 +354,7 @@ export default function CollectionsList() {
             onChange={(e) =>
               setFilterStatus(e.target.value as "all" | "active" | "disabled")
             }
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -237,7 +363,7 @@ export default function CollectionsList() {
         </div>
 
         {/* Results count */}
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
           {filteredCollections.length} of {collections.length} collections
         </div>
       </div>
@@ -246,17 +372,17 @@ export default function CollectionsList() {
       <div className="mt-6 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table className="min-w-full divide-y divide-gray-300">
+            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-50 sm:pl-0"
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 sm:pl-0"
                     onClick={() => handleSort("displayName")}
                   >
                     <div className="group inline-flex">
                       Collection
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -273,12 +399,12 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-50"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     onClick={() => handleSort("documentCount")}
                   >
                     <div className="group inline-flex">
                       Documents
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -295,19 +421,19 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-50"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     onClick={() => handleSort("status")}
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-50"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     onClick={() => handleSort("updatedAt")}
                   >
                     <div className="group inline-flex">
                       Last Updated
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -327,64 +453,72 @@ export default function CollectionsList() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredCollections.map((collection) => (
-                  <tr key={collection.id} className="hover:bg-gray-50">
+                  <tr
+                    key={collection.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-0">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
-                          <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                            <svg
-                              className="h-6 w-6 text-indigo-600"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                              ></path>
-                            </svg>
+                          <div
+                            className="h-10 w-10 rounded-lg flex items-center justify-center"
+                            style={{
+                              backgroundColor: `${getColorHex(collection.color)}20`,
+                            }}
+                          >
+                            {(() => {
+                              const Icon = getIconComponent(collection.icon);
+                              return (
+                                <Icon
+                                  className="h-6 w-6"
+                                  style={{
+                                    color: getColorHex(collection.color),
+                                  }}
+                                />
+                              );
+                            })()}
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-gray-900 dark:text-gray-100">
                             {collection.displayName}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {collection.description}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                             API:{" "}
-                            <code className="bg-gray-100 px-1 rounded">
+                            <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                               /api/v1/collections/{collection.name}
                             </code>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
                       <div className="flex items-center">
                         <span className="font-medium">
                           {collection.documentCount}
                         </span>
-                        <span className="ml-1 text-gray-500">items</span>
+                        <span className="ml-1 text-gray-500 dark:text-gray-400">
+                          items
+                        </span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
                       <span
                         className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                           collection.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                         }`}
                       >
                         {collection.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                       <div>
                         <div title={formatDateTime(collection.updatedAt)}>
                           {formatDate(collection.updatedAt)}
@@ -392,39 +526,23 @@ export default function CollectionsList() {
                       </div>
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <div className="flex items-center justify-end space-x-2">
-                        {/* View/Manage button */}
-                        <button
-                          className="text-indigo-600 hover:text-indigo-900 p-1 rounded-md hover:bg-indigo-50"
-                          title="Manage collection"
-                        >
-                          <ChevronRightIcon className="h-4 w-4" />
-                        </button>
-
+                      <div className="flex items-center justify-end space-x-3">
                         {/* Edit button */}
                         <button
-                          className="text-gray-600 hover:text-gray-900 p-1 rounded-md hover:bg-gray-50"
+                          onClick={() => handleEditCollection(collection)}
+                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
                           title="Edit collection"
                         >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-
-                        {/* Duplicate button */}
-                        <button
-                          onClick={() => handleDuplicateCollection(collection)}
-                          className="text-gray-600 hover:text-gray-900 p-1 rounded-md hover:bg-gray-50"
-                          title="Duplicate collection"
-                        >
-                          <DocumentDuplicateIcon className="h-4 w-4" />
+                          <LucideIcons.Pencil className="h-5 w-5" />
                         </button>
 
                         {/* Delete button */}
                         <button
                           onClick={() => handleDeleteCollection(collection.id)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50"
+                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30"
                           title="Delete collection"
                         >
-                          <TrashIcon className="h-4 w-4" />
+                          <LucideIcons.Trash2 className="h-5 w-5" />
                         </button>
                       </div>
                     </td>
@@ -440,7 +558,7 @@ export default function CollectionsList() {
       {filteredCollections.length === 0 && (
         <div className="text-center py-12">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -452,10 +570,10 @@ export default function CollectionsList() {
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             ></path>
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
             No collections found
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {searchTerm || filterStatus !== "all"
               ? "Try adjusting your search or filter criteria."
               : "Get started by creating your first collection."}
@@ -464,7 +582,7 @@ export default function CollectionsList() {
             <div className="mt-6">
               <button
                 type="button"
-                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
               >
                 <svg
                   className="mr-2 h-4 w-4"

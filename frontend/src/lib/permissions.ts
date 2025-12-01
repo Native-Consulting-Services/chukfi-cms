@@ -61,7 +61,7 @@ export function isSuperAdmin(): boolean {
     if (!user.roles || user.roles.length === 0) return false;
 
     return user.roles.some(
-      (role: any) => role.name.toLowerCase() === "super admin"
+      (role: any) => role.name.toLowerCase() === "super admin",
     );
   } catch (error) {
     console.error("Failed to check super admin status:", error);
@@ -74,7 +74,7 @@ export function isSuperAdmin(): boolean {
  */
 export function hasPermission(
   collection: string,
-  action: "create" | "read" | "update" | "delete"
+  action: "create" | "read" | "update" | "delete",
 ): boolean {
   // Super Admin has all permissions
   if (isSuperAdmin()) return true;
@@ -121,6 +121,6 @@ export function getAccessibleCollections(): string[] {
 
   const permissions = getUserPermissions();
   return Object.keys(permissions).filter(
-    (collection) => permissions[collection].read
+    (collection) => permissions[collection].read,
   );
 }

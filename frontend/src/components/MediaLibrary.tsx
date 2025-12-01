@@ -244,7 +244,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            }
+            },
           );
 
           if (!response.ok) {
@@ -272,7 +272,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -288,21 +288,21 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 dark:bg-gray-900">
       {/* Header and controls */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         {/* Search */}
         <div className="flex-1">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             </div>
             <input
               type="search"
               placeholder="Search files..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value as FilterType)}
-            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
           >
             <option value="all">All Files</option>
             <option value="image">Images</option>
@@ -330,7 +330,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
               setSortField(field as keyof MediaFile);
               setSortDirection(direction as "asc" | "desc");
             }}
-            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
           >
             <option value="created_at-desc">Newest First</option>
             <option value="created_at-asc">Oldest First</option>
@@ -344,7 +344,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
           <select
             value={itemsPerPage}
             onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
           >
             <option value={25}>25 per page</option>
             <option value={50}>50 per page</option>
@@ -356,20 +356,20 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
           <div className="flex rounded-md shadow-sm">
             <button
               onClick={() => setViewMode("grid")}
-              className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10 ${
+              className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-10 ${
                 viewMode === "grid"
-                  ? "bg-indigo-600 text-white ring-indigo-600"
-                  : "bg-white text-gray-900"
+                  ? "bg-indigo-600 dark:bg-indigo-500 text-white ring-indigo-600 dark:ring-indigo-500"
+                  : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               }`}
             >
               <Squares2X2Icon className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`relative -ml-px inline-flex items-center rounded-r-md px-2 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10 ${
+              className={`relative -ml-px inline-flex items-center rounded-r-md px-2 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-10 ${
                 viewMode === "list"
-                  ? "bg-indigo-600 text-white ring-indigo-600"
-                  : "bg-white text-gray-900"
+                  ? "bg-indigo-600 dark:bg-indigo-500 text-white ring-indigo-600 dark:ring-indigo-500"
+                  : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               }`}
             >
               <ListBulletIcon className="h-5 w-5" />
@@ -380,22 +380,22 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
 
       {/* Bulk actions */}
       {selectedFiles.size > 0 && (
-        <div className="mb-4 flex items-center justify-between rounded-md bg-blue-50 px-4 py-2">
-          <span className="text-sm text-blue-800">
+        <div className="mb-4 flex items-center justify-between rounded-md bg-blue-50 dark:bg-blue-900/20 px-4 py-2">
+          <span className="text-sm text-blue-800 dark:text-blue-300">
             {selectedFiles.size} file{selectedFiles.size > 1 ? "s" : ""}{" "}
             selected
           </span>
           <div className="flex gap-2">
             <button
               onClick={handleDeleteSelected}
-              className="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500"
+              className="inline-flex items-center rounded-md bg-red-600 dark:bg-red-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500 dark:hover:bg-red-400"
             >
               <TrashIcon className="mr-1 h-3 w-3" />
               Delete
             </button>
             <button
               onClick={() => setSelectedFiles(new Set())}
-              className="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-gray-500"
+              className="inline-flex items-center rounded-md bg-gray-600 dark:bg-gray-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-gray-500 dark:hover:bg-gray-400"
             >
               Cancel
             </button>
@@ -409,10 +409,10 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
           {paginatedFiles.map((file) => (
             <div
               key={file.id}
-              className={`group relative rounded-lg border p-3 hover:shadow-md transition-all duration-200 ${
+              className={`group relative rounded-lg border p-3 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50 transition-all duration-200 ${
                 selectedFiles.has(file.id)
-                  ? "border-indigo-500 bg-indigo-50"
-                  : "border-gray-300 bg-white"
+                  ? "border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
+                  : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
               }`}
             >
               {/* Selection checkbox */}
@@ -421,12 +421,12 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                   type="checkbox"
                   checked={selectedFiles.has(file.id)}
                   onChange={() => handleSelectFile(file.id)}
-                  className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-600"
+                  className="h-4 w-4 text-indigo-600 dark:text-indigo-500 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-indigo-600 dark:focus:ring-indigo-500"
                 />
               </div>
 
               {/* File preview */}
-              <div className="aspect-square mb-3 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+              <div className="aspect-square mb-3 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                 {file.mime_type.startsWith("image/") ? (
                   <img
                     src={file.url}
@@ -441,39 +441,39 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
               {/* File info */}
               <div>
                 <h4
-                  className="text-sm font-medium text-gray-900 truncate"
+                  className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"
                   title={file.filename}
                 >
                   {file.filename}
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {formatFileSize(file.size)}
                 </p>
               </div>
 
               {/* Actions overlay */}
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center gap-2">
                 <button
-                  className="rounded-full bg-white p-1.5 text-gray-700 hover:text-indigo-600"
+                  className="rounded-full bg-white dark:bg-gray-800 p-1.5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                   title="View"
                 >
                   <EyeIcon className="h-4 w-4" />
                 </button>
                 <button
-                  className="rounded-full bg-white p-1.5 text-gray-700 hover:text-indigo-600"
+                  className="rounded-full bg-white dark:bg-gray-800 p-1.5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                   title="Edit"
                 >
                   <PencilIcon className="h-4 w-4" />
                 </button>
                 <button
-                  className="rounded-full bg-white p-1.5 text-gray-700 hover:text-green-600"
+                  className="rounded-full bg-white dark:bg-gray-800 p-1.5 text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
                   title="Download"
                 >
                   <ArrowDownTrayIcon className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDeleteFile(file.id)}
-                  className="rounded-full bg-white p-1.5 text-gray-700 hover:text-red-600"
+                  className="rounded-full bg-white dark:bg-gray-800 p-1.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
                   title="Delete"
                 >
                   <TrashIcon className="h-4 w-4" />
@@ -483,9 +483,9 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
           ))}
         </div>
       ) : (
-        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-50">
+        <div className="overflow-hidden shadow dark:shadow-lg dark:shadow-black/50 ring-1 ring-black dark:ring-gray-700 ring-opacity-5 dark:ring-opacity-100 md:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8">
                   <input
@@ -495,36 +495,36 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                       selectedFiles.size === paginatedFiles.length
                     }
                     onChange={handleSelectAll}
-                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-600 dark:focus:ring-indigo-500"
                   />
                 </th>
                 <th
                   scope="col"
-                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900"
+                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
                 >
                   File
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
                 >
                   Type
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
                 >
                   Size
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
                 >
                   Uploaded
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
                 >
                   By
                 </th>
@@ -533,18 +533,22 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
               {paginatedFiles.map((file) => (
                 <tr
                   key={file.id}
-                  className={selectedFiles.has(file.id) ? "bg-indigo-50" : ""}
+                  className={
+                    selectedFiles.has(file.id)
+                      ? "bg-indigo-50 dark:bg-indigo-900/20"
+                      : ""
+                  }
                 >
                   <td className="relative w-12 px-6 sm:w-16 sm:px-8">
                     <input
                       type="checkbox"
                       checked={selectedFiles.has(file.id)}
                       onChange={() => handleSelectFile(file.id)}
-                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-600 dark:focus:ring-indigo-500"
                     />
                   </td>
                   <td className="whitespace-nowrap py-4 pl-4 pr-3">
@@ -563,49 +567,49 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                         )}
                       </div>
                       <div className="ml-4">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 dark:text-gray-100">
                           {file.filename}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                    <span className="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <span className="inline-flex rounded-full bg-gray-100 dark:bg-gray-700 px-2 text-xs font-semibold leading-5 text-gray-800 dark:text-gray-200">
                       {file.type}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {formatFileSize(file.size)}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(file.created_at)}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {file.uploader_name}
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                         title="View"
                       >
                         <EyeIcon className="h-4 w-4" />
                       </button>
                       <button
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                         title="Edit"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button
-                        className="text-green-600 hover:text-green-900"
+                        className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
                         title="Download"
                       >
                         <ArrowDownTrayIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteFile(file.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                         title="Delete"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -622,24 +626,26 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
       {/* Empty state */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          <p className="mt-2 text-sm text-gray-500">Loading media files...</p>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Loading media files...
+          </p>
         </div>
       ) : (
         filteredFiles.length === 0 && (
           <div className="text-center py-12">
-            <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
+            <PhotoIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
               No files found
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {searchTerm || filterType !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "Get started by uploading your first file."}
             </p>
             {!searchTerm && filterType === "all" && (
               <div className="mt-6">
-                <label className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer">
+                <label className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 cursor-pointer">
                   <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
                   Upload Files
                   <input
@@ -659,12 +665,12 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -673,14 +679,14 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }
               disabled={currentPage === totalPages}
-              className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
                 <span className="font-medium">
                   {Math.min(endIndex, filteredFiles.length)}
@@ -697,7 +703,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="sr-only">Previous</span>
                   <svg
@@ -729,8 +735,8 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                         currentPage === pageNum
-                          ? "z-10 bg-indigo-600 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                          : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                          ? "z-10 bg-indigo-600 dark:bg-indigo-500 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
+                          : "text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0"
                       }`}
                     >
                       {pageNum}
@@ -742,7 +748,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
                     setCurrentPage(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="sr-only">Next</span>
                   <svg
@@ -764,7 +770,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
       )}
 
       {/* Results info */}
-      <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
+      <div className="mt-6 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
         <div>
           Showing {startIndex + 1}-{Math.min(endIndex, filteredFiles.length)} of{" "}
           {filteredFiles.length} filtered ({mediaFiles.length} total)
@@ -772,7 +778,7 @@ export default function MediaLibrary({ onStatsUpdate }: MediaLibraryProps) {
         <div>
           Total storage:{" "}
           {formatFileSize(
-            mediaFiles.reduce((total, file) => total + file.size, 0)
+            mediaFiles.reduce((total, file) => total + file.size, 0),
           )}
         </div>
       </div>

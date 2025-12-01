@@ -1,0 +1,8 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import BlogPostsTrash from "../../components/BlogPostsTrash";
+---
+
+<AdminLayout title="Trash" currentPage="trash">
+  <BlogPostsTrash client:load />
+</AdminLayout>

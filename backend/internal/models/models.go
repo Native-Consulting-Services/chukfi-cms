@@ -68,6 +68,34 @@ type Media struct {
 	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
 }
 
+type ActivityLog struct {
+	ID         uuid.UUID              `json:"id" db:"id"`
+	UserID     uuid.UUID              `json:"userId" db:"user_id"`
+	Action     string                 `json:"action" db:"action"`
+	EntityType string                 `json:"entityType" db:"entity_type"`
+	EntityID   *uuid.UUID             `json:"entityId,omitempty" db:"entity_id"`
+	EntityName string                 `json:"entityName,omitempty" db:"entity_name"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty" db:"metadata"`
+	IPAddress  string                 `json:"ipAddress,omitempty" db:"ip_address"`
+	UserAgent  string                 `json:"userAgent,omitempty" db:"user_agent"`
+	CreatedAt  time.Time              `json:"createdAt" db:"created_at"`
+}
+
+type ActivityLogResponse struct {
+	ID          uuid.UUID              `json:"id"`
+	UserID      uuid.UUID              `json:"userId"`
+	UserName    string                 `json:"userName"`
+	UserAvatar  string                 `json:"userAvatar"`
+	Action      string                 `json:"action"`
+	EntityType  string                 `json:"entityType"`
+	EntityID    *uuid.UUID             `json:"entityId,omitempty"`
+	EntityName  string                 `json:"entityName,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	IPAddress   string                 `json:"ipAddress,omitempty"`
+	UserAgent   string                 `json:"userAgent,omitempty"`
+	CreatedAt   time.Time              `json:"createdAt"`
+}
+
 // Request/Response models
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`

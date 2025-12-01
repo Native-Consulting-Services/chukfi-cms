@@ -132,7 +132,7 @@ export default function ProfileSettings() {
             email,
             avatar,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -143,7 +143,7 @@ export default function ProfileSettings() {
 
       // Update localStorage
       const storedUser = JSON.parse(
-        localStorage.getItem("chukfi_user") || "{}"
+        localStorage.getItem("chukfi_user") || "{}",
       );
       const newUserData = { ...storedUser, ...updatedUser };
       localStorage.setItem("chukfi_user", JSON.stringify(newUserData));
@@ -198,7 +198,7 @@ export default function ProfileSettings() {
             current_password: currentPassword,
             new_password: newPassword,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -277,7 +277,9 @@ export default function ProfileSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading profile...</div>
+        <div className="text-gray-500 dark:text-gray-400">
+          Loading profile...
+        </div>
       </div>
     );
   }
@@ -285,12 +287,12 @@ export default function ProfileSettings() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <div className="text-red-500 text-lg">
+        <div className="text-red-500 dark:text-red-400 text-lg">
           No user data found. Please log in again.
         </div>
         <a
           href="/login"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
         >
           Go to Login
         </a>
@@ -305,15 +307,15 @@ export default function ProfileSettings() {
         <div
           className={`rounded-md p-4 ${
             message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
+              ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300"
+              : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300"
           }`}
         >
           <div className="flex">
             <div className="flex-shrink-0">
               {message.type === "success" ? (
                 <svg
-                  className="h-5 w-5 text-green-400"
+                  className="h-5 w-5 text-green-400 dark:text-green-500"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -325,7 +327,7 @@ export default function ProfileSettings() {
                 </svg>
               ) : (
                 <svg
-                  className="h-5 w-5 text-red-400"
+                  className="h-5 w-5 text-red-400 dark:text-red-500"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -347,8 +349,8 @@ export default function ProfileSettings() {
                   onClick={() => setMessage(null)}
                   className={`inline-flex rounded-md p-1.5 ${
                     message.type === "success"
-                      ? "text-green-500 hover:bg-green-100"
-                      : "text-red-500 hover:bg-red-100"
+                      ? "text-green-500 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800/30"
+                      : "text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30"
                   }`}
                 >
                   <span className="sr-only">Dismiss</span>
@@ -371,22 +373,22 @@ export default function ProfileSettings() {
       )}
 
       {/* Profile Information */}
-      <div className="bg-white shadow sm:rounded-lg">
+      <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
             Profile Information
           </h3>
-          <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <div className="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
             <p>Update your account's profile information and avatar.</p>
           </div>
           <form onSubmit={handleProfileUpdate} className="mt-5 space-y-6">
             {/* Avatar */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Profile Photo
               </label>
               <div className="mt-2 flex items-center space-x-6">
-                <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-100">
+                <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
                   {avatar ? (
                     <img
                       src={avatar}
@@ -394,7 +396,7 @@ export default function ProfileSettings() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                    <div className="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-500">
                       <svg
                         className="h-16 w-16"
                         fill="currentColor"
@@ -408,7 +410,7 @@ export default function ProfileSettings() {
                 <div>
                   <label
                     htmlFor="avatar-upload"
-                    className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    className="cursor-pointer rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     Change photo
                     <input
@@ -420,7 +422,7 @@ export default function ProfileSettings() {
                       disabled={saving}
                     />
                   </label>
-                  <p className="mt-2 text-xs text-gray-500">
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     JPG, PNG or GIF. Max 2MB.
                   </p>
                 </div>
@@ -431,7 +433,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Full Name
               </label>
@@ -440,7 +442,7 @@ export default function ProfileSettings() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               />
             </div>
@@ -449,7 +451,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Email Address
               </label>
@@ -458,7 +460,7 @@ export default function ProfileSettings() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               />
             </div>
@@ -467,7 +469,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="avatar-url"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Avatar URL (optional)
               </label>
@@ -477,9 +479,9 @@ export default function ProfileSettings() {
                 value={avatar}
                 onChange={(e) => setAvatar(e.target.value)}
                 placeholder="https://avatar.iran.liara.run/public"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Or paste a direct URL to your avatar image
               </p>
             </div>
@@ -488,7 +490,7 @@ export default function ProfileSettings() {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+                className="inline-flex justify-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500 disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
@@ -498,12 +500,12 @@ export default function ProfileSettings() {
       </div>
 
       {/* Change Password */}
-      <div className="bg-white shadow sm:rounded-lg">
+      <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
             Change Password
           </h3>
-          <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <div className="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
             <p>
               Ensure your account is using a long, random password to stay
               secure.
@@ -514,7 +516,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="current-password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Current Password
               </label>
@@ -523,7 +525,7 @@ export default function ProfileSettings() {
                 id="current-password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               />
             </div>
@@ -532,7 +534,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="new-password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 New Password
               </label>
@@ -541,11 +543,11 @@ export default function ProfileSettings() {
                 id="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 minLength={8}
                 required
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Must be at least 8 characters
               </p>
             </div>
@@ -554,7 +556,7 @@ export default function ProfileSettings() {
             <div>
               <label
                 htmlFor="confirm-password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Confirm New Password
               </label>
@@ -563,7 +565,7 @@ export default function ProfileSettings() {
                 id="confirm-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 minLength={8}
                 required
               />
@@ -573,7 +575,7 @@ export default function ProfileSettings() {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+                className="inline-flex justify-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500 disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Password"}
               </button>
@@ -583,21 +585,25 @@ export default function ProfileSettings() {
       </div>
 
       {/* Account Information (Read-only) */}
-      <div className="bg-white shadow sm:rounded-lg">
+      <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
             Account Information
           </h3>
-          <div className="mt-5 border-t border-gray-200">
-            <dl className="divide-y divide-gray-200">
+          <div className="mt-5 border-t border-gray-200 dark:border-gray-700">
+            <dl className="divide-y divide-gray-200 dark:divide-gray-700">
               <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                <dt className="text-sm font-medium text-gray-500">User ID</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 font-mono">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  User ID
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100 sm:col-span-2 sm:mt-0 font-mono">
                   {user?.id}
                 </dd>
               </div>
               <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                <dt className="text-sm font-medium text-gray-500">Role</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Role
+                </dt>
                 <dd className="mt-1 sm:col-span-2 sm:mt-0">
                   {(user as any)?.roles?.[0]?.name ? (
                     <div className="flex items-center">
@@ -622,12 +628,12 @@ export default function ProfileSettings() {
                           />
                         </svg>
                       </div>
-                      <span className="ml-3 text-sm font-medium text-gray-900">
+                      <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                         {(user as any).roles[0].name}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       No role assigned
                     </span>
                   )}

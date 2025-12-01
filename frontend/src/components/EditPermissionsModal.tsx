@@ -71,7 +71,7 @@ export default function EditPermissionsModal({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -81,7 +81,7 @@ export default function EditPermissionsModal({
         // Initialize permissions for all collections
         const allPermissions = COLLECTIONS.map((collection) => {
           const existing = existingPermissions.find(
-            (p: Permission) => p.collection === collection.name
+            (p: Permission) => p.collection === collection.name,
           );
           return (
             existing || {
@@ -107,12 +107,12 @@ export default function EditPermissionsModal({
   const handlePermissionChange = (
     collection: string,
     field: keyof Omit<Permission, "id" | "collection">,
-    value: boolean
+    value: boolean,
   ) => {
     setPermissions((prev) =>
       prev.map((p) =>
-        p.collection === collection ? { ...p, [field]: value } : p
-      )
+        p.collection === collection ? { ...p, [field]: value } : p,
+      ),
     );
   };
 
@@ -127,8 +127,8 @@ export default function EditPermissionsModal({
               canUpdate: true,
               canDelete: true,
             }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -143,8 +143,8 @@ export default function EditPermissionsModal({
               canUpdate: false,
               canDelete: false,
             }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -167,7 +167,7 @@ export default function EditPermissionsModal({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ permissions }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -179,7 +179,7 @@ export default function EditPermissionsModal({
       onClose();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to save permissions"
+        err instanceof Error ? err.message : "Failed to save permissions",
       );
     } finally {
       setSaving(false);
@@ -190,61 +190,65 @@ export default function EditPermissionsModal({
     <div className="fixed z-50 inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
         <div
-          className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+          className="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-80 dark:opacity-90 transition-opacity"
           onClick={onClose}
         ></div>
 
-        <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-4xl sm:w-full sm:p-6 z-50">
+        <div className="relative inline-block align-middle bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-4xl sm:w-full sm:p-6 z-50">
           <div>
             <div className="sm:flex sm:items-start">
               <div className="w-full">
-                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-2">
                   Edit Permissions: {role.name}
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">{role.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  {role.description}
+                </p>
 
                 {error && (
-                  <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
-                    <p className="text-sm text-red-800">{error}</p>
+                  <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
+                    <p className="text-sm text-red-800 dark:text-red-200">
+                      {error}
+                    </p>
                   </div>
                 )}
 
                 {loading ? (
                   <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                    <p className="mt-2 text-sm text-gray-500">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                       Loading permissions...
                     </p>
                   </div>
                 ) : (
                   <div className="mt-4 max-h-96 overflow-y-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50 sticky top-0">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Collection
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Create
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Read
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Update
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Delete
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {permissions.map((permission, index) => {
                           const collectionInfo = COLLECTIONS.find(
-                            (c) => c.name === permission.collection
+                            (c) => c.name === permission.collection,
                           );
                           const allSelected =
                             permission.canCreate &&
@@ -256,15 +260,17 @@ export default function EditPermissionsModal({
                             <tr
                               key={permission.collection}
                               className={
-                                index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                index % 2 === 0
+                                  ? "bg-white dark:bg-gray-800"
+                                  : "bg-gray-50 dark:bg-gray-750"
                               }
                             >
                               <td className="px-4 py-4">
-                                <div className="text-sm font-medium text-gray-900">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
                                   {collectionInfo?.label ||
                                     permission.collection}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
                                   {collectionInfo?.description}
                                 </div>
                               </td>
@@ -276,10 +282,10 @@ export default function EditPermissionsModal({
                                     handlePermissionChange(
                                       permission.collection,
                                       "canCreate",
-                                      e.target.checked
+                                      e.target.checked,
                                     )
                                   }
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                  className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
                                 />
                               </td>
                               <td className="px-4 py-4 text-center">
@@ -290,10 +296,10 @@ export default function EditPermissionsModal({
                                     handlePermissionChange(
                                       permission.collection,
                                       "canRead",
-                                      e.target.checked
+                                      e.target.checked,
                                     )
                                   }
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                  className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
                                 />
                               </td>
                               <td className="px-4 py-4 text-center">
@@ -304,10 +310,10 @@ export default function EditPermissionsModal({
                                     handlePermissionChange(
                                       permission.collection,
                                       "canUpdate",
-                                      e.target.checked
+                                      e.target.checked,
                                     )
                                   }
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                  className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
                                 />
                               </td>
                               <td className="px-4 py-4 text-center">
@@ -318,10 +324,10 @@ export default function EditPermissionsModal({
                                     handlePermissionChange(
                                       permission.collection,
                                       "canDelete",
-                                      e.target.checked
+                                      e.target.checked,
                                     )
                                   }
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                  className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
                                 />
                               </td>
                               <td className="px-4 py-4 text-center">
@@ -331,7 +337,7 @@ export default function EditPermissionsModal({
                                     onClick={() =>
                                       handleDeselectAll(permission.collection)
                                     }
-                                    className="text-xs text-red-600 hover:text-red-900"
+                                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                   >
                                     Clear All
                                   </button>
@@ -341,7 +347,7 @@ export default function EditPermissionsModal({
                                     onClick={() =>
                                       handleSelectAll(permission.collection)
                                     }
-                                    className="text-xs text-indigo-600 hover:text-indigo-900"
+                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                                   >
                                     Select All
                                   </button>
@@ -363,7 +369,7 @@ export default function EditPermissionsModal({
               type="button"
               disabled={saving || loading}
               onClick={handleSave}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-base font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? "Saving..." : "Save Permissions"}
             </button>
@@ -371,7 +377,7 @@ export default function EditPermissionsModal({
               type="button"
               disabled={saving}
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>

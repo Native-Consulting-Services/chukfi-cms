@@ -113,7 +113,7 @@ export default function UsersList() {
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setSelectedRoleId(
-      user.roles && user.roles.length > 0 ? user.roles[0].id : ""
+      user.roles && user.roles.length > 0 ? user.roles[0].id : "",
     );
     setShowEditModal(true);
     setFormError("");
@@ -143,7 +143,7 @@ export default function UsersList() {
           body: JSON.stringify({
             roleId: selectedRoleId || null,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -157,7 +157,7 @@ export default function UsersList() {
       await fetchUsers();
     } catch (err) {
       setFormError(
-        err instanceof Error ? err.message : "Failed to update role"
+        err instanceof Error ? err.message : "Failed to update role",
       );
     } finally {
       setFormLoading(false);
@@ -212,27 +212,36 @@ export default function UsersList() {
 
   const getRoleBadge = (roles: Role[] = []) => {
     if (roles.length === 0)
-      return <span className="text-xs text-gray-500">No roles</span>;
+      return (
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          No roles
+        </span>
+      );
 
     const role = roles[0];
     const lowerName = role.name.toLowerCase();
 
-    let badgeClass = "bg-gray-100 text-gray-800";
+    let badgeClass =
+      "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
 
     // Match the colors from RolesList
     if (lowerName.includes("super admin")) {
-      badgeClass = "bg-purple-100 text-purple-800";
+      badgeClass =
+        "bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300";
     } else if (lowerName.includes("admin")) {
-      badgeClass = "bg-red-100 text-red-800";
+      badgeClass = "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300";
     } else if (lowerName.includes("editor")) {
-      badgeClass = "bg-blue-100 text-blue-800";
+      badgeClass =
+        "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300";
     } else if (
       lowerName.includes("author") ||
       lowerName.includes("contributor")
     ) {
-      badgeClass = "bg-green-100 text-green-800";
+      badgeClass =
+        "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300";
     } else if (lowerName.includes("viewer") || lowerName.includes("reader")) {
-      badgeClass = "bg-gray-100 text-gray-800";
+      badgeClass =
+        "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
     }
 
     return (
@@ -260,10 +269,10 @@ export default function UsersList() {
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       {/* Error display */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
           <div className="flex">
             <svg
-              className="h-5 w-5 text-red-400"
+              className="h-5 w-5 text-red-400 dark:text-red-500"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -273,7 +282,9 @@ export default function UsersList() {
                 clipRule="evenodd"
               />
             </svg>
-            <p className="ml-3 text-sm text-red-800">{error}</p>
+            <p className="ml-3 text-sm text-red-800 dark:text-red-300">
+              {error}
+            </p>
           </div>
         </div>
       )}
@@ -284,7 +295,7 @@ export default function UsersList() {
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
-                className="h-5 w-5 text-gray-400"
+                className="h-5 w-5 text-gray-400 dark:text-gray-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -300,7 +311,7 @@ export default function UsersList() {
             <input
               type="text"
               placeholder="Search users..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -317,7 +328,7 @@ export default function UsersList() {
       {loading && (
         <div className="text-center py-12">
           <svg
-            className="animate-spin h-8 w-8 text-indigo-600 mx-auto"
+            className="animate-spin h-8 w-8 text-indigo-600 dark:text-indigo-400 mx-auto"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -335,20 +346,22 @@ export default function UsersList() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p className="mt-2 text-sm text-gray-500">Loading users...</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Loading users...
+          </p>
         </div>
       )}
 
       {/* Users table */}
       {!loading && (
-        <div className="bg-white overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-50">
+        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow ring-1 ring-black dark:ring-gray-700 ring-opacity-5 md:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
                   <input
                     type="checkbox"
-                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 dark:bg-gray-700 focus:ring-indigo-500"
                     checked={
                       selectedUsers.length === filteredUsers.length &&
                       filteredUsers.length > 0
@@ -358,19 +371,19 @@ export default function UsersList() {
                 </th>
                 <th
                   scope="col"
-                  className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                  className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white"
                 >
                   User
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
                 >
                   Role
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
                 >
                   Created
                 </th>
@@ -379,16 +392,16 @@ export default function UsersList() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                          <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                             <svg
-                              className="h-6 w-6 text-indigo-600"
+                              className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -403,17 +416,19 @@ export default function UsersList() {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-gray-900 dark:text-white">
                             {user.displayName}
                           </div>
-                          <div className="text-gray-500">{user.email}</div>
+                          <div className="text-gray-500 dark:text-gray-400">
+                            {user.email}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {getRoleBadge(user.roles)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(user.createdAt)}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -422,7 +437,7 @@ export default function UsersList() {
                           <button
                             type="button"
                             onClick={() => handleEditUser(user)}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                             title="Edit user"
                           >
                             <svg
@@ -444,7 +459,7 @@ export default function UsersList() {
                           <button
                             type="button"
                             onClick={() => handleDeleteUser(user.id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                             title="Delete user"
                           >
                             <svg
@@ -470,10 +485,10 @@ export default function UsersList() {
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-6 py-14 text-center text-sm text-gray-500"
+                    className="px-6 py-14 text-center text-sm text-gray-500 dark:text-gray-400"
                   >
                     <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
+                      className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -485,10 +500,10 @@ export default function UsersList() {
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                       />
                     </svg>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                       No users found
                     </h3>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       {searchTerm ||
                       filterRole !== "all" ||
                       filterStatus !== "all"
@@ -505,7 +520,7 @@ export default function UsersList() {
 
       {/* Results summary */}
       {!loading && (
-        <div className="mt-4 text-sm text-gray-700">
+        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
           Showing <span className="font-medium">{filteredUsers.length}</span> of{" "}
           <span className="font-medium">{users.length}</span> users
         </div>
@@ -516,29 +531,33 @@ export default function UsersList() {
         <div className="fixed z-50 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
             <div
-              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+              className="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-80 transition-opacity"
               onClick={() => setShowEditModal(false)}
             ></div>
 
-            <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+            <div className="relative inline-block align-middle bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
               <div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                     Edit User Role
                   </h3>
                   <div className="mt-4">
-                    <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                    <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
                       <div className="text-sm">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 dark:text-white">
                           {editingUser.displayName}
                         </div>
-                        <div className="text-gray-500">{editingUser.email}</div>
+                        <div className="text-gray-500 dark:text-gray-400">
+                          {editingUser.email}
+                        </div>
                       </div>
                     </div>
 
                     {formError && (
-                      <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
-                        <p className="text-sm text-red-800">{formError}</p>
+                      <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
+                        <p className="text-sm text-red-800 dark:text-red-300">
+                          {formError}
+                        </p>
                       </div>
                     )}
 
@@ -546,13 +565,13 @@ export default function UsersList() {
                       <div>
                         <label
                           htmlFor="role"
-                          className="block text-sm font-medium text-gray-700 mb-2"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                         >
                           Role
                         </label>
                         <select
                           id="role"
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           value={selectedRoleId}
                           onChange={(e) => setSelectedRoleId(e.target.value)}
                         >
@@ -564,7 +583,7 @@ export default function UsersList() {
                             </option>
                           ))}
                         </select>
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                           Only one role can be assigned per user.
                         </p>
                       </div>
@@ -575,7 +594,7 @@ export default function UsersList() {
                         type="button"
                         disabled={formLoading}
                         onClick={handleUpdateUserRole}
-                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-base font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {formLoading ? "Updating..." : "Update Role"}
                       </button>
@@ -586,7 +605,7 @@ export default function UsersList() {
                           setShowEditModal(false);
                           setEditingUser(null);
                         }}
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Cancel
                       </button>

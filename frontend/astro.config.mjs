@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  output: "server", // Enable SSR for dynamic routes
   integrations: [react()],
   server: {
     port: 4321,
@@ -17,7 +18,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     define: {
       "import.meta.env.API_URL": JSON.stringify(
-        process.env.API_URL || "http://localhost:8080"
+        process.env.API_URL || "http://localhost:8080",
       ),
     },
     build: {

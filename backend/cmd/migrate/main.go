@@ -71,6 +71,7 @@ func runSQLiteSchema(db *sql.DB, direction string) error {
 		"001_initial_schema_sqlite",
 		"002_add_user_profile_fields",
 		"003_add_media_fields",
+		"004_add_activity_logs_sqlite",
 	}
 
 	suffix := ".up.sql"

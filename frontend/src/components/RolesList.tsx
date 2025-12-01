@@ -27,7 +27,7 @@ export default function RolesList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [editingPermissions, setEditingPermissions] = useState<Role | null>(
-    null
+    null,
   );
   const [deletingRole, setDeletingRole] = useState<Role | null>(null);
 
@@ -93,7 +93,7 @@ export default function RolesList() {
     setSelectedRoles((prev) =>
       prev.includes(roleId)
         ? prev.filter((id) => id !== roleId)
-        : [...prev, roleId]
+        : [...prev, roleId],
     );
   };
 
@@ -101,7 +101,7 @@ export default function RolesList() {
     setSelectedRoles(
       selectedRoles.length === filteredRoles.length
         ? []
-        : filteredRoles.map((role) => role.id)
+        : filteredRoles.map((role) => role.id),
     );
   };
 
@@ -196,8 +196,10 @@ export default function RolesList() {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          <p className="mt-2 text-sm text-gray-500">Loading roles...</p>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Loading roles...
+          </p>
         </div>
       </div>
     );
@@ -207,10 +209,10 @@ export default function RolesList() {
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       {/* Error display */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
           <div className="flex">
             <svg
-              className="h-5 w-5 text-red-400"
+              className="h-5 w-5 text-red-400 dark:text-red-500"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -220,7 +222,9 @@ export default function RolesList() {
                 clipRule="evenodd"
               />
             </svg>
-            <p className="ml-3 text-sm text-red-800">{error}</p>
+            <p className="ml-3 text-sm text-red-800 dark:text-red-200">
+              {error}
+            </p>
           </div>
         </div>
       )}
@@ -231,7 +235,7 @@ export default function RolesList() {
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
-                className="h-5 w-5 text-gray-400"
+                className="h-5 w-5 text-gray-400 dark:text-gray-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -247,7 +251,7 @@ export default function RolesList() {
             <input
               type="text"
               placeholder="Search roles..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -256,14 +260,14 @@ export default function RolesList() {
       </div>
 
       {/* Roles table */}
-      <div className="bg-white overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead className="bg-gray-50">
+      <div className="bg-white dark:bg-gray-800 overflow-hidden shadow ring-1 ring-black dark:ring-white ring-opacity-5 dark:ring-opacity-10 md:rounded-lg">
+        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
                 <input
                   type="checkbox"
-                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-gray-700"
                   checked={
                     selectedRoles.length === filteredRoles.length &&
                     filteredRoles.length > 0
@@ -273,25 +277,25 @@ export default function RolesList() {
               </th>
               <th
                 scope="col"
-                className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                className="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
               >
                 Role
               </th>
               <th
                 scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
               >
                 Description
               </th>
               <th
                 scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
               >
                 Created
               </th>
               <th
                 scope="col"
-                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
               >
                 Updated
               </th>
@@ -300,19 +304,21 @@ export default function RolesList() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
             {filteredRoles.length > 0 ? (
               filteredRoles.map((role) => (
                 <tr
                   key={role.id}
                   className={
-                    selectedRoles.includes(role.id) ? "bg-gray-50" : undefined
+                    selectedRoles.includes(role.id)
+                      ? "bg-gray-50 dark:bg-gray-700/50"
+                      : undefined
                   }
                 >
                   <td className="relative px-7 sm:w-12 sm:px-6">
                     <input
                       type="checkbox"
-                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-gray-700"
                       checked={selectedRoles.includes(role.id)}
                       onChange={() => handleSelectRole(role.id)}
                     />
@@ -321,10 +327,10 @@ export default function RolesList() {
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
                         <div
-                          className={`h-10 w-10 rounded-lg ${getRoleIcon(role.name).bg} flex items-center justify-center`}
+                          className={`h-10 w-10 rounded-lg ${getRoleIcon(role.name).bg} dark:bg-opacity-20 flex items-center justify-center`}
                         >
                           <svg
-                            className={`h-5 w-5 ${getRoleIcon(role.name).color}`}
+                            className={`h-5 w-5 ${getRoleIcon(role.name).color} dark:brightness-125`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -339,19 +345,19 @@ export default function RolesList() {
                         </div>
                       </div>
                       <div className="ml-4">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 dark:text-gray-100">
                           {role.name}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {role.description || "-"}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(role.createdAt)}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(role.updatedAt)}
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -360,7 +366,7 @@ export default function RolesList() {
                         <button
                           type="button"
                           onClick={() => setEditingPermissions(role)}
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                           title="Edit permissions"
                         >
                           <svg
@@ -382,7 +388,7 @@ export default function RolesList() {
                         <button
                           type="button"
                           onClick={() => setDeletingRole(role)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                           title="Delete role"
                         >
                           <svg
@@ -408,10 +414,10 @@ export default function RolesList() {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-6 py-14 text-center text-sm text-gray-500"
+                  className="px-6 py-14 text-center text-sm text-gray-500 dark:text-gray-400"
                 >
                   <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
+                    className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -423,10 +429,10 @@ export default function RolesList() {
                       d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                     />
                   </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                     No roles found
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     {searchTerm
                       ? "Try adjusting your search criteria."
                       : "Get started by creating roles."}
@@ -440,7 +446,7 @@ export default function RolesList() {
 
       {/* Results summary */}
       {!loading && (
-        <div className="mt-4 text-sm text-gray-700">
+        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
           Showing <span className="font-medium">{filteredRoles.length}</span> of{" "}
           <span className="font-medium">{roles.length}</span> roles
         </div>
@@ -463,15 +469,15 @@ export default function RolesList() {
         <div className="fixed z-50 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
             <div
-              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+              className="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-80 dark:opacity-75 transition-opacity"
               onClick={() => setDeletingRole(null)}
             ></div>
 
-            <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+            <div className="relative inline-block align-middle bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
               <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/20 sm:mx-0 sm:h-10 sm:w-10">
                   <svg
-                    className="h-6 w-6 text-red-600"
+                    className="h-6 w-6 text-red-600 dark:text-red-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -485,14 +491,17 @@ export default function RolesList() {
                   </svg>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                     Delete Role
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Are you sure you want to delete the role{" "}
-                      <strong>{deletingRole.name}</strong>? This action cannot
-                      be undone and will remove all associated permissions.
+                      <strong className="text-gray-900 dark:text-gray-100">
+                        {deletingRole.name}
+                      </strong>
+                      ? This action cannot be undone and will remove all
+                      associated permissions.
                     </p>
                   </div>
                 </div>
@@ -501,14 +510,14 @@ export default function RolesList() {
                 <button
                   type="button"
                   onClick={() => handleDeleteRole(deletingRole)}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-600 text-base font-medium text-white hover:bg-red-700 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-red-500 dark:focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Delete
                 </button>
                 <button
                   type="button"
                   onClick={() => setDeletingRole(null)}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>

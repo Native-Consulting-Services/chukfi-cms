@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import BlogPostEditor from '../../../components/BlogPostEditor.tsx';
+---
+
+<AdminLayout title="New Post" currentPage="blog_posts">
+  <BlogPostEditor client:load />
+</AdminLayout>

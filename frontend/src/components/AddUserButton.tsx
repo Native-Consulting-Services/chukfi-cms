@@ -60,7 +60,7 @@ export default function AddUserButton() {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-400"
       >
         <svg
           className="mr-2 h-4 w-4"
@@ -83,20 +83,22 @@ export default function AddUserButton() {
         <div className="fixed z-50 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
             <div
-              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity"
+              className="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-80 transition-opacity"
               onClick={() => setShowAddModal(false)}
             ></div>
 
-            <div className="relative inline-block align-middle bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+            <div className="relative inline-block align-middle bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
               <div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                     Add New User
                   </h3>
                   <div className="mt-4">
                     {formError && (
-                      <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
-                        <p className="text-sm text-red-800">{formError}</p>
+                      <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
+                        <p className="text-sm text-red-800 dark:text-red-300">
+                          {formError}
+                        </p>
                       </div>
                     )}
                     <form
@@ -109,7 +111,7 @@ export default function AddUserButton() {
                         <div>
                           <label
                             htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                           >
                             Email
                           </label>
@@ -117,7 +119,7 @@ export default function AddUserButton() {
                             type="email"
                             id="email"
                             required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             value={newUser.email}
                             onChange={(e) =>
                               setNewUser({ ...newUser, email: e.target.value })
@@ -127,7 +129,7 @@ export default function AddUserButton() {
                         <div>
                           <label
                             htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                           >
                             Password
                           </label>
@@ -136,7 +138,7 @@ export default function AddUserButton() {
                             id="password"
                             required
                             minLength={6}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             value={newUser.password}
                             onChange={(e) =>
                               setNewUser({
@@ -149,7 +151,7 @@ export default function AddUserButton() {
                         <div>
                           <label
                             htmlFor="displayName"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                           >
                             Display Name
                           </label>
@@ -157,7 +159,7 @@ export default function AddUserButton() {
                             type="text"
                             id="displayName"
                             required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             value={newUser.displayName}
                             onChange={(e) =>
                               setNewUser({
@@ -172,7 +174,7 @@ export default function AddUserButton() {
                         <button
                           type="submit"
                           disabled={formLoading}
-                          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-base font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {formLoading ? "Creating..." : "Create User"}
                         </button>
@@ -180,7 +182,7 @@ export default function AddUserButton() {
                           type="button"
                           disabled={formLoading}
                           onClick={() => setShowAddModal(false)}
-                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Cancel
                         </button>

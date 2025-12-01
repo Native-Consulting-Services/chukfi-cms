@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ActivityPage from '../../components/ActivityPage.tsx';
+---
+
+<AdminLayout title="Activity Log">
+  <ActivityPage client:load />
+</AdminLayout>

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"chukfi-cms/backend/internal/activity"
 	"chukfi-cms/backend/internal/auth"
 	"chukfi-cms/backend/internal/db"
 	"chukfi-cms/backend/internal/middleware"
@@ -19,9 +20,10 @@ import (
 )
 
 type Handler struct {
-	DB          *db.DB
-	AuthService *auth.Service
-	Storage     storage.Storage
+	DB             *db.DB
+	AuthService    *auth.Service
+	Storage        storage.Storage
+	ActivityLogger *activity.Logger
 }
 
 type ErrorResponse struct {
@@ -198,6 +200,13 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:   now,
 	}
 
+	// Log user creation activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			go h.ActivityLogger.LogCreate(r.Context(), currentUserID, "user", userID, req.Email, r.RemoteAddr, r.UserAgent())
+		}
+	}
+
 	h.writeJSON(w, http.StatusCreated, user)
 }
 
@@ -255,6 +264,13 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.writeError(w, http.StatusInternalServerError, "database_error", "Failed to update user")
 		return
+	}
+
+	// Log user update activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			go h.ActivityLogger.LogUpdate(r.Context(), currentUserID, "user", userID, req.Email, r.RemoteAddr, r.UserAgent())
+		}
 	}
 
 	// Return updated user data
@@ -389,10 +405,21 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get user email for activity log before committing
+	var userEmail string
+	h.DB.QueryRow("SELECT email FROM users WHERE id = ?", userID).Scan(&userEmail)
+
 	// Commit the transaction
 	if err := tx.Commit(); err != nil {
 		h.writeError(w, http.StatusInternalServerError, "database_error", "Failed to commit transaction")
 		return
+	}
+
+	// Log user deletion activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			go h.ActivityLogger.LogDelete(r.Context(), currentUserID, "user", userID, userEmail, r.RemoteAddr, r.UserAgent())
+		}
 	}
 
 	h.writeJSON(w, http.StatusOK, map[string]string{
@@ -543,6 +570,13 @@ func (h *Handler) CreateRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Log role creation activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			go h.ActivityLogger.LogCreate(r.Context(), currentUserID, "role", roleID, req.Name, r.RemoteAddr, r.UserAgent())
+		}
+	}
+
 	h.writeJSON(w, http.StatusCreated, map[string]interface{}{
 		"role":    role,
 		"message": "Role created successfully",
@@ -613,6 +647,14 @@ func (h *Handler) DeleteRole(w http.ResponseWriter, r *http.Request) {
 	if rowsAffected == 0 {
 		h.writeError(w, http.StatusNotFound, "not_found", "Role not found")
 		return
+	}
+
+	// Log role deletion activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			roleUUID, _ := uuid.Parse(roleID)
+			go h.ActivityLogger.LogDelete(r.Context(), currentUserID, "role", roleUUID, roleName, r.RemoteAddr, r.UserAgent())
+		}
 	}
 
 	h.writeJSON(w, http.StatusOK, map[string]interface{}{
@@ -995,6 +1037,14 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	if err := h.Storage.Delete(filename); err != nil {
 		// Log error but don't fail the request since DB record is already deleted
 		log.Printf("Warning: Failed to delete file %s: %v", filename, err)
+	}
+
+	// Log media deletion activity
+	if h.ActivityLogger != nil {
+		if currentUserID, ok := middleware.GetUserID(r); ok {
+			mediaUUID, _ := uuid.Parse(mediaID)
+			go h.ActivityLogger.LogDelete(r.Context(), currentUserID, "media", mediaUUID, filename, r.RemoteAddr, r.UserAgent())
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
