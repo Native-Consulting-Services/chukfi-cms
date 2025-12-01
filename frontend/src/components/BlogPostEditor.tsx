@@ -56,7 +56,7 @@ interface BlogPost {
   content: string;
   excerpt: string;
   status: "draft" | "published" | "scheduled";
-  author: string;
+  author?: string;
   featuredImage?: string;
   bannerImage?: string;
   featured?: boolean;

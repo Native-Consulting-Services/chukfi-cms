@@ -187,34 +187,34 @@ export default function BlogPostsList() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
         <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="px-4 py-5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+          <div className="rounded-lg bg-gray-50 px-4 py-5 dark:bg-gray-700/50">
+            <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
               Total Posts
             </dt>
             <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
               {totalPosts}
             </dd>
           </div>
-          <div className="px-4 py-5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+          <div className="rounded-lg bg-gray-50 px-4 py-5 dark:bg-gray-700/50">
+            <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
               Published
             </dt>
             <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
               {publishedCount}
             </dd>
           </div>
-          <div className="px-4 py-5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+          <div className="rounded-lg bg-gray-50 px-4 py-5 dark:bg-gray-700/50">
+            <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
               Drafts
             </dt>
             <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
               {draftCount}
             </dd>
           </div>
-          <div className="px-4 py-5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+          <div className="rounded-lg bg-gray-50 px-4 py-5 dark:bg-gray-700/50">
+            <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
               Scheduled
             </dt>
             <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
@@ -225,9 +225,9 @@ export default function BlogPostsList() {
       </div>
 
       {/* Filter bar */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex-1 max-w-lg">
+      <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-lg flex-1">
             <label htmlFor="search" className="sr-only">
               Search posts
             </label>
@@ -250,7 +250,7 @@ export default function BlogPostsList() {
                 id="search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 bg-white py-2 pr-3 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
                 placeholder="Search posts..."
               />
             </div>
@@ -264,7 +264,7 @@ export default function BlogPostsList() {
                   e.target.value as "all" | "draft" | "published" | "scheduled",
                 )
               }
-              className="block rounded-md border-0 bg-white dark:bg-gray-900 py-2 pl-3 pr-10 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block rounded-md border-0 bg-white py-2 pr-10 pl-3 text-gray-900 ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
             >
               <option value="all">All Status</option>
               <option value="published">Published</option>
@@ -277,7 +277,7 @@ export default function BlogPostsList() {
               onChange={(e) =>
                 setSortBy(e.target.value as "updated" | "created" | "title")
               }
-              className="block rounded-md border-0 bg-white dark:bg-gray-900 py-2 pl-3 pr-10 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block rounded-md border-0 bg-white py-2 pr-10 pl-3 text-gray-900 ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
             >
               <option value="updated">Last Updated</option>
               <option value="created">Date Created</option>
@@ -318,7 +318,7 @@ export default function BlogPostsList() {
               <div className="mt-6">
                 <a
                   href="/admin/blog_posts/new"
-                  className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400"
+                  className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                 >
                   <svg
                     className="mr-2 h-4 w-4"
@@ -342,13 +342,13 @@ export default function BlogPostsList() {
       ) : (
         <div className="px-6 pb-6">
           {/* Desktop: Table view (hidden on mobile) */}
-          <div className="hidden lg:block overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-gray-700 rounded-lg">
+          <div className="ring-opacity-5 hidden overflow-hidden rounded-lg ring-1 shadow ring-black lg:block dark:ring-gray-700">
             <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700/50">
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:pl-6"
+                    className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-white"
                   >
                     Title
                   </th>
@@ -382,23 +382,23 @@ export default function BlogPostsList() {
                   >
                     Schedule Date
                   </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-6">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-gray-800">
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-gray-800">
                 {filteredPosts.map((post) => (
                   <tr
                     key={post.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                    <td className="py-4 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-6">
                       <div className="flex items-center gap-2">
                         {post.featured && (
                           <span title="Featured">
                             <Star
-                              className="h-4 w-4 text-yellow-500 fill-yellow-500"
+                              className="h-4 w-4 fill-yellow-500 text-yellow-500"
                               aria-label="Featured"
                             />
                           </span>
@@ -407,13 +407,13 @@ export default function BlogPostsList() {
                           <div className="font-medium text-gray-900 dark:text-white">
                             {post.title}
                           </div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">
+                          <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                             /{post.slug}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       <span
                         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                           post.status === "published"
@@ -430,16 +430,16 @@ export default function BlogPostsList() {
                             : "Draft"}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {post.author}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {formatDate(post.createdAt)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {formatDate(post.updatedAt)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {post.status === "scheduled" && post.publishAt ? (
                         <span className="text-blue-600 dark:text-blue-400">
                           {formatDate(post.publishAt)}
@@ -450,11 +450,11 @@ export default function BlogPostsList() {
                         </span>
                       )}
                     </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
                       <div className="flex items-center justify-end gap-2">
                         <a
                           href={`/admin/blog_posts/${post.id}/edit`}
-                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                           title="Edit"
                         >
                           <Pencil className="h-5 w-5" />
@@ -462,7 +462,7 @@ export default function BlogPostsList() {
                         <button
                           type="button"
                           onClick={() => handleDelete(post)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                           title="Delete"
                         >
                           <Trash2 className="h-5 w-5" />
@@ -476,40 +476,39 @@ export default function BlogPostsList() {
           </div>
 
           {/* Mobile/Tablet: Card view */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
             {filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow ring-1 ring-black ring-opacity-5 dark:ring-gray-700 p-5"
+                className="ring-opacity-5 rounded-lg bg-white p-5 ring-1 shadow ring-black transition-shadow hover:shadow-md dark:bg-gray-800 dark:ring-gray-700"
               >
                 {/* Header: Title and Featured Star */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-base font-semibold text-gray-900 dark:text-white">
                       {post.title}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                    <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
                       /{post.slug}
                     </p>
                   </div>
                   {post.featured && (
                     <Star
-                      className="h-5 w-5 text-yellow-500 fill-yellow-500 flex-shrink-0"
+                      className="h-5 w-5 flex-shrink-0 fill-yellow-500 text-yellow-500"
                       aria-label="Featured"
-                      title="Featured"
                     />
                   )}
                 </div>
 
                 {/* Excerpt */}
                 {post.excerpt && (
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                  <p className="mb-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
                     {post.excerpt}
                   </p>
                 )}
 
                 {/* Metadata */}
-                <div className="flex flex-wrap items-center gap-2 mb-4">
+                <div className="mb-4 flex flex-wrap items-center gap-2">
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                       post.status === "published"
@@ -553,10 +552,10 @@ export default function BlogPostsList() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 border-t border-gray-200 pt-3 dark:border-gray-700">
                   <a
                     href={`/admin/blog_posts/${post.id}/edit`}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-md transition-colors"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
                   >
                     <Pencil className="h-4 w-4" />
                     Edit
@@ -564,7 +563,7 @@ export default function BlogPostsList() {
                   <button
                     type="button"
                     onClick={() => handleDelete(post)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                   >
                     <Trash2 className="h-4 w-4" />
                     Delete
@@ -578,18 +577,18 @@ export default function BlogPostsList() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && postToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Delete Post
               </h3>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            <p className="mb-6 text-sm text-gray-600 dark:text-gray-300">
               Are you sure you want to delete "{postToDelete.title}"? It will be
               moved to trash and automatically deleted after 30 days.
             </p>
@@ -601,14 +600,14 @@ export default function BlogPostsList() {
                   setShowDeleteModal(false);
                   setPostToDelete(null);
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600"
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
               >
                 Delete Post
               </button>
