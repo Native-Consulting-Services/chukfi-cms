@@ -1,0 +1,25 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import BlogPostEditor from '../../../components/BlogPostEditor.tsx';
+---
+
+<AdminLayout title="Edit Post" currentPage="blog_posts">
+  <BlogPostEditor client:only="react" />
+  
+  <script>
+    // Extract post ID from URL query parameter and pass to React component
+    // URL format: /admin/blog_posts/edit?id=123
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');
+    
+    // Find the BlogPostEditor component and update its props
+    if (postId) {
+      // The component will handle fetching the post data based on the ID
+      const editorContainer = document.querySelector('[data-astro-cid-BlogPostEditor]');
+      if (editorContainer) {
+        // React component will read the ID from URL itself
+        console.log('Editing post:', postId);
+      }
+    }
+  </script>
+</AdminLayout>

@@ -4,7 +4,7 @@ import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  output: "server", // Enable SSR for dynamic routes
+  output: "static", // Static build - all data fetched client-side from Go API
   integrations: [react()],
   server: {
     port: 4321,

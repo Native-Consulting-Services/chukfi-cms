@@ -73,10 +73,23 @@ interface BlogPostEditorProps {
 }
 
 export default function BlogPostEditor({
-  postId,
+  postId: postIdProp,
   onSave,
   onCancel,
 }: BlogPostEditorProps) {
+  // Get post ID from prop or URL query parameter
+  const [postId, setPostId] = useState<string | undefined>(postIdProp);
+
+  useEffect(() => {
+    if (!postIdProp && typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idFromUrl = urlParams.get("id");
+      if (idFromUrl) {
+        setPostId(idFromUrl);
+      }
+    }
+  }, [postIdProp]);
+
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -598,10 +611,10 @@ export default function BlogPostEditor({
           <button
             type="button"
             onClick={() => (window.location.href = "/admin/blog_posts")}
-            className="inline-flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+            className="inline-flex items-center rounded-md p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Back to Blog Posts"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {postId ? "Edit Post" : "New Post"}
@@ -612,9 +625,9 @@ export default function BlogPostEditor({
             <button
               type="button"
               onClick={handleDelete}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 border border-red-300 dark:border-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-600 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </button>
           )}
@@ -622,18 +635,18 @@ export default function BlogPostEditor({
             type="button"
             onClick={() => handleSave("draft")}
             disabled={isSaving}
-            className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="mr-2 h-4 w-4" />
             Save Draft
           </button>
           <button
             type="button"
             onClick={() => handleSave("published")}
             disabled={isSaving}
-            className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 rounded-md hover:bg-indigo-500 dark:hover:bg-indigo-600 disabled:opacity-50"
+            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600"
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="mr-2 h-4 w-4" />
             Publish
           </button>
           <button
@@ -652,16 +665,16 @@ export default function BlogPostEditor({
               handleSave("scheduled");
             }}
             disabled={isSaving}
-            className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 dark:bg-green-500 rounded-md hover:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50"
+            className="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:opacity-50 dark:bg-green-500 dark:hover:bg-green-600"
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="mr-2 h-4 w-4" />
             Schedule
           </button>
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
@@ -670,11 +683,11 @@ export default function BlogPostEditor({
       </div>
 
       {/* Post metadata */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50 p-6 space-y-4">
+      <div className="space-y-4 rounded-lg bg-white p-6 shadow dark:bg-gray-800 dark:shadow-gray-900/50">
         <div>
           <label
             htmlFor="title"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Title *
           </label>
@@ -684,14 +697,14 @@ export default function BlogPostEditor({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter post title..."
-            className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 px-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
           />
         </div>
 
         <div>
           <label
             htmlFor="slug"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Slug
           </label>
@@ -701,14 +714,14 @@ export default function BlogPostEditor({
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             placeholder="post-url-slug"
-            className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 px-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
           />
         </div>
 
         <div>
           <label
             htmlFor="excerpt"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Excerpt
           </label>
@@ -718,39 +731,39 @@ export default function BlogPostEditor({
             onChange={(e) => setExcerpt(e.target.value)}
             placeholder="Brief description (optional, auto-generated if empty)..."
             rows={3}
-            className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 px-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Banner Image
           </label>
 
           {/* Mode selector tabs */}
-          <div className="flex gap-2 mb-3">
+          <div className="mb-3 flex gap-2">
             <button
               type="button"
               onClick={() => setBannerInputMode("url")}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
                 bannerInputMode === "url"
                   ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              <Link2 className="w-4 h-4" />
+              <Link2 className="h-4 w-4" />
               URL
             </button>
             <button
               type="button"
               onClick={() => setBannerInputMode("upload")}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
                 bannerInputMode === "upload"
                   ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="h-4 w-4" />
               Upload
             </button>
             <button
@@ -759,13 +772,13 @@ export default function BlogPostEditor({
                 setBannerInputMode("media");
                 setShowMediaPicker(true);
               }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
                 bannerInputMode === "media"
                   ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              <FolderOpen className="w-4 h-4" />
+              <FolderOpen className="h-4 w-4" />
               Media Library
             </button>
           </div>
@@ -777,17 +790,17 @@ export default function BlogPostEditor({
               value={bannerImage}
               onChange={(e) => setBannerImage(e.target.value)}
               placeholder="https://example.com/banner.jpg"
-              className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 px-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
             />
           )}
 
           {/* Upload mode */}
           {bannerInputMode === "upload" && (
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+            <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center dark:border-gray-600">
               <Upload className="mx-auto h-12 w-12 text-gray-400" />
               <div className="mt-2">
                 <label htmlFor="file-upload" className="cursor-pointer">
-                  <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                  <span className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                     Upload a file
                   </span>
                   <input
@@ -809,11 +822,11 @@ export default function BlogPostEditor({
                     }}
                   />
                 </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   or drag and drop
                 </p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 PNG, JPG, WEBP up to 10MB
               </p>
             </div>
@@ -821,8 +834,8 @@ export default function BlogPostEditor({
 
           {/* Media library picker */}
           {bannerInputMode === "media" && showMediaPicker && (
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-              <div className="flex items-center justify-between mb-3">
+            <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-900">
+              <div className="mb-3 flex items-center justify-between">
                 <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                   Select from Media Library
                 </h4>
@@ -831,10 +844,10 @@ export default function BlogPostEditor({
                   onClick={() => setShowMediaPicker(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+              <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 Media library integration coming soon. For now, use URL or
                 Upload options.
               </div>
@@ -843,11 +856,11 @@ export default function BlogPostEditor({
 
           {/* Preview */}
           {bannerImage && (
-            <div className="mt-3 relative">
+            <div className="relative mt-3">
               <img
                 src={bannerImage}
                 alt="Banner preview"
-                className="w-full h-32 object-cover rounded-lg"
+                className="h-32 w-full rounded-lg object-cover"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
@@ -855,10 +868,10 @@ export default function BlogPostEditor({
               <button
                 type="button"
                 onClick={() => setBannerImage("")}
-                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
                 title="Remove image"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -869,14 +882,14 @@ export default function BlogPostEditor({
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label className="relative inline-flex cursor-pointer items-center">
             <input
               type="checkbox"
               checked={featured}
               onChange={(e) => setFeatured(e.target.checked)}
-              className="sr-only peer"
+              className="peer sr-only"
             />
-            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+            <div className="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-indigo-600 peer-focus:ring-4 peer-focus:ring-indigo-300 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-indigo-800"></div>
             <span className="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">
               Featured Post
             </span>
@@ -890,7 +903,7 @@ export default function BlogPostEditor({
         <div>
           <label
             htmlFor="publishAt"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Schedule Publish Date (Optional)
           </label>
@@ -899,7 +912,7 @@ export default function BlogPostEditor({
             id="publishAt"
             value={publishAt}
             onChange={(e) => setPublishAt(e.target.value)}
-            className="block w-full rounded-md border-0 bg-white dark:bg-gray-900 py-2 px-3 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
           />
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             If set, the post will be automatically published at this date and
@@ -909,276 +922,276 @@ export default function BlogPostEditor({
       </div>
 
       {/* Editor */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50 overflow-hidden">
+      <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800 dark:shadow-gray-900/50">
         {/* Toolbar */}
-        <div className="border-b border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 border-b border-gray-200 p-2 dark:border-gray-700">
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("bold") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Bold"
           >
-            <Bold className="w-4 h-4" />
+            <Bold className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("italic") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Italic"
           >
-            <Italic className="w-4 h-4" />
+            <Italic className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("strike") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Strikethrough"
           >
-            <Strikethrough className="w-4 h-4" />
+            <Strikethrough className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("underline") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Underline"
           >
-            <UnderlineIcon className="w-4 h-4" />
+            <UnderlineIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleCode().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("code") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Code"
           >
-            <Code className="w-4 h-4" />
+            <Code className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleHighlight().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("highlight") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Highlight"
           >
-            <Highlighter className="w-4 h-4" />
+            <Highlighter className="h-4 w-4" />
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="mx-1 w-px bg-gray-300 dark:bg-gray-600" />
 
           {/* Text Alignment */}
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive({ textAlign: "left" })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Align Left"
           >
-            <AlignLeft className="w-4 h-4" />
+            <AlignLeft className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive({ textAlign: "center" })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Align Center"
           >
-            <AlignCenter className="w-4 h-4" />
+            <AlignCenter className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive({ textAlign: "right" })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Align Right"
           >
-            <AlignRight className="w-4 h-4" />
+            <AlignRight className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive({ textAlign: "justify" })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Justify"
           >
-            <AlignJustify className="w-4 h-4" />
+            <AlignJustify className="h-4 w-4" />
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="mx-1 w-px bg-gray-300 dark:bg-gray-600" />
 
           <button
             type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
             }
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("heading", { level: 1 })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Heading 1"
           >
-            <Heading1 className="w-4 h-4" />
+            <Heading1 className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("heading", { level: 2 })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Heading 2"
           >
-            <Heading2 className="w-4 h-4" />
+            <Heading2 className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 3 }).run()
             }
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("heading", { level: 3 })
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Heading 3"
           >
-            <Heading3 className="w-4 h-4" />
+            <Heading3 className="h-4 w-4" />
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="mx-1 w-px bg-gray-300 dark:bg-gray-600" />
 
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("bulletList")
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Bullet List"
           >
-            <List className="w-4 h-4" />
+            <List className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("orderedList")
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Numbered List"
           >
-            <ListOrdered className="w-4 h-4" />
+            <ListOrdered className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("blockquote")
                 ? "bg-gray-200 dark:bg-gray-600"
                 : ""
             }`}
             title="Quote"
           >
-            <Quote className="w-4 h-4" />
+            <Quote className="h-4 w-4" />
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="mx-1 w-px bg-gray-300 dark:bg-gray-600" />
 
           <button
             type="button"
             onClick={setLink}
-            className={`p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+            className={`rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 ${
               editor.isActive("link") ? "bg-gray-200 dark:bg-gray-600" : ""
             }`}
             title="Add Link"
           >
-            <Link2 className="w-4 h-4" />
+            <Link2 className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={addImage}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Add Image"
           >
-            <ImageIcon className="w-4 h-4" />
+            <ImageIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={addYoutubeVideo}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Embed YouTube Video"
           >
-            <YoutubeIcon className="w-4 h-4" />
+            <YoutubeIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={addTable}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Insert Table"
           >
-            <TableIcon className="w-4 h-4" />
+            <TableIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={addDocument}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Attach Document"
           >
-            <Paperclip className="w-4 h-4" />
+            <Paperclip className="h-4 w-4" />
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="mx-1 w-px bg-gray-300 dark:bg-gray-600" />
 
           <button
             type="button"
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Undo"
           >
-            <Undo className="w-4 h-4" />
+            <Undo className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
-            className="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+            className="rounded p-2 text-gray-700 hover:bg-gray-100 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Redo"
           >
-            <Redo className="w-4 h-4" />
+            <Redo className="h-4 w-4" />
           </button>
         </div>
 
         {/* Table Controls Bar - Only show when inside a table */}
         {editor.isActive("table") && (
-          <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20">
+          <div className="border-t border-gray-200 bg-indigo-50 px-4 py-2 dark:border-gray-700 dark:bg-indigo-900/20">
             <div className="flex items-center gap-4 text-sm">
               <span className="font-medium text-indigo-900 dark:text-indigo-300">
                 Table Controls:
@@ -1186,77 +1199,77 @@ export default function BlogPostEditor({
 
               {/* Column Controls */}
               <div className="flex items-center gap-1">
-                <span className="text-gray-600 dark:text-gray-400 text-xs mr-1">
+                <span className="mr-1 text-xs text-gray-600 dark:text-gray-400">
                   Columns:
                 </span>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().addColumnBefore().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Plus className="w-3 h-3 mr-1" />
+                  <Plus className="mr-1 h-3 w-3" />
                   Add Before
                 </button>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().addColumnAfter().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Plus className="w-3 h-3 mr-1" />
+                  <Plus className="mr-1 h-3 w-3" />
                   Add After
                 </button>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().deleteColumn().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Minus className="w-3 h-3 mr-1" />
+                  <Minus className="mr-1 h-3 w-3" />
                   Delete
                 </button>
               </div>
 
-              <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
 
               {/* Row Controls */}
               <div className="flex items-center gap-1">
-                <span className="text-gray-600 dark:text-gray-400 text-xs mr-1">
+                <span className="mr-1 text-xs text-gray-600 dark:text-gray-400">
                   Rows:
                 </span>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().addRowBefore().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Plus className="w-3 h-3 mr-1" />
+                  <Plus className="mr-1 h-3 w-3" />
                   Add Before
                 </button>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().addRowAfter().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Plus className="w-3 h-3 mr-1" />
+                  <Plus className="mr-1 h-3 w-3" />
                   Add After
                 </button>
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().deleteRow().run()}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  className="inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <Minus className="w-3 h-3 mr-1" />
+                  <Minus className="mr-1 h-3 w-3" />
                   Delete
                 </button>
               </div>
 
-              <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
 
               {/* Delete Table */}
               <button
                 type="button"
                 onClick={() => editor.chain().focus().deleteTable().run()}
-                className="inline-flex items-center px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400"
+                className="inline-flex items-center rounded border border-red-300 bg-red-100 px-2 py-1 text-xs text-red-700 hover:bg-red-200 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
               >
-                <Trash2 className="w-3 h-3 mr-1" />
+                <Trash2 className="mr-1 h-3 w-3" />
                 Delete Table
               </button>
             </div>
@@ -1267,22 +1280,22 @@ export default function BlogPostEditor({
         <EditorContent editor={editor} />
 
         {/* Footer stats */}
-        <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="border-t border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
           {wordCount} words · {charCount} characters
         </div>
       </div>
 
       {/* Link Modal */}
       {showLinkModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Add Link
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Link Text
                 </label>
                 <input
@@ -1290,7 +1303,7 @@ export default function BlogPostEditor({
                   value={linkText}
                   onChange={(e) => setLinkText(e.target.value)}
                   placeholder="Enter link text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   autoFocus
                 />
               </div>
@@ -1305,8 +1318,8 @@ export default function BlogPostEditor({
                   }}
                   className={`px-4 py-2 text-sm font-medium ${
                     linkType === "external"
-                      ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
                   External URL
@@ -1319,8 +1332,8 @@ export default function BlogPostEditor({
                   }}
                   className={`px-4 py-2 text-sm font-medium ${
                     linkType === "internal"
-                      ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
                   Internal Page
@@ -1329,7 +1342,7 @@ export default function BlogPostEditor({
 
               {linkType === "external" ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     URL
                   </label>
                   <input
@@ -1337,7 +1350,7 @@ export default function BlogPostEditor({
                     value={linkUrl}
                     onChange={(e) => setLinkUrl(e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && linkText && linkUrl) {
                         handleInsertLink();
@@ -1347,14 +1360,14 @@ export default function BlogPostEditor({
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Select Page
                   </label>
                   {pages.length > 0 ? (
                     <select
                       value={linkUrl}
                       onChange={(e) => setLinkUrl(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="">-- Select a page --</option>
                       {pages.map((page) => (
@@ -1364,7 +1377,7 @@ export default function BlogPostEditor({
                       ))}
                     </select>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    <p className="text-sm text-gray-500 italic dark:text-gray-400">
                       No pages found. Create pages in the Pages collection
                       first.
                     </p>
@@ -1380,7 +1393,7 @@ export default function BlogPostEditor({
                     setLinkText("");
                     setLinkUrl("");
                   }}
-                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                  className="rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
@@ -1388,7 +1401,7 @@ export default function BlogPostEditor({
                   type="button"
                   onClick={handleInsertLink}
                   disabled={!linkText || !linkUrl}
-                  className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Insert Link
                 </button>
@@ -1400,14 +1413,14 @@ export default function BlogPostEditor({
 
       {/* Media Embed Modal */}
       {showMediaModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Insert Media
             </h3>
 
             {/* Media Type Tabs */}
-            <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+            <div className="mb-4 flex border-b border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => {
@@ -1417,8 +1430,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   mediaInputMode === "upload"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 Upload File
@@ -1432,8 +1445,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   mediaInputMode === "url"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 URL
@@ -1447,8 +1460,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   mediaInputMode === "library"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 Media Library
@@ -1459,7 +1472,7 @@ export default function BlogPostEditor({
               {/* Upload Tab */}
               {mediaInputMode === "upload" && (
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                  <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center dark:border-gray-600">
                     <input
                       type="file"
                       id="media-upload"
@@ -1469,36 +1482,36 @@ export default function BlogPostEditor({
                     />
                     <label
                       htmlFor="media-upload"
-                      className="cursor-pointer flex flex-col items-center"
+                      className="flex cursor-pointer flex-col items-center"
                     >
-                      <Upload className="w-12 h-12 text-gray-400 mb-2" />
+                      <Upload className="mb-2 h-12 w-12 text-gray-400" />
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         Click to upload or drag and drop
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      <span className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                         Images or videos only (Max 10MB)
                       </span>
                     </label>
                   </div>
                   {mediaPreview && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
                         Preview:
                       </p>
                       {mediaFile?.type.startsWith("image/") ? (
                         <img
                           src={mediaPreview}
                           alt="Preview"
-                          className="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
+                          className="h-auto max-w-full rounded-lg border border-gray-300 dark:border-gray-600"
                         />
                       ) : mediaFile?.type.startsWith("video/") ? (
                         <video
                           src={mediaPreview}
                           controls
-                          className="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
+                          className="h-auto max-w-full rounded-lg border border-gray-300 dark:border-gray-600"
                         />
                       ) : (
-                        <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-700">
                           <p className="text-sm text-gray-700 dark:text-gray-300">
                             {mediaFile?.name}
                           </p>
@@ -1515,7 +1528,7 @@ export default function BlogPostEditor({
               {/* URL Tab */}
               {mediaInputMode === "url" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Media URL
                   </label>
                   <input
@@ -1523,18 +1536,18 @@ export default function BlogPostEditor({
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                   {mediaUrl && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
                         Preview:
                       </p>
                       {mediaUrl.match(/\\.(jpg|jpeg|png|gif|webp)$/i) ? (
                         <img
                           src={mediaUrl}
                           alt="Preview"
-                          className="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
+                          className="h-auto max-w-full rounded-lg border border-gray-300 dark:border-gray-600"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display =
                               "none";
@@ -1544,10 +1557,10 @@ export default function BlogPostEditor({
                         <video
                           src={mediaUrl}
                           controls
-                          className="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
+                          className="h-auto max-w-full rounded-lg border border-gray-300 dark:border-gray-600"
                         />
                       ) : (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                        <p className="text-sm text-gray-500 italic dark:text-gray-400">
                           No preview available
                         </p>
                       )}
@@ -1566,25 +1579,25 @@ export default function BlogPostEditor({
                           key={item.id}
                           type="button"
                           onClick={() => setMediaUrl(item.url)}
-                          className={`relative aspect-square rounded-lg overflow-hidden border-2 ${
+                          className={`relative aspect-square overflow-hidden rounded-lg border-2 ${
                             mediaUrl === item.url
                               ? "border-indigo-600 dark:border-indigo-400"
-                              : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                              : "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500"
                           }`}
                         >
                           {item.type.startsWith("image") ? (
                             <img
                               src={item.url}
                               alt={item.title}
-                              className="w-full h-full object-cover"
+                              className="h-full w-full object-cover"
                             />
                           ) : item.type.startsWith("video") ? (
-                            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                              <Upload className="w-8 h-8 text-gray-400" />
+                            <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
+                              <Upload className="h-8 w-8 text-gray-400" />
                             </div>
                           ) : (
-                            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center p-2">
-                              <p className="text-xs text-gray-600 dark:text-gray-400 text-center truncate">
+                            <div className="flex h-full w-full items-center justify-center bg-gray-200 p-2 dark:bg-gray-700">
+                              <p className="truncate text-center text-xs text-gray-600 dark:text-gray-400">
                                 {item.title}
                               </p>
                             </div>
@@ -1593,7 +1606,7 @@ export default function BlogPostEditor({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic text-center py-8">
+                    <p className="py-8 text-center text-sm text-gray-500 italic dark:text-gray-400">
                       No media items found. Upload media to the Media collection
                       first.
                     </p>
@@ -1601,7 +1614,7 @@ export default function BlogPostEditor({
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -1610,7 +1623,7 @@ export default function BlogPostEditor({
                     setMediaFile(null);
                     setMediaPreview("");
                   }}
-                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                  className="rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
@@ -1618,7 +1631,7 @@ export default function BlogPostEditor({
                   type="button"
                   onClick={handleInsertMedia}
                   disabled={!mediaUrl && !mediaPreview}
-                  className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Insert Media
                 </button>
@@ -1630,14 +1643,14 @@ export default function BlogPostEditor({
 
       {/* Document Attach Modal */}
       {showDocumentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Attach Document
             </h3>
 
             {/* Document Type Tabs */}
-            <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+            <div className="mb-4 flex border-b border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => {
@@ -1647,8 +1660,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   documentInputMode === "upload"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 Upload File
@@ -1661,8 +1674,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   documentInputMode === "url"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 URL
@@ -1675,8 +1688,8 @@ export default function BlogPostEditor({
                 }}
                 className={`px-4 py-2 text-sm font-medium ${
                   documentInputMode === "library"
-                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
                 Documents Library
@@ -1688,7 +1701,7 @@ export default function BlogPostEditor({
               {documentInputMode === "upload" && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Document Title
                     </label>
                     <input
@@ -1696,10 +1709,10 @@ export default function BlogPostEditor({
                       value={documentTitle}
                       onChange={(e) => setDocumentTitle(e.target.value)}
                       placeholder="Enter document title"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                  <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center dark:border-gray-600">
                     <input
                       type="file"
                       id="document-upload"
@@ -1709,23 +1722,23 @@ export default function BlogPostEditor({
                     />
                     <label
                       htmlFor="document-upload"
-                      className="cursor-pointer flex flex-col items-center"
+                      className="flex cursor-pointer flex-col items-center"
                     >
-                      <Paperclip className="w-12 h-12 text-gray-400 mb-2" />
+                      <Paperclip className="mb-2 h-12 w-12 text-gray-400" />
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         Click to upload document
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      <span className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                         PDF, Word, Excel, PowerPoint, Text, ZIP (Max 50MB)
                       </span>
                     </label>
                   </div>
                   {documentFile && (
-                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-700">
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         📎 {documentFile.name}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {(documentFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -1737,7 +1750,7 @@ export default function BlogPostEditor({
               {documentInputMode === "url" && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Document Title
                     </label>
                     <input
@@ -1745,11 +1758,11 @@ export default function BlogPostEditor({
                       value={documentTitle}
                       onChange={(e) => setDocumentTitle(e.target.value)}
                       placeholder="Enter document title"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Document URL
                     </label>
                     <input
@@ -1757,7 +1770,7 @@ export default function BlogPostEditor({
                       value={documentUrl}
                       onChange={(e) => setDocumentUrl(e.target.value)}
                       placeholder="https://example.com/document.pdf"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -1776,23 +1789,23 @@ export default function BlogPostEditor({
                             setDocumentUrl(doc.url);
                             setDocumentTitle(doc.title);
                           }}
-                          className={`w-full p-4 rounded-lg border-2 text-left ${
+                          className={`w-full rounded-lg border-2 p-4 text-left ${
                             documentUrl === doc.url
-                              ? "border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
-                              : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                              ? "border-indigo-600 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-900/20"
+                              : "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500"
                           }`}
                         >
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             📎 {doc.title}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             {doc.filename}
                           </p>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic text-center py-8">
+                    <p className="py-8 text-center text-sm text-gray-500 italic dark:text-gray-400">
                       No documents found. Upload documents to the Documents
                       collection first.
                     </p>
@@ -1800,7 +1813,7 @@ export default function BlogPostEditor({
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -1809,7 +1822,7 @@ export default function BlogPostEditor({
                     setDocumentFile(null);
                     setDocumentTitle("");
                   }}
-                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                  className="rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
@@ -1817,7 +1830,7 @@ export default function BlogPostEditor({
                   type="button"
                   onClick={handleInsertDocument}
                   disabled={!documentTitle || (!documentUrl && !documentFile)}
-                  className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Attach Document
                 </button>
@@ -1829,18 +1842,18 @@ export default function BlogPostEditor({
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Delete Post
               </h3>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            <p className="mb-6 text-sm text-gray-600 dark:text-gray-300">
               Are you sure you want to delete "{title || "this post"}"? It will
               be moved to trash and automatically deleted after 30 days.
             </p>
@@ -1849,14 +1862,14 @@ export default function BlogPostEditor({
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600"
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
               >
                 Delete Post
               </button>
