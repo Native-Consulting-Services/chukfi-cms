@@ -93,9 +93,6 @@ export default function BlogPostEditor({
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [status, setStatus] = useState<"draft" | "published" | "scheduled">(
-    "draft",
-  );
   const [bannerImage, setBannerImage] = useState("");
   const [featured, setFeatured] = useState(false);
   const [publishAt, setPublishAt] = useState("");
@@ -129,7 +126,7 @@ export default function BlogPostEditor({
   const [documentUrl, setDocumentUrl] = useState("");
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [documentTitle, setDocumentTitle] = useState("");
-  const [documents, setDocuments] = useState<
+  const [documents] = useState<
     Array<{ id: string; title: string; url: string; filename: string }>
   >([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -202,7 +199,6 @@ export default function BlogPostEditor({
             setTitle(post.title);
             setSlug(post.slug);
             setExcerpt(post.excerpt);
-            setStatus(post.status);
             setBannerImage(post.bannerImage || "");
             setFeatured(post.featured || false);
             setPublishAt(post.publishAt || "");

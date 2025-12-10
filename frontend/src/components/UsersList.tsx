@@ -26,8 +26,8 @@ export default function UsersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterRole] = useState("all");
+  const [filterStatus] = useState("all");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -246,7 +246,7 @@ export default function UsersList() {
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClass}`}
       >
         {role.name}
       </span>
@@ -266,10 +266,10 @@ export default function UsersList() {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6">
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
       {/* Error display */}
       {error && (
-        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex">
             <svg
               className="h-5 w-5 text-red-400 dark:text-red-500"
@@ -290,10 +290,10 @@ export default function UsersList() {
       )}
 
       {/* Search and Actions Header */}
-      <div className="sm:flex sm:items-center sm:justify-between mb-6">
-        <div className="flex-1 min-w-0">
+      <div className="mb-6 sm:flex sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1">
           <div className="relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
                 className="h-5 w-5 text-gray-400 dark:text-gray-500"
                 fill="none"
@@ -311,7 +311,7 @@ export default function UsersList() {
             <input
               type="text"
               placeholder="Search users..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full rounded-md border border-gray-300 bg-white py-2 pr-3 pl-10 leading-5 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -326,9 +326,9 @@ export default function UsersList() {
 
       {/* Loading state */}
       {loading && (
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <svg
-            className="animate-spin h-8 w-8 text-indigo-600 dark:text-indigo-400 mx-auto"
+            className="mx-auto h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -354,14 +354,14 @@ export default function UsersList() {
 
       {/* Users table */}
       {!loading && (
-        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow ring-1 ring-black dark:ring-gray-700 ring-opacity-5 md:rounded-lg">
+        <div className="ring-opacity-5 overflow-hidden bg-white ring-1 shadow ring-black md:rounded-lg dark:bg-gray-800 dark:ring-gray-700">
           <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
                   <input
                     type="checkbox"
-                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 dark:bg-gray-700 focus:ring-indigo-500"
+                    className="absolute top-1/2 left-4 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                     checked={
                       selectedUsers.length === filteredUsers.length &&
                       filteredUsers.length > 0
@@ -387,19 +387,19 @@ export default function UsersList() {
                 >
                   Created
                 </th>
-                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-6">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                    <td className="py-4 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-6">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900">
                             <svg
                               className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
                               fill="none"
@@ -425,19 +425,19 @@ export default function UsersList() {
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {getRoleBadge(user.roles)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {formatDate(user.createdAt)}
                     </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <div className="flex justify-end items-center space-x-2">
+                    <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
+                      <div className="flex items-center justify-end space-x-2">
                         {mounted && canUpdate("users") && (
                           <button
                             type="button"
                             onClick={() => handleEditUser(user)}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                            className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                             title="Edit user"
                           >
                             <svg
@@ -459,7 +459,7 @@ export default function UsersList() {
                           <button
                             type="button"
                             onClick={() => handleDeleteUser(user.id)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                             title="Delete user"
                           >
                             <svg
@@ -528,21 +528,21 @@ export default function UsersList() {
 
       {/* Edit User Modal */}
       {showEditModal && editingUser && (
-        <div className="fixed z-50 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:p-0">
             <div
-              className="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-80 transition-opacity"
+              className="fixed inset-0 bg-gray-500 opacity-80 transition-opacity dark:bg-gray-900"
               onClick={() => setShowEditModal(false)}
             ></div>
 
-            <div className="relative inline-block align-middle bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6 z-50">
+            <div className="relative z-50 inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-middle shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800">
               <div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
                   <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                     Edit User Role
                   </h3>
                   <div className="mt-4">
-                    <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
+                    <div className="mb-4 rounded-md bg-gray-50 p-4 dark:bg-gray-900">
                       <div className="text-sm">
                         <div className="font-medium text-gray-900 dark:text-white">
                           {editingUser.displayName}
@@ -554,7 +554,7 @@ export default function UsersList() {
                     </div>
 
                     {formError && (
-                      <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
+                      <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
                         <p className="text-sm text-red-800 dark:text-red-300">
                           {formError}
                         </p>
@@ -565,13 +565,13 @@ export default function UsersList() {
                       <div>
                         <label
                           htmlFor="role"
-                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
                           Role
                         </label>
                         <select
                           id="role"
-                          className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                           value={selectedRoleId}
                           onChange={(e) => setSelectedRoleId(e.target.value)}
                         >
@@ -589,12 +589,12 @@ export default function UsersList() {
                       </div>
                     </div>
 
-                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                       <button
                         type="button"
                         disabled={formLoading}
                         onClick={handleUpdateUserRole}
-                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-base font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:col-start-2 sm:text-sm dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-offset-gray-800"
                       >
                         {formLoading ? "Updating..." : "Update Role"}
                       </button>
@@ -605,7 +605,7 @@ export default function UsersList() {
                           setShowEditModal(false);
                           setEditingUser(null);
                         }}
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:col-start-1 sm:mt-0 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800"
                       >
                         Cancel
                       </button>

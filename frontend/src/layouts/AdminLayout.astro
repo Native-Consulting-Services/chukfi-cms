@@ -1,8 +1,8 @@
 ---
-import Layout from './Layout.astro';
-import SidebarNav from '../components/SidebarNav.tsx';
-import UserMenu from '../components/UserMenu.tsx';
-import ThemeToggle from '../components/ThemeToggle.tsx';
+import Layout from "./Layout.astro";
+import SidebarNav from "../components/SidebarNav.tsx";
+import UserMenu from "../components/UserMenu.tsx";
+import ThemeToggle from "../components/ThemeToggle.tsx";
 
 export interface Props {
   title: string;
@@ -26,18 +26,18 @@ const { title, currentPage } = Astro.props;
       transition: opacity 0.15s ease-in;
     }
   </style>
-  
-  <script type="module">
+
+  <script type="module" is:inline>
     // Check if user is authenticated before rendering
-    const authToken = localStorage.getItem('chukfi_auth_token');
+    const authToken = localStorage.getItem("chukfi_auth_token");
     if (!authToken) {
       // Redirect to login page if not authenticated
-      window.location.replace('/login');
+      window.location.replace("/login");
     } else {
       // User is authenticated, show content
-      const adminContent = document.getElementById('admin-content');
+      const adminContent = document.getElementById("admin-content");
       if (adminContent) {
-        adminContent.classList.add('auth-verified');
+        adminContent.classList.add("auth-verified");
       }
     }
   </script>
@@ -45,12 +45,16 @@ const { title, currentPage } = Astro.props;
   <div id="admin-content" class="flex h-screen bg-gray-100 dark:bg-gray-900">
     <!-- Sidebar -->
     <div class="hidden md:flex md:w-64 md:flex-col">
-      <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div class="flex items-center flex-shrink-0 px-4">
-          <img class="w-8 h-8" src="/favicon.svg" alt="Chukfi CMS" />
-          <h1 class="ml-3 text-xl font-semibold text-gray-900 dark:text-white">Chukfi CMS</h1>
+      <div
+        class="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5 dark:border-gray-700 dark:bg-gray-800"
+      >
+        <div class="flex flex-shrink-0 items-center px-4">
+          <img class="h-8 w-8" src="/favicon.svg" alt="Chukfi CMS" />
+          <h1 class="ml-3 text-xl font-semibold text-gray-900 dark:text-white">
+            Chukfi CMS
+          </h1>
         </div>
-        <div class="mt-5 flex-grow flex flex-col">
+        <div class="mt-5 flex flex-grow flex-col">
           <nav class="flex-1 px-2 pb-4">
             <SidebarNav currentPage={currentPage} client:load />
           </nav>
@@ -59,23 +63,38 @@ const { title, currentPage } = Astro.props;
     </div>
 
     <!-- Main content -->
-    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+    <div class="flex w-0 flex-1 flex-col overflow-hidden">
       <!-- Top navigation -->
-      <div class="relative z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex-1 px-4 flex justify-between">
-          <div class="flex-1 flex">
+      <div
+        class="relative z-10 flex h-16 flex-shrink-0 border-b border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/50"
+      >
+        <div class="flex flex-1 justify-between px-4">
+          <div class="flex flex-1">
             <!-- Mobile menu button -->
-            <button class="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden">
+            <button
+              class="border-r border-gray-200 px-4 text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none focus:ring-inset md:hidden dark:border-gray-700 dark:text-gray-400"
+            >
               <span class="sr-only">Open sidebar</span>
-              <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+              <svg
+                class="h-6 w-6"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h7"></path>
               </svg>
             </button>
-            <div class="flex-1 flex items-center px-4">
-              <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{title}</h1>
+            <div class="flex flex-1 items-center px-4">
+              <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+                {title}
+              </h1>
             </div>
           </div>
-          <div class="ml-4 flex items-center md:ml-6 space-x-2">
+          <div class="ml-4 flex items-center space-x-2 md:ml-6">
             <ThemeToggle client:load />
             <UserMenu client:load />
           </div>
@@ -83,9 +102,11 @@ const { title, currentPage } = Astro.props;
       </div>
 
       <!-- Page content -->
-      <main class="flex-1 relative overflow-y-auto focus:outline-none bg-gray-50 dark:bg-gray-900">
+      <main
+        class="relative flex-1 overflow-y-auto bg-gray-50 focus:outline-none dark:bg-gray-900"
+      >
         <div class="py-6">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
             <slot />
           </div>
         </div>

@@ -12,9 +12,6 @@ interface ActivityLog {
   createdAt: string;
 }
 
-// Backend returns activities array directly
-interface ActivityResponse extends Array<ActivityLog> {}
-
 export default function RecentActivity() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -214,12 +211,12 @@ export default function RecentActivity() {
 
   if (loading && activities.length === 0) {
     return (
-      <div className="rounded-lg bg-white dark:bg-gray-800 shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Recent Activity
         </h3>
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-500"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-600 dark:border-indigo-500"></div>
         </div>
       </div>
     );
@@ -227,11 +224,11 @@ export default function RecentActivity() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white dark:bg-gray-800 shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Recent Activity
         </h3>
-        <div className="text-center py-8 text-red-600 dark:text-red-400">
+        <div className="py-8 text-center text-red-600 dark:text-red-400">
           {error}
         </div>
       </div>
@@ -239,21 +236,21 @@ export default function RecentActivity() {
   }
 
   return (
-    <div className="rounded-lg bg-white dark:bg-gray-800 shadow">
+    <div className="rounded-lg bg-white shadow dark:bg-gray-800">
       <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Recent Activity
           </h3>
           <button
             onClick={loadActivities}
             disabled={loading}
-            className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             {loading ? (
               <>
                 <svg
-                  className="animate-spin h-4 w-4"
+                  className="h-4 w-4 animate-spin"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -280,9 +277,9 @@ export default function RecentActivity() {
         </div>
 
         {activities.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="py-8 text-center text-gray-500 dark:text-gray-400">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-3"
+              className="mx-auto mb-3 h-12 w-12 text-gray-400 dark:text-gray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -304,18 +301,18 @@ export default function RecentActivity() {
                   <div className="relative pb-8">
                     {idx !== activities.length - 1 && (
                       <span
-                        className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"
+                        className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"
                         aria-hidden="true"
                       />
                     )}
                     <div className="relative flex items-start space-x-3">
                       <div className="relative">
                         <img
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 ring-8 ring-white dark:ring-gray-800"
+                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white dark:bg-gray-700 dark:ring-gray-800"
                           src={activity.userAvatar}
                           alt={activity.userName}
                         />
-                        <span className="absolute -bottom-0.5 -right-1 rounded-tl bg-white dark:bg-gray-800 px-0.5 py-px">
+                        <span className="absolute -right-1 -bottom-0.5 rounded-tl bg-white px-0.5 py-px dark:bg-gray-800">
                           {getActionIcon(activity.action)}
                         </span>
                       </div>
@@ -344,10 +341,10 @@ export default function RecentActivity() {
       </div>
 
       {activities.length > 0 && (
-        <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-3">
+        <div className="border-t border-gray-200 px-6 py-3 dark:border-gray-700">
           <a
             href="/admin/activity"
-            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             View all activity →
           </a>

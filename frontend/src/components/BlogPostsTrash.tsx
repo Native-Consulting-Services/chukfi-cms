@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { RotateCcw, Trash2, Star } from "lucide-react";
 import { logActivity } from "../lib/activityLogger";
 
@@ -70,8 +70,10 @@ export default function BlogPostsTrash() {
       if (stored) {
         try {
           const parsedPosts: BlogPost[] = JSON.parse(stored);
-          const postToRestore = parsedPosts.find((p) => p.id === postId);
-          const updatedPosts = allPosts.map((p) => {
+          const postToRestore = parsedPosts.find(
+            (p: BlogPost) => p.id === postId,
+          );
+          const updatedPosts = parsedPosts.map((p: BlogPost) => {
             if (p.id === postId) {
               const { deletedAt, ...rest } = p;
               return rest as BlogPost;
@@ -83,7 +85,7 @@ export default function BlogPostsTrash() {
             JSON.stringify(updatedPosts),
           );
           setDeletedPosts(
-            updatedPosts.filter((p) => p.deletedAt) as BlogPost[],
+            updatedPosts.filter((p: BlogPost) => p.deletedAt) as BlogPost[],
           );
           window.dispatchEvent(new CustomEvent("blogPostsUpdated"));
 

@@ -1,49 +1,49 @@
 ---
-import AdminLayout from '../../../layouts/AdminLayout.astro';
-import RolesList from '../../../components/RolesList.tsx';
-import CreateRoleButton from '../../../components/CreateRoleButton.tsx';
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import RolesList from "../../../components/RolesList.tsx";
+import CreateRoleButton from "../../../components/CreateRoleButton.tsx";
 ---
 
-<script type="module">
+<script type="module" is:inline>
   // Check if user has Super Admin role
   const checkSuperAdminAccess = () => {
-    const userData = localStorage.getItem('chukfi_user');
-    console.log('[Roles Page] Raw userData from localStorage:', userData);
-    
+    const userData = localStorage.getItem("chukfi_user");
+    console.log("[Roles Page] Raw userData from localStorage:", userData);
+
     if (!userData) {
-      console.log('[Roles Page] No user data, redirecting to login');
-      window.location.replace('/login');
+      console.log("[Roles Page] No user data, redirecting to login");
+      window.location.replace("/login");
       return;
     }
-    
+
     try {
       const user = JSON.parse(userData);
-      console.log('[Roles Page] Parsed user:', user);
-      console.log('[Roles Page] User roles:', user.roles);
-      
+      console.log("[Roles Page] Parsed user:", user);
+      console.log("[Roles Page] User roles:", user.roles);
+
       const roles = user.roles || [];
-      const isSuperAdmin = roles.some(role => {
-        console.log('[Roles Page] Checking role:', role, 'name:', role.name);
-        const match = role.name && role.name.toLowerCase() === 'super admin';
-        console.log('[Roles Page] Does it match?', match);
+      const isSuperAdmin = roles.some((role) => {
+        console.log("[Roles Page] Checking role:", role, "name:", role.name);
+        const match = role.name && role.name.toLowerCase() === "super admin";
+        console.log("[Roles Page] Does it match?", match);
         return match;
       });
-      
-      console.log('[Roles Page] Final isSuperAdmin result:', isSuperAdmin);
-      
+
+      console.log("[Roles Page] Final isSuperAdmin result:", isSuperAdmin);
+
       if (!isSuperAdmin) {
-        console.log('[Roles Page] Not a Super Admin, redirecting to dashboard');
+        console.log("[Roles Page] Not a Super Admin, redirecting to dashboard");
         // Redirect non-Super Admins to dashboard
-        window.location.replace('/admin');
+        window.location.replace("/admin");
       } else {
-        console.log('[Roles Page] Access granted - user is Super Admin');
+        console.log("[Roles Page] Access granted - user is Super Admin");
       }
     } catch (e) {
-      console.error('[Roles Page] Failed to parse user data:', e);
-      window.location.replace('/login');
+      console.error("[Roles Page] Failed to parse user data:", e);
+      window.location.replace("/login");
     }
   };
-  
+
   checkSuperAdminAccess();
 </script>
 
@@ -52,25 +52,36 @@ import CreateRoleButton from '../../../components/CreateRoleButton.tsx';
     <!-- Page header -->
     <div class="md:flex md:items-center md:justify-between">
       <div class="min-w-0 flex-1">
-        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+        <h2
+          class="text-2xl leading-7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+        >
           Roles & Permissions
         </h2>
-        <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+        <div
+          class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6"
+        >
           <div class="mt-2 flex items-center text-sm text-gray-500">
-            <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+            <svg
+              class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z"
+                clip-rule="evenodd"></path>
             </svg>
             Manage roles and access control permissions
           </div>
         </div>
       </div>
-      <div class="mt-4 flex md:ml-4 md:mt-0">
+      <div class="mt-4 flex md:mt-0 md:ml-4">
         <CreateRoleButton client:load />
       </div>
     </div>
 
     <!-- Roles table -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="rounded-lg bg-white shadow">
       <RolesList client:load />
     </div>
   </div>
