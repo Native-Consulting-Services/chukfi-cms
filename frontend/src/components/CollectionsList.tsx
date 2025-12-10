@@ -163,20 +163,8 @@ const getColorHex = (colorName?: string): string => {
 };
 
 export default function CollectionsList() {
-  const [collections, setCollections] = useState<Collection[]>(() => {
-    // Initialize from localStorage or use mock data
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("chukfi_collections");
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch (e) {
-          console.error("Failed to parse stored collections", e);
-        }
-      }
-    }
-    return mockCollections;
-  });
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Collection>("updatedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -184,14 +172,39 @@ export default function CollectionsList() {
     "all" | "active" | "disabled"
   >("all");
 
-  // Save to localStorage whenever collections change
+  // Fetch collections from API
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("chukfi_collections", JSON.stringify(collections));
-      // Dispatch event after saving to ensure other components get fresh data
-      window.dispatchEvent(new CustomEvent("collectionsStorageUpdated"));
-    }
-  }, [collections]);
+    const fetchCollections = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          "http://localhost:8080/api/v1/collections",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setCollections(data || []);
+        } else {
+          console.error("Failed to fetch collections:", response.statusText);
+          // Fallback to mock data if API fails
+          setCollections(mockCollections);
+        }
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+        // Fallback to mock data if fetch fails
+        setCollections(mockCollections);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCollections();
+  }, []);
 
   // Listen for new collection events
   useEffect(() => {
@@ -312,10 +325,25 @@ export default function CollectionsList() {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex h-64 items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent dark:border-indigo-400"></div>
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              Loading collections...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       {/* Search and filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row">
         {/* Search */}
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
@@ -342,7 +370,7 @@ export default function CollectionsList() {
               placeholder="Search collections..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-600 dark:placeholder:text-gray-500 dark:focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -354,7 +382,7 @@ export default function CollectionsList() {
             onChange={(e) =>
               setFilterStatus(e.target.value as "all" | "active" | "disabled")
             }
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white py-1.5 pr-10 pl-3 text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-600 dark:focus:ring-indigo-500"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -377,12 +405,12 @@ export default function CollectionsList() {
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 sm:pl-0"
+                    className="cursor-pointer py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 sm:pl-0 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("displayName")}
                   >
                     <div className="group inline-flex">
                       Collection
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -399,12 +427,12 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("documentCount")}
                   >
                     <div className="group inline-flex">
                       Documents
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -421,19 +449,19 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("status")}
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("updatedAt")}
                   >
                     <div className="group inline-flex">
                       Last Updated
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -448,7 +476,7 @@ export default function CollectionsList() {
                       </span>
                     </div>
                   </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                  <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-0">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -459,11 +487,11 @@ export default function CollectionsList() {
                     key={collection.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-0">
+                    <td className="py-4 pr-3 pl-4 whitespace-nowrap sm:pl-0">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
                           <div
-                            className="h-10 w-10 rounded-lg flex items-center justify-center"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg"
                             style={{
                               backgroundColor: `${getColorHex(collection.color)}20`,
                             }}
@@ -488,16 +516,16 @@ export default function CollectionsList() {
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {collection.description}
                           </div>
-                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                             API:{" "}
-                            <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                            <code className="rounded bg-gray-100 px-1 dark:bg-gray-800">
                               /api/v1/collections/{collection.name}
                             </code>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">
                       <div className="flex items-center">
                         <span className="font-medium">
                           {collection.documentCount}
@@ -507,30 +535,30 @@ export default function CollectionsList() {
                         </span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                        className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
                           collection.status === "active"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                         }`}
                       >
                         {collection.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       <div>
                         <div title={formatDateTime(collection.updatedAt)}>
                           {formatDate(collection.updatedAt)}
                         </div>
                       </div>
                     </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                    <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
                       <div className="flex items-center justify-end space-x-3">
                         {/* Edit button */}
                         <button
                           onClick={() => handleEditCollection(collection)}
-                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                          className="rounded-md p-2 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300"
                           title="Edit collection"
                         >
                           <LucideIcons.Pencil className="h-5 w-5" />
@@ -539,7 +567,7 @@ export default function CollectionsList() {
                         {/* Delete button */}
                         <button
                           onClick={() => handleDeleteCollection(collection.id)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30"
+                          className="rounded-md p-2 text-red-600 hover:bg-red-50 hover:text-red-900 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                           title="Delete collection"
                         >
                           <LucideIcons.Trash2 className="h-5 w-5" />
@@ -556,7 +584,7 @@ export default function CollectionsList() {
 
       {/* Empty state */}
       {filteredCollections.length === 0 && (
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600"
             fill="none"
@@ -582,7 +610,7 @@ export default function CollectionsList() {
             <div className="mt-6">
               <button
                 type="button"
-                className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
+                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
               >
                 <svg
                   className="mr-2 h-4 w-4"
