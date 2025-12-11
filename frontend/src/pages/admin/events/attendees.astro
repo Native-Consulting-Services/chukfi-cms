@@ -1,0 +1,40 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AttendeeManagement from "../../components/AttendeeManagement";
+---
+
+<AdminLayout title="Attendee Management">
+  <AttendeeManagement client:load eventId="" eventTitle="" />
+</AdminLayout>
+
+<script>
+  // Get event details from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const eventId = urlParams.get("id");
+
+  if (eventId && typeof window !== "undefined") {
+    // Load event from localStorage to get the title
+    const stored = localStorage.getItem("chukfi_events");
+    if (stored) {
+      try {
+        const events = JSON.parse(stored);
+        const event = events.find((e: any) => e.id === eventId);
+        if (event) {
+          // Update the component props
+          const component = document.querySelector("astro-island");
+          if (component) {
+            component.setAttribute(
+              "props",
+              JSON.stringify({
+                eventId: eventId,
+                eventTitle: event.title,
+              }),
+            );
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load event", e);
+      }
+    }
+  }
+</script>

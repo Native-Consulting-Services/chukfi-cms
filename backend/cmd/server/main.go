@@ -48,9 +48,9 @@ func main() {
 
 	// Initialize storage
 	storageConfig := storage.Config{
-		Type:     "local",
+		Type:      "local",
 		LocalPath: "./uploads",
-		BaseURL:  fmt.Sprintf("http://localhost:%s/uploads", port),
+		BaseURL:   fmt.Sprintf("http://localhost:%s/uploads", port),
 	}
 	storageBackend, err := storage.NewStorage(storageConfig)
 	if err != nil {
@@ -101,13 +101,29 @@ func main() {
 
 	// API routes
 	r.Route("/api/v1", func(r chi.Router) {
+		// Public routes
+		r.Get("/events", h.GetPublicEvents) // Public events listing
+
 		// Auth routes (public)
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/login", h.Login)
+			r.Post("/signup", h.Signup)
 			r.Post("/refresh", h.RefreshToken)
 			r.With(middleware.RequireAuth(authService)).Post("/logout", h.Logout)
 			r.With(middleware.RequireAuth(authService)).Get("/me", h.GetCurrentUser)
 		})
+
+		// Event Registrations (mixed public/protected)
+		r.Route("/events/{eventId}/registrations", func(r chi.Router) {
+			r.Post("/", h.RegisterForEvent)                                                                                                        // Public can register
+			r.With(middleware.RequireAuth(authService)).Delete("/", h.UnregisterFromEvent)                                                         // Authenticated users can unregister
+			r.With(middleware.RequireAuth(authService)).Get("/me", h.GetUserEventRegistration)                                                     // Check if user is registered
+			r.With(middleware.RequireAuth(authService), middleware.RequirePermission("events", "read")).Get("/", h.GetEventRegistrations)          // Admin can view all
+			r.With(middleware.RequireAuth(authService), middleware.RequirePermission("events", "read")).Get("/stats", h.GetEventRegistrationStats) // Admin can view stats
+		})
+
+		// My Registrations
+		r.With(middleware.RequireAuth(authService)).Get("/events/my-registrations", h.GetMyRegistrations)
 
 		// Protected routes
 		r.Group(func(r chi.Router) {
@@ -137,7 +153,7 @@ func main() {
 					r.Get("/", h.GetRole)
 					r.With(middleware.RequirePermission("roles", "update")).Patch("/", h.UpdateRole)
 					r.With(middleware.RequirePermission("roles", "delete")).Delete("/", h.DeleteRole)
-					
+
 					// Permissions for this role
 					r.Route("/permissions", func(r chi.Router) {
 						r.Get("/", h.GetRolePermissions)

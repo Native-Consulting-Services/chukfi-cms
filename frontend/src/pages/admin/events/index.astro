@@ -1,0 +1,8 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import EventsList from "../../../components/EventsList";
+---
+
+<AdminLayout title="Events" currentPage="events">
+  <EventsList client:load />
+</AdminLayout>

@@ -1,0 +1,8 @@
+---
+import UserDashboardLayout from "../../layouts/UserDashboardLayout.astro";
+import PublicProductsList from "../../components/PublicProductsList.tsx";
+---
+
+<UserDashboardLayout title="Browse Products">
+  <PublicProductsList client:load />
+</UserDashboardLayout>

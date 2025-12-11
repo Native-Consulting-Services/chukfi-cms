@@ -1,0 +1,8 @@
+---
+import UserDashboardLayout from "../../layouts/UserDashboardLayout.astro";
+import UserProfileSettings from "../../components/UserProfileSettings.tsx";
+---
+
+<UserDashboardLayout title="Profile Settings" currentPage="profile">
+  <UserProfileSettings client:load />
+</UserDashboardLayout>

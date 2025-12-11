@@ -1,0 +1,8 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import EventEditor from "../../../components/EventEditor";
+---
+
+<AdminLayout title="New Event" currentPage="events">
+  <EventEditor client:load />
+</AdminLayout>

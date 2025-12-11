@@ -1,0 +1,8 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import ProductEditor from "../../../components/ProductEditor.tsx";
+---
+
+<AdminLayout title="New Product" currentPage="products">
+  <ProductEditor client:load />
+</AdminLayout>

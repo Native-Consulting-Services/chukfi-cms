@@ -59,7 +59,12 @@ export default function BlogPostsList() {
                 const publishDate = new Date(post.publishAt);
                 if (publishDate <= now) {
                   postsUpdated = true;
-                  return { ...post, status: "published" as const };
+                  return {
+                    ...post,
+                    status: "published" as const,
+                    createdAt: post.publishAt, // Use scheduled date as creation date
+                    updatedAt: post.publishAt,
+                  };
                 }
               }
               return post;
@@ -453,7 +458,7 @@ export default function BlogPostsList() {
                     <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
                       <div className="flex items-center justify-end gap-2">
                         <a
-                          href={`/admin/blog_posts/${post.id}/edit`}
+                          href={`/admin/blog_posts/edit?id=${post.id}`}
                           className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                           title="Edit"
                         >
@@ -554,7 +559,7 @@ export default function BlogPostsList() {
                 {/* Actions */}
                 <div className="flex items-center gap-2 border-t border-gray-200 pt-3 dark:border-gray-700">
                   <a
-                    href={`/admin/blog_posts/${post.id}/edit`}
+                    href={`/admin/blog_posts/edit?id=${post.id}`}
                     className="flex flex-1 items-center justify-center gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
                   >
                     <Pencil className="h-4 w-4" />

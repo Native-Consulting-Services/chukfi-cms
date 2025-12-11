@@ -67,8 +67,14 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ currentPage }) => {
       if (stored) {
         try {
           const parsedCollections = JSON.parse(stored);
-          setCollections(parsedCollections);
-          return;
+          // Validate collections have required fields
+          if (Array.isArray(parsedCollections)) {
+            const validCollections = parsedCollections.filter(
+              (col) => col && col.name && col.displayName && col.status,
+            );
+            setCollections(validCollections);
+            return;
+          }
         } catch (e) {
           console.error("Failed to parse stored collections", e);
         }
@@ -154,7 +160,13 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ currentPage }) => {
     ];
 
     const activeCollections = collections.filter((c) => c.status === "active");
-    const collectionNavItems: NavItem[] = activeCollections.map((col) => ({
+
+    // Sort collections alphabetically by displayName
+    const sortedCollections = [...activeCollections].sort((a, b) =>
+      a.displayName.localeCompare(b.displayName),
+    );
+
+    const collectionNavItems: NavItem[] = sortedCollections.map((col) => ({
       name: col.displayName,
       href: `/admin/${col.name}`,
       collection: col.name,
@@ -172,6 +184,27 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ currentPage }) => {
     }));
 
     const systemNavigation: NavItem[] = [
+      {
+        name: "My Events",
+        href: "/admin/my-events",
+        collection: "my-events",
+        icon: ({ className }) => (
+          <svg
+            className={className}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        ),
+        current: currentPage === "my-events",
+      },
       {
         name: "Trash",
         href: "/admin/trash",
@@ -306,20 +339,14 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ currentPage }) => {
             <a
               key={item.name}
               href={item.href}
-              className={`
-                ${
-                  item.current
-                    ? "bg-indigo-100 dark:bg-indigo-900 border-indigo-600 text-indigo-700 dark:text-indigo-300"
-                    : "border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-                }
-                group flex items-center px-3 py-2 text-sm font-medium border-l-4
-              `}
+              className={` ${
+                item.current
+                  ? "border-indigo-600 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
+                  : "border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+              } group flex items-center border-l-4 px-3 py-2 text-sm font-medium`}
             >
               <Icon
-                className={`
-                  ${item.current ? "text-indigo-500 dark:text-indigo-400" : "text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"}
-                  flex-shrink-0 -ml-1 mr-3 h-6 w-6
-                `}
+                className={` ${item.current ? "text-indigo-500 dark:text-indigo-400" : "text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"} mr-3 -ml-1 h-6 w-6 flex-shrink-0`}
               />
               <span className="truncate">{item.name}</span>
             </a>
@@ -337,20 +364,14 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ currentPage }) => {
           <a
             key={item.name}
             href={item.href}
-            className={`
-              ${
-                item.current
-                  ? "bg-indigo-100 dark:bg-indigo-900 border-indigo-600 text-indigo-700 dark:text-indigo-300"
-                  : "border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-              }
-              group flex items-center px-3 py-2 text-sm font-medium border-l-4
-            `}
+            className={` ${
+              item.current
+                ? "border-indigo-600 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
+                : "border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+            } group flex items-center border-l-4 px-3 py-2 text-sm font-medium`}
           >
             <Icon
-              className={`
-                ${item.current ? "text-indigo-500 dark:text-indigo-400" : "text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"}
-                flex-shrink-0 -ml-1 mr-3 h-6 w-6
-              `}
+              className={` ${item.current ? "text-indigo-500 dark:text-indigo-400" : "text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"} mr-3 -ml-1 h-6 w-6 flex-shrink-0`}
             />
             <span className="truncate">{item.name}</span>
           </a>

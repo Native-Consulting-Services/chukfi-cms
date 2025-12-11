@@ -1,0 +1,8 @@
+---
+import UserDashboardLayout from "../../layouts/UserDashboardLayout.astro";
+import UserOrdersDashboard from "../../components/UserOrdersDashboard.tsx";
+---
+
+<UserDashboardLayout title="My Orders" currentPage="orders">
+  <UserOrdersDashboard client:load />
+</UserDashboardLayout>

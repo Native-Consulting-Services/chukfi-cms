@@ -1,8 +1,8 @@
 ---
-import AdminLayout from '../../../layouts/AdminLayout.astro';
-import CollectionsList from '../../../components/CollectionsList.tsx';
-import NewCollectionModal from '../../../components/NewCollectionModal.tsx';
-import EditCollectionModal from '../../../components/EditCollectionModal.tsx';
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import CollectionsList from "../../../components/CollectionsList.tsx";
+import NewCollectionModal from "../../../components/NewCollectionModal.tsx";
+import EditCollectionModal from "../../../components/EditCollectionModal.tsx";
 ---
 
 <AdminLayout title="Collections" currentPage="collections">
@@ -10,36 +10,47 @@ import EditCollectionModal from '../../../components/EditCollectionModal.tsx';
     <!-- Page header -->
     <div class="md:flex md:items-center md:justify-between">
       <div class="min-w-0 flex-1">
-        <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+        <h2
+          class="text-2xl leading-7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight dark:text-white"
+        >
           Collections
         </h2>
-        <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-          <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+        <div
+          class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6"
+        >
+          <div
+            class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400"
+          >
+            <svg
+              class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+              ></path>
             </svg>
             Manage your content types and data models
           </div>
         </div>
       </div>
-      <div class="mt-4 flex md:ml-4 md:mt-0">
-        <button
-          type="button"
-          id="import-collection-btn"
-          class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-        >
-          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0-6V4m0 6h6m-6 0H6"></path>
-          </svg>
-          Import Collection
-        </button>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
         <button
           type="button"
           id="new-collection-btn"
-          class="ml-3 inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-400"
+          class="ml-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus-visible:outline-indigo-400"
         >
-          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          <svg
+            class="mr-2 h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
           New Collection
         </button>
@@ -47,7 +58,9 @@ import EditCollectionModal from '../../../components/EditCollectionModal.tsx';
     </div>
 
     <!-- Collections table -->
-    <div class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg">
+    <div
+      class="rounded-lg bg-white shadow dark:bg-gray-800 dark:shadow-gray-900/50"
+    >
       <CollectionsList client:load />
     </div>
   </div>
@@ -60,13 +73,13 @@ import EditCollectionModal from '../../../components/EditCollectionModal.tsx';
 
   <script>
     // Handle modal open/close
-    document.addEventListener('DOMContentLoaded', () => {
-      const newCollectionBtn = document.getElementById('new-collection-btn');
-      
+    document.addEventListener("DOMContentLoaded", () => {
+      const newCollectionBtn = document.getElementById("new-collection-btn");
+
       if (newCollectionBtn) {
-        newCollectionBtn.addEventListener('click', () => {
+        newCollectionBtn.addEventListener("click", () => {
           // Dispatch custom event to open modal
-          window.dispatchEvent(new CustomEvent('openNewCollectionModal'));
+          window.dispatchEvent(new CustomEvent("openNewCollectionModal"));
         });
       }
     });

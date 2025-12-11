@@ -1,0 +1,8 @@
+---
+import UserDashboardLayout from "../../layouts/UserDashboardLayout.astro";
+import CombinedEventsPage from "../../components/CombinedEventsPage.tsx";
+---
+
+<UserDashboardLayout title="Events" currentPage="events">
+  <CombinedEventsPage client:load />
+</UserDashboardLayout>
