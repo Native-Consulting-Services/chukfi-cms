@@ -23,6 +23,14 @@ export default defineConfig({
     },
     build: {
       cssCodeSplit: false,
+      chunkSizeWarningLimit: 1000, // Increase limit to 1000 KB for large editor components
+      rollupOptions: {
+        onwarn(warning, warn) {
+          // Suppress warnings about unused imports in Astro's internal files
+          if (warning.code === "UNUSED_EXTERNAL_IMPORT") return;
+          warn(warning);
+        },
+      },
     },
   },
 });

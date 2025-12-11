@@ -26,8 +26,8 @@ interface Page {
 
 const { slug } = Astro.params;
 
-// This will be hydrated client-side
-const pageData: Page | null = null;
+// Explicitly type the variable
+const pageData = null as Page | null;
 ---
 
 <Layout title={pageData?.seo?.title || pageData?.title || "Page"}>

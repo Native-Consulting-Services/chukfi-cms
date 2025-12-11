@@ -167,7 +167,7 @@ export default function PageEditor({ pageId: pageIdProp }: PageEditorProps) {
     if (!template) return;
 
     setBlocks(template.blocks);
-    setLayout(template.id);
+    setLayout(template.id as "default" | "full-width" | "sidebar");
     if (!title && template.name !== "Blank") {
       setTitle(template.name);
     }

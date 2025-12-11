@@ -436,12 +436,7 @@ export default function EventsList() {
       {/* Registration form modal */}
       {showRegistrationForm && selectedEvent && (
         <EventRegistrationForm
-          eventId={selectedEvent.id}
-          eventTitle={selectedEvent.title}
-          eventDate={selectedEvent.startDate}
-          location={selectedEvent.location}
-          capacity={selectedEvent.capacity}
-          currentRegistrations={selectedEvent.registrations || 0}
+          event={selectedEvent}
           onClose={() => {
             setShowRegistrationForm(false);
             setSelectedEvent(null);
