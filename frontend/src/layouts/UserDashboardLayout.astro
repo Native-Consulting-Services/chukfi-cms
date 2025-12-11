@@ -1,0 +1,108 @@
+---
+import Layout from "./Layout.astro";
+import UserNav from "../components/UserNav.tsx";
+import MobileUserNav from "../components/MobileUserNav.tsx";
+import UserMenu from "../components/UserMenu.tsx";
+import ThemeToggle from "../components/ThemeToggle.tsx";
+
+export interface Props {
+  title: string;
+  currentPage?: string;
+}
+
+const { title, currentPage } = Astro.props;
+---
+
+<Layout title={title}>
+  <!-- Authentication Check -->
+  <style>
+    /* Hide dashboard content until auth check completes */
+    #dashboard-content {
+      opacity: 0;
+      visibility: hidden;
+    }
+    #dashboard-content.auth-verified {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.15s ease-in;
+    }
+  </style>
+
+  <script type="module" is:inline>
+    // Check if user is authenticated before rendering
+    const authToken = localStorage.getItem("chukfi_auth_token");
+    if (!authToken) {
+      // Redirect to login page if not authenticated
+      window.location.replace("/login");
+    } else {
+      // User is authenticated, show content
+      const dashboardContent = document.getElementById("dashboard-content");
+      if (dashboardContent) {
+        dashboardContent.classList.add("auth-verified");
+      }
+    }
+  </script>
+
+  <div
+    id="dashboard-content"
+    class="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
+  >
+    <!-- Top Navigation Bar -->
+    <nav
+      class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <!-- Logo/Brand -->
+          <div class="flex items-center space-x-4">
+            <!-- Mobile menu button -->
+            <MobileUserNav currentPage={currentPage} client:load />
+
+            <a
+              href="/dashboard"
+              class="flex items-center space-x-2 text-xl font-bold text-indigo-600 dark:text-indigo-400"
+            >
+              <svg
+                class="h-8 w-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                ></path>
+              </svg>
+              <span class="hidden sm:inline">My Account</span>
+            </a>
+          </div>
+
+          <!-- Right side: Navigation, Theme Toggle, User Menu -->
+          <div class="flex items-center space-x-4">
+            <UserNav currentPage={currentPage} client:load />
+            <ThemeToggle client:load />
+            <UserMenu client:load />
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="mx-auto w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 lg:px-8">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="border-t border-gray-200 bg-white py-6 dark:border-gray-700 dark:bg-gray-800"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+          &copy; {new Date().getFullYear()} Chukfi CMS. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </div>
+</Layout>

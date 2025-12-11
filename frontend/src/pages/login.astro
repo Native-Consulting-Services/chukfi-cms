@@ -36,10 +36,10 @@ import Layout from "../layouts/Layout.astro";
       <h2
         class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white"
       >
-        Sign in to Chukfi CMS
+        Sign in to your account
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
-        Access your content management dashboard
+        Access your dashboard
       </p>
     </div>
 
@@ -221,30 +221,64 @@ import Layout from "../layouts/Layout.astro";
           </div>
 
           <!-- Demo Credentials Info -->
-          <div class="mt-4 rounded-md bg-amber-50 p-4 dark:bg-amber-900/20">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-5 w-5 text-amber-600 dark:text-amber-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clip-rule="evenodd"></path>
-                </svg>
+          <div class="mt-4 space-y-3">
+            <!-- Admin Account -->
+            <div class="rounded-md bg-amber-50 p-4 dark:bg-amber-900/20">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg
+                    class="h-5 w-5 text-amber-600 dark:text-amber-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p
+                    class="mb-1 text-sm font-medium text-amber-800 dark:text-amber-200"
+                  >
+                    Admin account:
+                  </p>
+                  <p
+                    class="font-mono text-xs text-amber-700 dark:text-amber-300"
+                  >
+                    Email: admin@chukfi.com<br />
+                    Password: admin123
+                  </p>
+                </div>
               </div>
-              <div class="ml-3">
-                <p
-                  class="mb-1 text-sm font-medium text-amber-800 dark:text-amber-200"
-                >
-                  Default admin account:
-                </p>
-                <p class="font-mono text-xs text-amber-700 dark:text-amber-300">
-                  Email: admin@chukfi.com<br />
-                  Password: admin123
-                </p>
+            </div>
+
+            <!-- User Account -->
+            <div class="rounded-md bg-blue-50 p-4 dark:bg-blue-900/20">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg
+                    class="h-5 w-5 text-blue-600 dark:text-blue-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p
+                    class="mb-1 text-sm font-medium text-blue-800 dark:text-blue-200"
+                  >
+                    User account:
+                  </p>
+                  <p class="font-mono text-xs text-blue-700 dark:text-blue-300">
+                    Email: john.doe@example.com<br />
+                    Password: password123
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -348,11 +382,14 @@ import Layout from "../layouts/Layout.astro";
         // Store auth tokens and user data
         localStorage.setItem("chukfi_auth_token", data.accessToken);
         localStorage.setItem("chukfi_refresh_token", data.refreshToken);
+        localStorage.setItem("chukfi_user_email", data.user.email);
 
         const userDataToStore = {
           id: data.user.id,
           email: data.user.email,
           name: data.user.displayName,
+          displayName: data.user.displayName,
+          avatar: data.user.avatar || "",
           roles: data.user.roles || [],
         };
 
@@ -364,9 +401,24 @@ import Layout from "../layouts/Layout.astro";
         console.log("[Login] Verified stored data:", storedData);
         console.log("[Login] Parsed back:", JSON.parse(storedData));
 
-        console.log("Redirecting to /admin...");
-        // Redirect to admin dashboard
-        window.location.href = "/admin";
+        // Check if user has admin role
+        const isAdmin = data.user.roles?.some(
+          (role) =>
+            role.name === "Super Admin" ||
+            role.name === "Admin" ||
+            role.name === "Administrator",
+        );
+
+        console.log("Is admin:", isAdmin);
+
+        // Redirect based on role
+        if (isAdmin) {
+          console.log("Redirecting to /admin...");
+          window.location.href = "/admin";
+        } else {
+          console.log("Redirecting to /dashboard...");
+          window.location.href = "/dashboard";
+        }
       } catch (error) {
         console.error("Login error:", error);
         if (errorText) {

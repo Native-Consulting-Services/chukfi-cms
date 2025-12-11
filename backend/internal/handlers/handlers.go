@@ -66,7 +66,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		h.writeError(w, http.StatusUnauthorized, "invalid_credentials", "Invalid email or password")
 		return
 	}
-	
+
 	fmt.Printf("Login successful for: %s\n", user.Email)
 
 	accessToken, refreshToken, err := h.AuthService.GenerateTokens(user)
@@ -722,11 +722,11 @@ func (h *Handler) GetRolePermissions(w http.ResponseWriter, r *http.Request) {
 			h.writeError(w, http.StatusInternalServerError, "database_error", fmt.Sprintf("Failed to parse permissions: %v", err))
 			return
 		}
-		
+
 		// Parse UUIDs
 		p.ID, _ = uuid.Parse(idStr)
 		p.RoleID, _ = uuid.Parse(roleIDStr)
-		
+
 		permissions = append(permissions, p)
 	}
 
@@ -904,15 +904,15 @@ func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
 		}
 
 		mediaList = append(mediaList, map[string]interface{}{
-			"id":           id,
-			"filename":     filename,
-			"url":          url,
-			"mime_type":    mimeType,
-			"size":         size,
-			"uploaded_by":  uploadedBy,
+			"id":            id,
+			"filename":      filename,
+			"url":           url,
+			"mime_type":     mimeType,
+			"size":          size,
+			"uploaded_by":   uploadedBy,
 			"uploader_name": uploaderName,
-			"created_at":   createdAt,
-			"updated_at":   updatedAt,
+			"created_at":    createdAt,
+			"updated_at":    updatedAt,
 		})
 	}
 
@@ -1050,4 +1050,55 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Media deleted successfully"})
+}
+
+// GetPublicEvents returns all published events (public endpoint)
+func (h *Handler) GetPublicEvents(w http.ResponseWriter, r *http.Request) {
+	query := `
+		SELECT d.id, d.data, d.created_at, d.updated_at
+		FROM documents d
+		INNER JOIN collections c ON d.collection_id = c.id
+		WHERE c.slug = 'events'
+		AND d.status = 'published'
+		ORDER BY d.created_at DESC
+	`
+
+	rows, err := h.DB.Query(query)
+	if err != nil {
+		log.Printf("GetPublicEvents query error: %v", err)
+		h.writeError(w, http.StatusInternalServerError, "database_error", "Failed to fetch events")
+		return
+	}
+	defer rows.Close()
+
+	var events []map[string]interface{}
+	for rows.Next() {
+		var id string
+		var dataJSON []byte
+		var createdAt, updatedAt time.Time
+
+		if err := rows.Scan(&id, &dataJSON, &createdAt, &updatedAt); err != nil {
+			log.Printf("GetPublicEvents scan error: %v", err)
+			continue
+		}
+
+		var data map[string]interface{}
+		if err := json.Unmarshal(dataJSON, &data); err != nil {
+			log.Printf("GetPublicEvents unmarshal error: %v", err)
+			continue
+		}
+
+		// Add metadata
+		data["id"] = id
+		data["created_at"] = createdAt
+		data["updated_at"] = updatedAt
+
+		events = append(events, data)
+	}
+
+	if events == nil {
+		events = []map[string]interface{}{}
+	}
+
+	h.writeJSON(w, http.StatusOK, events)
 }

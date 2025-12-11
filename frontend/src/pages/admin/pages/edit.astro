@@ -1,0 +1,8 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import PageEditor from "../../../components/PageEditor.tsx";
+---
+
+<AdminLayout title="Edit Page" currentPage="pages">
+  <PageEditor client:load />
+</AdminLayout>

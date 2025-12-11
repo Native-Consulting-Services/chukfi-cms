@@ -7,15 +7,15 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID  `json:"id" db:"id"`
-	Email        string     `json:"email" db:"email"`
-	PasswordHash string     `json:"-" db:"password_hash"`
-	DisplayName  string     `json:"displayName" db:"display_name"`
-	Name         string     `json:"name" db:"name"`
-	Avatar       string     `json:"avatar" db:"avatar"`
-	CreatedAt    time.Time  `json:"createdAt" db:"created_at"`
-	UpdatedAt    time.Time  `json:"updatedAt" db:"updated_at"`
-	Roles        []Role     `json:"roles,omitempty"`
+	ID           uuid.UUID `json:"id" db:"id"`
+	Email        string    `json:"email" db:"email"`
+	PasswordHash string    `json:"-" db:"password_hash"`
+	DisplayName  string    `json:"displayName" db:"display_name"`
+	Name         string    `json:"name" db:"name"`
+	Avatar       string    `json:"avatar" db:"avatar"`
+	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" db:"updated_at"`
+	Roles        []Role    `json:"roles,omitempty"`
 }
 
 type Role struct {
@@ -28,15 +28,15 @@ type Role struct {
 }
 
 type Permission struct {
-	ID           uuid.UUID `json:"id" db:"id"`
-	RoleID       uuid.UUID `json:"roleId" db:"role_id"`
-	Collection   string    `json:"collection" db:"collection"`
-	CanCreate    bool      `json:"canCreate" db:"can_create"`
-	CanRead      bool      `json:"canRead" db:"can_read"`
-	CanUpdate    bool      `json:"canUpdate" db:"can_update"`
-	CanDelete    bool      `json:"canDelete" db:"can_delete"`
-	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt    time.Time `json:"updatedAt" db:"updated_at"`
+	ID         uuid.UUID `json:"id" db:"id"`
+	RoleID     uuid.UUID `json:"roleId" db:"role_id"`
+	Collection string    `json:"collection" db:"collection"`
+	CanCreate  bool      `json:"canCreate" db:"can_create"`
+	CanRead    bool      `json:"canRead" db:"can_read"`
+	CanUpdate  bool      `json:"canUpdate" db:"can_update"`
+	CanDelete  bool      `json:"canDelete" db:"can_delete"`
+	CreatedAt  time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type Collection struct {
@@ -82,18 +82,18 @@ type ActivityLog struct {
 }
 
 type ActivityLogResponse struct {
-	ID          uuid.UUID              `json:"id"`
-	UserID      uuid.UUID              `json:"userId"`
-	UserName    string                 `json:"userName"`
-	UserAvatar  string                 `json:"userAvatar"`
-	Action      string                 `json:"action"`
-	EntityType  string                 `json:"entityType"`
-	EntityID    *uuid.UUID             `json:"entityId,omitempty"`
-	EntityName  string                 `json:"entityName,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	IPAddress   string                 `json:"ipAddress,omitempty"`
-	UserAgent   string                 `json:"userAgent,omitempty"`
-	CreatedAt   time.Time              `json:"createdAt"`
+	ID         uuid.UUID              `json:"id"`
+	UserID     uuid.UUID              `json:"userId"`
+	UserName   string                 `json:"userName"`
+	UserAvatar string                 `json:"userAvatar"`
+	Action     string                 `json:"action"`
+	EntityType string                 `json:"entityType"`
+	EntityID   *uuid.UUID             `json:"entityId,omitempty"`
+	EntityName string                 `json:"entityName,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	IPAddress  string                 `json:"ipAddress,omitempty"`
+	UserAgent  string                 `json:"userAgent,omitempty"`
+	CreatedAt  time.Time              `json:"createdAt"`
 }
 
 // Request/Response models
@@ -103,9 +103,15 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 	User         User   `json:"user"`
+}
+
+type SignupRequest struct {
+	Email       string `json:"email" validate:"required,email"`
+	Password    string `json:"password" validate:"required,min=8"`
+	DisplayName string `json:"display_name" validate:"required"`
 }
 
 type CreateUserRequest struct {
@@ -122,15 +128,15 @@ type UpdateUserRequest struct {
 }
 
 type CreateRoleRequest struct {
-	Name        string                 `json:"name" validate:"required"`
-	Description string                 `json:"description"`
-	Permissions []PermissionRequest    `json:"permissions"`
+	Name        string              `json:"name" validate:"required"`
+	Description string              `json:"description"`
+	Permissions []PermissionRequest `json:"permissions"`
 }
 
 type UpdateRoleRequest struct {
-	Name        *string                `json:"name,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Permissions []PermissionRequest    `json:"permissions,omitempty"`
+	Name        *string             `json:"name,omitempty"`
+	Description *string             `json:"description,omitempty"`
+	Permissions []PermissionRequest `json:"permissions,omitempty"`
 }
 
 type PermissionRequest struct {

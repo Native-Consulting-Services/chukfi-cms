@@ -96,6 +96,7 @@ export default function BlogPostEditor({
   const [bannerImage, setBannerImage] = useState("");
   const [featured, setFeatured] = useState(false);
   const [publishAt, setPublishAt] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [bannerInputMode, setBannerInputMode] = useState<
@@ -202,6 +203,7 @@ export default function BlogPostEditor({
             setBannerImage(post.bannerImage || "");
             setFeatured(post.featured || false);
             setPublishAt(post.publishAt || "");
+            setCreatedAt(post.createdAt || "");
             editor?.commands.setContent(post.content);
           }
         } catch (e) {
@@ -323,7 +325,7 @@ export default function BlogPostEditor({
       featured,
       publishAt:
         saveStatus === "scheduled" ? publishAt || undefined : undefined,
-      createdAt: postId ? undefined : now,
+      createdAt: createdAt || (postId ? undefined : now),
       updatedAt: now,
     };
 
@@ -913,6 +915,27 @@ export default function BlogPostEditor({
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             If set, the post will be automatically published at this date and
             time
+          </p>
+        </div>
+
+        {/* Created Date Override */}
+        <div>
+          <label
+            htmlFor="createdAt"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Created Date (Optional Override)
+          </label>
+          <input
+            type="datetime-local"
+            id="createdAt"
+            value={createdAt}
+            onChange={(e) => setCreatedAt(e.target.value)}
+            className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-900 dark:text-white dark:ring-gray-600 dark:focus:ring-indigo-500"
+          />
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Override the created date for this post (leave empty to use current
+            time)
           </p>
         </div>
       </div>

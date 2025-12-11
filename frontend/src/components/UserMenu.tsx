@@ -6,6 +6,7 @@ const UserMenu: React.FC = () => {
     name: "Admin User",
     email: "admin@example.com",
     avatar: "",
+    isAdmin: false,
   });
 
   const loadUserData = () => {
@@ -13,10 +14,18 @@ const UserMenu: React.FC = () => {
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
+        // Check if user has admin role
+        const isAdmin =
+          userData.roles?.some(
+            (role: any) =>
+              role.name === "Admin" || role.name === "Administrator",
+          ) || false;
+
         setUser({
-          name: userData.name || userData.displayName || "Admin User",
-          email: userData.email || "admin@example.com",
-          avatar: userData.avatar || "https://avatar.iran.liara.run/public",
+          name: userData.name || userData.displayName || "User",
+          email: userData.email || "user@example.com",
+          avatar: userData.avatar || "",
+          isAdmin,
         });
       } catch (e) {
         console.error("Failed to parse user data:", e);
@@ -59,7 +68,7 @@ const UserMenu: React.FC = () => {
     <div className="relative">
       <button
         type="button"
-        className="max-w-xs bg-white dark:bg-gray-800 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-900"
+        className="flex max-w-xs items-center rounded-full bg-white text-sm focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-800 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-900"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded="false"
         aria-haspopup="true"
@@ -72,17 +81,17 @@ const UserMenu: React.FC = () => {
             alt={user.name}
           />
         ) : (
-          <div className="h-8 w-8 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500">
             <span className="text-sm font-medium text-white">
               {user.name.charAt(0)}
             </span>
           </div>
         )}
-        <span className="hidden md:block ml-3 text-gray-700 dark:text-gray-200 text-sm font-medium">
+        <span className="ml-3 hidden text-sm font-medium text-gray-700 md:block dark:text-gray-200">
           {user.name}
         </span>
         <svg
-          className={`hidden md:block ml-2 h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${
+          className={`ml-2 hidden h-5 w-5 text-gray-400 transition-transform duration-200 md:block dark:text-gray-500 ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="currentColor"
@@ -105,8 +114,8 @@ const UserMenu: React.FC = () => {
           ></div>
 
           {/* Dropdown */}
-          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none z-20">
-            <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <div className="ring-opacity-5 absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black focus:outline-none dark:bg-gray-800 dark:ring-gray-700">
+            <div className="border-b border-gray-200 px-4 py-2 dark:border-gray-700">
               <p className="text-sm font-medium text-gray-900 dark:text-white">
                 {user.name}
               </p>
@@ -115,24 +124,44 @@ const UserMenu: React.FC = () => {
               </p>
             </div>
 
-            <a
-              href="/admin/profile"
-              className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Your Profile
-            </a>
+            {user.isAdmin ? (
+              <>
+                <a
+                  href="/admin/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  Admin Dashboard
+                </a>
 
-            <a
-              href="/admin/settings"
-              className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Settings
-            </a>
+                <a
+                  href="/admin/settings"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  Admin Settings
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/dashboard/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  Your Profile
+                </a>
+
+                <a
+                  href="/dashboard"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  Dashboard
+                </a>
+              </>
+            )}
 
             <div className="border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 onClick={handleLogout}
               >
                 Sign out

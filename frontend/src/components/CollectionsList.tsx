@@ -12,6 +12,7 @@ interface Collection {
   status: "active" | "disabled";
   icon?: string;
   color?: string;
+  isSystem?: boolean;
 }
 
 // Mock data - replace with actual API call
@@ -27,6 +28,7 @@ const mockCollections: Collection[] = [
     status: "active",
     icon: "FileText",
     color: "blue",
+    isSystem: true,
   },
   {
     id: "2",
@@ -39,6 +41,7 @@ const mockCollections: Collection[] = [
     status: "active",
     icon: "FileCode",
     color: "purple",
+    isSystem: true,
   },
   {
     id: "3",
@@ -84,7 +87,7 @@ const mockCollections: Collection[] = [
     documentCount: 15,
     createdAt: "2024-03-15T14:30:00Z",
     updatedAt: "2024-11-21T10:10:00Z",
-    status: "disabled",
+    status: "active",
     icon: "Calendar",
     color: "rose",
   },
@@ -99,6 +102,7 @@ const mockCollections: Collection[] = [
     status: "active",
     icon: "Image",
     color: "cyan",
+    isSystem: true,
   },
   {
     id: "8",
@@ -111,6 +115,7 @@ const mockCollections: Collection[] = [
     status: "active",
     icon: "Settings",
     color: "gray",
+    isSystem: true,
   },
 ];
 
@@ -163,26 +168,50 @@ const getColorHex = (colorName?: string): string => {
 };
 
 export default function CollectionsList() {
-  const [collections, setCollections] = useState<Collection[]>(() => {
-    // Initialize from localStorage or use mock data
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("chukfi_collections");
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch (e) {
-          console.error("Failed to parse stored collections", e);
-        }
-      }
-    }
-    return mockCollections;
-  });
+  const [collections, setCollections] = useState<Collection[]>(mockCollections);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<keyof Collection>("updatedAt");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortField, setSortField] = useState<keyof Collection>("displayName");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "disabled"
   >("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    console.log("[CollectionsList] Component mounted");
+    console.log("[CollectionsList] Initial collections:", collections);
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("chukfi_collections");
+      console.log("[CollectionsList] Stored data:", stored);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          console.log("[CollectionsList] Parsed collections:", parsed);
+          // Validate parsed data has correct structure
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const isValid = parsed.every(
+              (item) => item && item.displayName && item.description,
+            );
+            if (isValid) {
+              setCollections(parsed);
+            } else {
+              console.warn(
+                "[CollectionsList] Invalid data in localStorage, using mock data",
+              );
+              localStorage.removeItem("chukfi_collections");
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse stored collections", e);
+          localStorage.removeItem("chukfi_collections");
+        }
+      }
+      setIsLoading(false);
+    }
+  }, []);
 
   // Save to localStorage whenever collections change
   useEffect(() => {
@@ -262,6 +291,11 @@ export default function CollectionsList() {
   // Filter and sort collections
   const filteredCollections = collections
     .filter((collection) => {
+      // Validate collection has required fields
+      if (!collection || !collection.displayName || !collection.description) {
+        console.warn("[CollectionsList] Invalid collection:", collection);
+        return false;
+      }
       const matchesSearch =
         collection.displayName
           .toLowerCase()
@@ -285,6 +319,26 @@ export default function CollectionsList() {
       return 0;
     });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredCollections.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCollections = filteredCollections.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
+  console.log(
+    "[CollectionsList] Render - collections:",
+    collections.length,
+    "filtered:",
+    filteredCollections.length,
+    "loading:",
+    isLoading,
+  );
+
   const handleSort = (field: keyof Collection) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -295,6 +349,13 @@ export default function CollectionsList() {
   };
 
   const handleDeleteCollection = (id: string) => {
+    const collection = collections.find((c) => c.id === id);
+    if (collection?.isSystem) {
+      alert(
+        "This is a system collection and cannot be deleted. System collections are essential for the CMS to function properly.",
+      );
+      return;
+    }
     if (
       confirm(
         "Are you sure you want to delete this collection? This action cannot be undone.",
@@ -312,10 +373,20 @@ export default function CollectionsList() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-6">
+        <div className="text-gray-500 dark:text-gray-400">
+          Loading collections...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       {/* Search and filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row">
         {/* Search */}
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
@@ -342,7 +413,7 @@ export default function CollectionsList() {
               placeholder="Search collections..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-600 dark:placeholder:text-gray-500 dark:focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -354,7 +425,7 @@ export default function CollectionsList() {
             onChange={(e) =>
               setFilterStatus(e.target.value as "all" | "active" | "disabled")
             }
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 bg-white py-1.5 pr-10 pl-3 text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-600 dark:focus:ring-indigo-500"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -377,12 +448,12 @@ export default function CollectionsList() {
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 sm:pl-0"
+                    className="cursor-pointer py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 sm:pl-0 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("displayName")}
                   >
                     <div className="group inline-flex">
                       Collection
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -399,12 +470,12 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("documentCount")}
                   >
                     <div className="group inline-flex">
                       Documents
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -421,19 +492,19 @@ export default function CollectionsList() {
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("status")}
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort("updatedAt")}
                   >
                     <div className="group inline-flex">
                       Last Updated
-                      <span className="invisible ml-2 flex-none rounded text-gray-400 dark:text-gray-500 group-hover:visible">
+                      <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible dark:text-gray-500">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 20 20"
@@ -448,22 +519,25 @@ export default function CollectionsList() {
                       </span>
                     </div>
                   </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                  <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-0">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredCollections.map((collection) => (
+                {paginatedCollections.map((collection) => (
                   <tr
                     key={collection.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    onClick={() =>
+                      (window.location.href = `/admin/${collection.name}`)
+                    }
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-0">
+                    <td className="py-4 pr-3 pl-4 whitespace-nowrap sm:pl-0">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
                           <div
-                            className="h-10 w-10 rounded-lg flex items-center justify-center"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg"
                             style={{
                               backgroundColor: `${getColorHex(collection.color)}20`,
                             }}
@@ -482,22 +556,26 @@ export default function CollectionsList() {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="font-medium text-gray-900 dark:text-gray-100">
+                          <a
+                            href={`/admin/${collection.name}`}
+                            className="font-medium text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {collection.displayName}
-                          </div>
+                          </a>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {collection.description}
                           </div>
-                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                             API:{" "}
-                            <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                            <code className="rounded bg-gray-100 px-1 dark:bg-gray-800">
                               /api/v1/collections/{collection.name}
                             </code>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">
                       <div className="flex items-center">
                         <span className="font-medium">
                           {collection.documentCount}
@@ -507,43 +585,53 @@ export default function CollectionsList() {
                         </span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                        className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
                           collection.status === "active"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                         }`}
                       >
                         {collection.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       <div>
                         <div title={formatDateTime(collection.updatedAt)}>
                           {formatDate(collection.updatedAt)}
                         </div>
                       </div>
                     </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <div className="flex items-center justify-end space-x-3">
+                    <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
+                      <div className="flex items-center justify-end gap-2">
                         {/* Edit button */}
                         <button
-                          onClick={() => handleEditCollection(collection)}
-                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditCollection(collection);
+                          }}
+                          className="rounded-md p-2 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300"
                           title="Edit collection"
                         >
                           <LucideIcons.Pencil className="h-5 w-5" />
                         </button>
 
-                        {/* Delete button */}
-                        <button
-                          onClick={() => handleDeleteCollection(collection.id)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30"
-                          title="Delete collection"
-                        >
-                          <LucideIcons.Trash2 className="h-5 w-5" />
-                        </button>
+                        {/* Delete button - only show for non-system collections */}
+                        {!collection.isSystem ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCollection(collection.id);
+                            }}
+                            className="rounded-md p-2 text-red-600 hover:bg-red-50 hover:text-red-900 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                            title="Delete collection"
+                          >
+                            <LucideIcons.Trash2 className="h-5 w-5" />
+                          </button>
+                        ) : (
+                          <div className="h-9 w-9"></div>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -556,7 +644,7 @@ export default function CollectionsList() {
 
       {/* Empty state */}
       {filteredCollections.length === 0 && (
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600"
             fill="none"
@@ -582,7 +670,7 @@ export default function CollectionsList() {
             <div className="mt-6">
               <button
                 type="button"
-                className="inline-flex items-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
+                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
               >
                 <svg
                   className="mr-2 h-4 w-4"
@@ -601,6 +689,87 @@ export default function CollectionsList() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && filteredCollections.length > 0 && (
+        <div className="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex flex-1 justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+                <span className="font-medium">
+                  {Math.min(endIndex, filteredCollections.length)}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium">
+                  {filteredCollections.length}
+                </span>{" "}
+                results
+              </p>
+            </div>
+            <div>
+              <nav
+                className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                aria-label="Pagination"
+              >
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-gray-600 dark:hover:bg-gray-700"
+                >
+                  <span className="sr-only">Previous</span>
+                  <LucideIcons.ChevronLeft className="h-5 w-5" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                        currentPage === page
+                          ? "z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          : "text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-gray-600 dark:hover:bg-gray-700"
+                >
+                  <span className="sr-only">Next</span>
+                  <LucideIcons.ChevronRight className="h-5 w-5" />
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       )}
     </div>

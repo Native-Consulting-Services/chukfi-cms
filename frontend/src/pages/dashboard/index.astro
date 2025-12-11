@@ -1,0 +1,8 @@
+---
+import UserDashboardLayout from "../../layouts/UserDashboardLayout.astro";
+import DashboardOverview from "../../components/DashboardOverview.tsx";
+---
+
+<UserDashboardLayout title="My Dashboard" currentPage="dashboard">
+  <DashboardOverview client:load />
+</UserDashboardLayout>
