@@ -1,8 +1,11 @@
 ---
-export const prerender = false;
-
 import Layout from "../../layouts/Layout.astro";
 import { Calendar, MapPin, Users, ArrowLeft, Clock } from "lucide-react";
+
+// Return empty paths - this page is rendered client-side with dynamic data
+export async function getStaticPaths() {
+  return [];
+}
 
 // This page will be rendered client-side with the event data
 ---
