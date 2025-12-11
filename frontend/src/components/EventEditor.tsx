@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
 interface Event {
   id: string;

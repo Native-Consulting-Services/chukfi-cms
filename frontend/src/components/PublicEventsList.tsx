@@ -3,7 +3,6 @@ import {
   Calendar,
   MapPin,
   Users,
-  Clock,
   ArrowRight,
   Search,
   LogIn,
@@ -306,14 +305,7 @@ export default function PublicEventsList() {
       {/* Registration Form Modal */}
       {showRegistrationForm && selectedEvent && (
         <EventRegistrationForm
-          eventId={selectedEvent.id}
-          eventTitle={selectedEvent.title}
-          eventDate={getEventDate(selectedEvent)}
-          location={selectedEvent.location}
-          capacity={selectedEvent.capacity}
-          currentRegistrations={
-            selectedEvent.registrations || selectedEvent.current_registrations
-          }
+          event={selectedEvent}
           onClose={() => {
             setShowRegistrationForm(false);
             setSelectedEvent(null);

@@ -86,7 +86,7 @@ export default function MyEvents() {
     }
   };
 
-  const handleUnregister = async (registrationId: string, eventId: string) => {
+  const handleUnregister = async (eventId: string) => {
     if (!confirm("Are you sure you want to unregister from this event?")) {
       return;
     }
@@ -286,7 +286,7 @@ export default function MyEvents() {
                 </a>
                 {status.text === "Upcoming" && (
                   <button
-                    onClick={() => handleUnregister(registration.id, event.id)}
+                    onClick={() => handleUnregister(event.id)}
                     className="rounded-md border border-red-300 bg-white p-2 text-red-600 hover:bg-red-50 dark:border-red-700 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/30"
                     title="Unregister"
                   >

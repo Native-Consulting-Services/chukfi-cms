@@ -37,7 +37,6 @@ export default function PageEditor({ pageId: pageIdProp }: PageEditorProps) {
   const [layout, setLayout] = useState<"default" | "full-width" | "sidebar">(
     "default",
   );
-  const [status, setStatus] = useState<"draft" | "published">("draft");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -69,7 +68,6 @@ export default function PageEditor({ pageId: pageIdProp }: PageEditorProps) {
             setSlug(page.slug);
             setBlocks(page.blocks || []);
             setLayout(page.layout);
-            setStatus(page.status);
             setSeoTitle(page.seo.title);
             setSeoDescription(page.seo.description);
             setIsHomePage(!!page.isHomePage);

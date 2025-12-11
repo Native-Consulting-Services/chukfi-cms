@@ -44,7 +44,6 @@ export default function DashboardOverview() {
   });
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -106,12 +105,12 @@ export default function DashboardOverview() {
           .filter((e: any) => e !== null);
 
         const upcoming = eventsWithDetails.filter((event: any) => {
-          const eventDate = new Date(event.startDate || event.date);
+          const eventDate = new Date(event.date);
           return eventDate > now && event.registrationStatus === "confirmed";
         });
 
         const past = eventsWithDetails.filter((event: any) => {
-          const eventDate = new Date(event.startDate || event.date);
+          const eventDate = new Date(event.date);
           return eventDate <= now && event.registrationStatus === "confirmed";
         });
 
@@ -293,8 +292,7 @@ export default function DashboardOverview() {
                   <div className="mt-1 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center">
                       <Clock className="mr-1 h-4 w-4" />
-                      {formatDate(event.startDate || event.date)} at{" "}
-                      {formatTime(event.startDate || event.date)}
+                      {formatDate(event.date)} at {formatTime(event.date)}
                     </span>
                     {event.location && (
                       <span className="flex items-center">
@@ -369,7 +367,7 @@ export default function DashboardOverview() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {formatDate(event.startDate || event.date)}
+                      {formatDate(event.date)}
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {event.location || "—"}

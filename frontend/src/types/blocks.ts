@@ -173,7 +173,7 @@ export const BLOCK_REGISTRY: BlockMetadata[] = [
 
 // Helper to create a new block with default content
 export function createDefaultBlock(type: BlockType): Block {
-  const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  const id = Date.now().toString() + Math.random().toString(36).slice(2, 11);
 
   const defaultContent: Record<BlockType, BlockContent> = {
     hero: {

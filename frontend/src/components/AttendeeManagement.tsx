@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Search, Mail, Calendar, CheckCircle, X } from "lucide-react";
+import { Users, Search, Mail, Calendar, CheckCircle } from "lucide-react";
 
 interface Registration {
   id: string;

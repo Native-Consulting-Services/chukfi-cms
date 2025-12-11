@@ -39,7 +39,7 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Youtube as YoutubeIcon,
+  Video,
   Table as TableIcon,
   Paperclip,
   Plus,
@@ -1167,7 +1167,7 @@ export default function BlogPostEditor({
             className="rounded p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Embed YouTube Video"
           >
-            <YoutubeIcon className="h-4 w-4" />
+            <Video className="h-4 w-4" />
           </button>
           <button
             type="button"

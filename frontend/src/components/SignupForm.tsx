@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, UserPlus, Mail, Lock, User } from "lucide-react";
+import { UserPlus, Mail, Lock, User } from "lucide-react";
 
 export default function SignupForm() {
   const [email, setEmail] = useState("");

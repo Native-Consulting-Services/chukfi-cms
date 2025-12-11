@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, MapPin, Users, Clock, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Users, Clock } from "lucide-react";
 import EventRegistrationForm from "./EventRegistrationForm";
 
 interface Event {
@@ -16,14 +16,6 @@ interface Event {
   registration_mode?: string;
   registrationMode?: string;
   status?: string;
-}
-
-interface Registration {
-  id: string;
-  event_id: string;
-  status: string;
-  name: string;
-  email: string;
 }
 
 export default function EventDetailsPage() {

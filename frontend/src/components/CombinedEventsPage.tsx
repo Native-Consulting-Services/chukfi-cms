@@ -7,7 +7,6 @@ import {
   Search,
   CheckCircle,
   XCircle,
-  AlertCircle,
 } from "lucide-react";
 import EventRegistrationForm from "./EventRegistrationForm";
 

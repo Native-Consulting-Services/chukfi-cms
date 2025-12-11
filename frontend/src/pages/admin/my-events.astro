@@ -1,8 +1,8 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import MyEvents from "../../components/MyEvents";
+import MyEventsComponent from "../../components/MyEvents.tsx";
 ---
 
 <AdminLayout title="My Events">
-  <MyEvents client:load />
+  <MyEventsComponent client:load />
 </AdminLayout>

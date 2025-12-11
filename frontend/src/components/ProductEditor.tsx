@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Save, Trash2, Upload, X } from "lucide-react";
 import { logActivity } from "../lib/activityLogger";
 
