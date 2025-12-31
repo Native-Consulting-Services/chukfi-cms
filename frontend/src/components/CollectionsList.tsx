@@ -617,21 +617,25 @@ export default function CollectionsList() {
                           <LucideIcons.Pencil className="h-5 w-5" />
                         </button>
 
-                        {/* Delete button - only show for non-system collections */}
-                        {!collection.isSystem ? (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteCollection(collection.id);
-                            }}
-                            className="rounded-md p-2 text-red-600 hover:bg-red-50 hover:text-red-900 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
-                            title="Delete collection"
-                          >
-                            <LucideIcons.Trash2 className="h-5 w-5" />
-                          </button>
-                        ) : (
-                          <div className="h-9 w-9"></div>
-                        )}
+                        {/* Delete button - disabled for Events, Products, Team Members, and Testimonials */}
+                        {!collection.isSystem &&
+                          ![
+                            "events",
+                            "products",
+                            "team_members",
+                            "testimonials",
+                          ].includes(collection.name) && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCollection(collection.id);
+                              }}
+                              className="rounded-md p-2 text-red-600 hover:bg-red-50 hover:text-red-900 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                              title="Delete collection"
+                            >
+                              <LucideIcons.Trash2 className="h-5 w-5" />
+                            </button>
+                          )}
                       </div>
                     </td>
                   </tr>

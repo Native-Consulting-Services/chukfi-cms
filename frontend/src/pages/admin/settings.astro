@@ -1,0 +1,30 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import SettingsPanel from "../../components/SettingsPanel.tsx";
+
+// Get the authenticated user from cookie/session
+// This would be handled by middleware in production
+const user = {
+  name: "Admin User",
+  email: "admin@example.com",
+};
+---
+
+<AdminLayout title="Settings" currentPage="settings">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <!-- Page header -->
+    <div class="mb-8 sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          Settings
+        </h1>
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+          Manage your site configuration and preferences
+        </p>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <SettingsPanel client:load />
+  </div>
+</AdminLayout>
