@@ -1,0 +1,19 @@
+# tidb server at port 4002
+version: '3.8'
+
+services:
+  tidb-chukfi:
+    image: pingcap/tidb:latest
+    container_name: tidb-chukfi
+
+    ports:
+      - "4002:4000"
+    command:
+      - --store=unistore
+      - --path=/tmp/tidb
+      - -L=info
+
+    volumes:
+      - ./docker-tidb:/tmp/tidb
+
+  

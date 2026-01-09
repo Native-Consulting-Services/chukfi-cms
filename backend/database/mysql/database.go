@@ -2,13 +2,14 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"native-consult.io/chukfi-cms/database/global"
+	defaultSchema "native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
 )
 
@@ -30,9 +31,14 @@ func InitDatabase(schema []interface{}) {
 		panic("failed to connect database:" + err.Error())
 	}
 
-	fullSchema := append(schema, global.DefaultSchema...)
+	fullSchema := append(schema, defaultSchema.DefaultSchema...)
 
 	db.AutoMigrate(fullSchema...)
+
+	// print every schema that exists
+	for _, s := range fullSchema {
+		fmt.Printf("Database Schema: %T\n", s)
+	}
 
 	// create base user
 
@@ -41,17 +47,23 @@ func InitDatabase(schema []interface{}) {
 		panic("failed to hash base user password:" + err.Error())
 	}
 
-	user := global.User{
+	user := defaultSchema.User{
 		Fullname:    "Chukfi Admin",
 		Password:    string(basePassword),
 		Email:       "admin@nativeconsult.io",
 		Permissions: uint(permissions.Admin),
 	}
 
-	err = gorm.G[global.User](db).Create(context.Background(), &user)
+	// check if user exists
+	var existingUser defaultSchema.User
+	result := db.Where("email = ?", user.Email).First(&existingUser)
 
-	if err != nil {
-		panic("failed to create base user:" + err.Error())
+	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
+		err = gorm.G[defaultSchema.User](db).Create(context.Background(), &user)
+
+		if err != nil {
+			panic("failed to create base user:" + err.Error())
+		}
 	}
 
 	// setup :)
