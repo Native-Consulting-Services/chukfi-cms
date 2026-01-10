@@ -104,6 +104,22 @@ func extractFieldsRecursive(t reflect.Type, fields *[]FieldMetadata) {
 	}
 }
 
+func hasHiddenField(model interface{}) bool {
+	t := reflect.TypeOf(model)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		if strings.ToLower(field.Name) == "hidden" {
+			return true
+		}
+	}
+
+	return false
+}
+
 func hasAdminOnlyField(model interface{}) bool {
 	t := reflect.TypeOf(model)
 	if t.Kind() == reflect.Ptr {
@@ -141,7 +157,13 @@ func singularize(name string) string {
 func RegisterSchema(model interface{}) {
 	tableName := getTableName(model)
 	adminOnly := hasAdminOnlyField(model)
+	hasHiddenField := hasHiddenField(model)
 	fields := extractFields(model)
+
+	// if hidden, do NOT register
+	if hasHiddenField {
+		return
+	}
 
 	mu.Lock()
 	defer mu.Unlock()
@@ -224,6 +246,9 @@ func GetFieldNames(tableName string) []string {
 	return names
 }
 
+// ValidateBody checks for missing required fields and unknown fields in the provided body map.
+// Uses a schema registry to validate the fields.
+// e.g Post -> posts
 func ValidateBody(tableName string, body map[string]interface{}) (missingFields []string, unknownFields []string) {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -255,6 +280,8 @@ func ValidateBody(tableName string, body map[string]interface{}) (missingFields 
 	return missingFields, unknownFields
 }
 
+// ResolveTableName resolves the actual table name from the provided name,
+// considering aliases and naming strategies.
 func ResolveTableName(name string) (string, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -264,6 +291,15 @@ func ResolveTableName(name string) (string, bool) {
 	}
 
 	if actual, exists := aliases[name]; exists {
+		return actual, true
+	}
+
+	snakeName := schema.NamingStrategy{}.TableName(name)
+	if _, exists := registry[snakeName]; exists {
+		return snakeName, true
+	}
+
+	if actual, exists := aliases[snakeName]; exists {
 		return actual, true
 	}
 

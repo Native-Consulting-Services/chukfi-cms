@@ -21,6 +21,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type APIKeys struct {
+	schema.BaseModel
+	Key        string `gorm:"type:char(64);not null;uniqueIndex"`
+	OwnerEmail string `gorm:"type:varchar(100);not null;index"`
+	ExpiresAt  int64  `gorm:"not null;index"`
+}
+
 type Post struct {
 	schema.BaseModel
 	Type  string `gorm:"type:varchar(100);not null"`
@@ -35,6 +42,7 @@ type Post struct {
 func main() {
 	database.InitDatabase([]interface{}{
 		&Post{},
+		&APIKeys{},
 	})
 
 	// register custom permission

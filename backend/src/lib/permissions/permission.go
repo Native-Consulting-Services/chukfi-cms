@@ -60,6 +60,7 @@ func init() {
 	}
 }
 
+// InitPermissions initializes the permission system with the given database connection.
 func InitPermissions(db *gorm.DB) error {
 	registry.mu.Lock()
 	registry.db = db
@@ -70,6 +71,7 @@ func InitPermissions(db *gorm.DB) error {
 	return LoadCustomPermissions(db)
 }
 
+// LoadCustomPermissions loads custom permissions from the database into the registry.
 func LoadCustomPermissions(db *gorm.DB) error {
 	var customPerms []CustomPermission
 	if err := db.Order("bit_position asc").Find(&customPerms).Error; err != nil {
@@ -92,6 +94,7 @@ func LoadCustomPermissions(db *gorm.DB) error {
 	return nil
 }
 
+// RegisterPermission registers a new custom permission with the given name.
 func RegisterPermission(name string) (Permission, error) {
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
@@ -129,6 +132,7 @@ func RegisterPermission(name string) (Permission, error) {
 	return perm, nil
 }
 
+// UnregisterPermission removes a custom permission by name.
 func UnregisterPermission(name string) error {
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
@@ -156,6 +160,7 @@ func UnregisterPermission(name string) error {
 	return nil
 }
 
+// GetPermissionByName retrieves a permission by its name.
 func GetPermissionByName(name string) (Permission, bool) {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()
@@ -163,6 +168,7 @@ func GetPermissionByName(name string) (Permission, bool) {
 	return perm, ok
 }
 
+// GetAllCustomPermissions retrieves all custom permissions from the database.
 func GetAllCustomPermissions() []CustomPermission {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()
@@ -174,6 +180,7 @@ func GetAllCustomPermissions() []CustomPermission {
 	return perms
 }
 
+// HasPermission checks if the userPermissions include the requiredPermissions.
 func HasPermission(userPermissions, requiredPermissions Permission) bool {
 	if userPermissions&Administrator == Administrator {
 		return true
@@ -181,6 +188,7 @@ func HasPermission(userPermissions, requiredPermissions Permission) bool {
 	return userPermissions&requiredPermissions == requiredPermissions
 }
 
+// AllPermissionsAsStrings returns a slice of all registered permission names.
 func AllPermissionsAsStrings() []string {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()
@@ -192,6 +200,7 @@ func AllPermissionsAsStrings() []string {
 	return names
 }
 
+// PermissionsToStrings converts a Permission bitmask to a slice of permission names.
 func PermissionsToStrings(userPermissions Permission) []string {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()
@@ -205,6 +214,7 @@ func PermissionsToStrings(userPermissions Permission) []string {
 	return names
 }
 
+// StringsToPermission converts a slice of permission names to a Permission bitmask.
 func StringsToPermission(names []string) Permission {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()
@@ -218,6 +228,7 @@ func StringsToPermission(names []string) Permission {
 	return combined
 }
 
+// PermissionToName retrieves the name of a permission given its bitmask.
 func PermissionToName(permission Permission) string {
 	registry.mu.RLock()
 	defer registry.mu.RUnlock()

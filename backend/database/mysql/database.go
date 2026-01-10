@@ -8,15 +8,25 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
+
 	"gorm.io/gorm"
 	defaultSchema "native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
 	"native-consult.io/chukfi-cms/src/lib/schemaregistry"
 )
 
+// DB is the global database connection (MYSQL, *gorm.DB)
 var DB *gorm.DB
+
+// The database schema to be migrated, can be appended to by using InitDatabase(schema []interface{})
 var Schema *[]interface{}
 
+/*
+InitDatabase initializes the database connection and migrates the provided schemas.
+It also creates a default admin user if it does not already exist.
+
+Using: MYSQL, requires DATABASE_DSN in .env file
+*/
 func InitDatabase(schema []interface{}) {
 	err := godotenv.Load()
 	if err != nil {

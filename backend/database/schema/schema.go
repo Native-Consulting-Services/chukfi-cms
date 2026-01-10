@@ -35,6 +35,8 @@ type UserToken struct {
 	UserID    uuid.UUID `gorm:"type:char(36);not null;index"`
 	Token     string    `gorm:"type:char(64);not null;uniqueIndex"`
 	ExpiresAt int64     `gorm:"not null;index"`
+
+	Hidden string `gorm:"-:all"` // hidden from metadata
 }
 
 var DefaultSchema = []interface{}{

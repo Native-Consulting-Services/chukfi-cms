@@ -16,6 +16,7 @@ import (
 	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/chumiddleware"
 	"native-consult.io/chukfi-cms/src/httpresponder"
+	usercache "native-consult.io/chukfi-cms/src/lib/cache/user"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
 	"native-consult.io/chukfi-cms/src/lib/schemaregistry"
 )
@@ -25,6 +26,9 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
+/*
+GetUserIDFromAuthToken retrieves the userID associated with the given auth token from the database.
+*/
 func GetUserIDFromAuthToken(database *gorm.DB, authToken string) (string, error) {
 	var userToken schema.UserToken
 	result := database.Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(&userToken)
@@ -34,6 +38,9 @@ func GetUserIDFromAuthToken(database *gorm.DB, authToken string) (string, error)
 	return userToken.UserID.String(), nil
 }
 
+/*
+GetUserIDFromRequest retrieves the userID from the request context. If not found, it returns an empty string.
+*/
 func GetUserIDFromRequest(request *http.Request) string {
 	userID, ok := request.Context().Value("userID").(string)
 	if !ok || userID == "" {
@@ -42,6 +49,11 @@ func GetUserIDFromRequest(request *http.Request) string {
 	return userID
 }
 
+/*
+GetUserFromRequest retrieves the user associated with the request. It first checks the request context for a userID.
+If not found, it looks for an auth token in the context, validates it against the database,
+and retrieves the corresponding user.
+*/
 func GetUserFromRequest(request *http.Request, database *gorm.DB) (*schema.User, error) {
 	userID, ok := request.Context().Value("userID").(string)
 	if !ok || userID == "" {
@@ -50,49 +62,48 @@ func GetUserFromRequest(request *http.Request, database *gorm.DB) (*schema.User,
 		if !ok || authToken == "" {
 			return nil, fmt.Errorf("no user ID or auth token in request")
 		}
+
+		// check cache
 		var result, err = gorm.G[schema.UserToken](database).Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(request.Context())
 		if err != nil || result.ID == uuid.Nil {
 			return nil, fmt.Errorf("invalid auth token")
 		}
 		userID = result.UserID.String()
 	}
+
+	cacheduser, found := usercache.UserCacheInstance.Get(userID)
+
+	if found {
+		return &cacheduser, nil
+	}
+
 	var user schema.User
 	result := database.Where("id = ?", userID).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	usercache.UserCacheInstance.Set(userID, user)
 	return &user, nil
 }
 
+/*
+RequestRequiresPermission checks if the user associated with the request has the required permissions.
+*/
 func RequestRequiresPermission(request *http.Request, database *gorm.DB, requiredPermissions permissions.Permission) bool {
-	userID, ok := request.Context().Value("userID").(string)
-	println(userID, ok)
-	if !ok || userID == "" {
-		// try to get from auth token
-		authToken, ok := request.Context().Value("authToken").(string)
-		if !ok || authToken == "" {
-			return false
-		}
-		var result, err = gorm.G[schema.UserToken](database).Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(request.Context())
-		if err != nil || result.ID == uuid.Nil {
-			return false
-		}
-		userID = result.UserID.String()
-	}
-
-	var user schema.User
-	result := database.Where("id = ?", userID).First(&user)
-
-	if result.Error != nil {
+	user, err := GetUserFromRequest(request, database)
+	if err != nil {
 		return false
 	}
-
-	println("user has permissions!", permissions.PermissionToName(permissions.Permission(user.Permissions)))
 
 	return permissions.HasPermission(permissions.Permission(user.Permissions), requiredPermissions)
 
 }
-func RouteRequiresPermission(database *gorm.DB, required permissions.Permission) func(next http.Handler) http.Handler {
+
+/*
+RoutesRequiresPermission is a middleware that checks if the user has the required permissions to access the route.
+If not, it returns a 403 Forbidden response.
+*/
+func RoutesRequiresPermission(database *gorm.DB, required permissions.Permission) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -110,6 +121,10 @@ func RouteRequiresPermission(database *gorm.DB, required permissions.Permission)
 	}
 }
 
+/*
+AuthMiddlewareWithDatabase checks for auth token in context, validates it against the database,
+and if valid, adds the userID to the request context.
+*/
 func AuthMiddlewareWithDatabase(database *gorm.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -155,6 +170,7 @@ func SetupRouter(database *gorm.DB) *chi.Mux {
 
 	r.Route("/admin", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
+
 			r.Post("/login", func(w http.ResponseWriter, r *http.Request) {
 				// check if already logged in
 				authToken, ok := r.Context().Value("authToken").(string)
