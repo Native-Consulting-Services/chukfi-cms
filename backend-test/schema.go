@@ -6,6 +6,7 @@ import (
 
 type APIKeys struct {
 	schema.BaseModel
+	schema.AdminOnly
 	Key        string `gorm:"type:char(64);not null;uniqueIndex"`
 	OwnerEmail string `gorm:"type:varchar(100);not null;index"`
 	ExpiresAt  int64  `gorm:"not null;index"`
