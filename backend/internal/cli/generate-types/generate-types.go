@@ -38,6 +38,9 @@ func printHelp() {
 	fmt.Printf(`
 Usage: %s generate-types [options]
 
+The generate-types command generates TypeScript types from Go schema definitions.
+The database needs to be accessible & running to fetch the schema metadata.
+
 Options:
   --schema=<path>*    Path to a Go file containing your schema structs
                      (e.g., --schema=./schema.go)
