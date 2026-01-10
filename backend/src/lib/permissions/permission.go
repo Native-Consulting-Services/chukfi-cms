@@ -27,7 +27,6 @@ var (
 
 var (
 	ErrMaxPermissionsReached = errors.New("maximum permissions reached (64)")
-	ErrPermissionExists      = errors.New("permission already exists")
 	ErrPermissionNotFound    = errors.New("permission not found")
 )
 
@@ -97,8 +96,10 @@ func RegisterPermission(name string) (Permission, error) {
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
 
-	if _, exists := registry.nameToPermission[name]; exists {
-		return 0, ErrPermissionExists
+	foundperm, exists := registry.nameToPermission[name]
+
+	if exists {
+		return foundperm, nil
 	}
 
 	if registry.nextBit >= 64 {

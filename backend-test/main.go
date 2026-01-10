@@ -9,11 +9,10 @@ import (
 	"native-consult.io/chukfi-cms/cmd/router"
 	"native-consult.io/chukfi-cms/cmd/serve"
 	databasehelper "native-consult.io/chukfi-cms/database/helper"
-	"native-consult.io/chukfi-cms/database/mysql"
+	database "native-consult.io/chukfi-cms/database/mysql"
 	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/httpresponder"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
-
 
 	// gorm
 	"gorm.io/gorm"
@@ -24,9 +23,9 @@ import (
 
 type Post struct {
 	schema.BaseModel
-	Type  string `gorm:"type:varchar(100)"`
-	Body  string `gorm:"type:text"`
-	Title string `gorm:"type:varchar(255)"`
+	Type  string `gorm:"type:varchar(100);not null"`
+	Body  string `gorm:"type:text;not null"`
+	Title string `gorm:"type:varchar(255);not null;index"`
 
 	AuthorID string `gorm:"type:char(36);index"`
 
@@ -43,7 +42,6 @@ func main() {
 	if err != nil {
 		panic("failed to register permission: " + err.Error())
 	}
-
 
 	// generate a post from schema
 	testPost := Post{
@@ -65,7 +63,7 @@ func main() {
 			panic("failed to create test post:" + err.Error())
 		}
 	}
-		
+
 	*/
 
 	if err != nil || result.ID == uuid.Nil {

@@ -10,6 +10,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	uuid "github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/chumiddleware"
@@ -17,6 +19,20 @@ import (
 	"native-consult.io/chukfi-cms/src/lib/permissions"
 	"native-consult.io/chukfi-cms/src/lib/schemaregistry"
 )
+
+type loginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func GetUserIDFromAuthToken(database *gorm.DB, authToken string) (string, error) {
+	var userToken schema.UserToken
+	result := database.Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(&userToken)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return userToken.UserID.String(), nil
+}
 
 func GetUserIDFromRequest(request *http.Request) string {
 	userID, ok := request.Context().Value("userID").(string)
@@ -29,7 +45,16 @@ func GetUserIDFromRequest(request *http.Request) string {
 func GetUserFromRequest(request *http.Request, database *gorm.DB) (*schema.User, error) {
 	userID, ok := request.Context().Value("userID").(string)
 	if !ok || userID == "" {
-		return nil, fmt.Errorf("no user ID in request context")
+		// try to get from auth token
+		authToken, ok := request.Context().Value("authToken").(string)
+		if !ok || authToken == "" {
+			return nil, fmt.Errorf("no user ID or auth token in request")
+		}
+		var result, err = gorm.G[schema.UserToken](database).Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(request.Context())
+		if err != nil || result.ID == uuid.Nil {
+			return nil, fmt.Errorf("invalid auth token")
+		}
+		userID = result.UserID.String()
 	}
 	var user schema.User
 	result := database.Where("id = ?", userID).First(&user)
@@ -41,8 +66,18 @@ func GetUserFromRequest(request *http.Request, database *gorm.DB) (*schema.User,
 
 func RequestRequiresPermission(request *http.Request, database *gorm.DB, requiredPermissions permissions.Permission) bool {
 	userID, ok := request.Context().Value("userID").(string)
+	println(userID, ok)
 	if !ok || userID == "" {
-		return false
+		// try to get from auth token
+		authToken, ok := request.Context().Value("authToken").(string)
+		if !ok || authToken == "" {
+			return false
+		}
+		var result, err = gorm.G[schema.UserToken](database).Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(request.Context())
+		if err != nil || result.ID == uuid.Nil {
+			return false
+		}
+		userID = result.UserID.String()
 	}
 
 	var user schema.User
@@ -52,17 +87,15 @@ func RequestRequiresPermission(request *http.Request, database *gorm.DB, require
 		return false
 	}
 
+	println("user has permissions!", permissions.PermissionToName(permissions.Permission(user.Permissions)))
+
 	return permissions.HasPermission(permissions.Permission(user.Permissions), requiredPermissions)
 
 }
 func RouteRequiresPermission(database *gorm.DB, required permissions.Permission) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userId, ok := r.Context().Value("userID").(string)
-			if !ok || userId == "" {
-				httpresponder.SendErrorResponse(w, r, "Unauthorized: No user ID in context", http.StatusUnauthorized)
-				return
-			}
+
 			user, err := GetUserFromRequest(r, database)
 			if err != nil {
 				httpresponder.SendErrorResponse(w, r, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
@@ -121,6 +154,89 @@ func SetupRouter(database *gorm.DB) *chi.Mux {
 	// admin routes with database so /admin/collection/${collectionName}/get
 
 	r.Route("/admin", func(r chi.Router) {
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/login", func(w http.ResponseWriter, r *http.Request) {
+				// check if already logged in
+				authToken, ok := r.Context().Value("authToken").(string)
+				if ok && authToken != "" {
+					// check if token is valid
+					result, err := gorm.G[schema.UserToken](database).Where("token = ? AND expires_at > ?", authToken, time.Now().Unix()).First(r.Context())
+					if err == nil && result.ID != uuid.Nil {
+						httpresponder.SendErrorResponse(w, r, "Already logged in", http.StatusBadRequest)
+						return
+					}
+				}
+
+				var body loginRequest
+				err := json.NewDecoder(r.Body).Decode(&body)
+				if err != nil {
+					httpresponder.SendErrorResponse(w, r, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+					return
+				}
+
+				if body.Email == "" || body.Password == "" {
+					httpresponder.SendErrorResponse(w, r, "Email and password are required", http.StatusBadRequest)
+					return
+				}
+
+				var user schema.User
+				result := database.Where("email = ?", body.Email).First(&user)
+				if result.Error != nil {
+					httpresponder.SendErrorResponse(w, r, "Invalid email or password", http.StatusUnauthorized)
+					return
+				}
+
+				// bcrypt compare
+				err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+				if err != nil {
+					httpresponder.SendErrorResponse(w, r, "Invalid email or password", http.StatusUnauthorized)
+					return
+				}
+				// create auth token
+				token := uuid.NewV4()
+
+				userToken := schema.UserToken{
+					UserID:    user.ID,
+					Token:     token.String(),
+					ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+				}
+
+				err = gorm.G[schema.UserToken](database).Create(r.Context(), &userToken)
+				if err != nil {
+					httpresponder.SendErrorResponse(w, r, "Failed to save auth token: "+err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				// set cookie
+				http.SetCookie(w, &http.Cookie{
+					Name:    "chukfi_auth_token",
+					Value:   token.String(),
+					Expires: time.Unix(userToken.ExpiresAt, 0),
+					Path:    "/",
+				})
+
+				type simpleUser struct {
+					ID          string   `json:"id"`
+					Fullname    string   `json:"fullname"`
+					Email       string   `json:"email"`
+					Permissions []string `json:"permissions"`
+				}
+
+				perms := permissions.PermissionsToStrings(permissions.Permission(user.Permissions))
+
+				httpresponder.SendNormalResponse(w, r, map[string]interface{}{
+					"authToken": token.String(),
+					"expiresAt": userToken.ExpiresAt,
+					"user": simpleUser{
+						ID:          user.ID.String(),
+						Fullname:    user.Fullname,
+						Email:       user.Email,
+						Permissions: perms,
+					},
+				})
+			})
+		})
+
 		r.Route("/collection", func(r chi.Router) {
 			r.Route("/{collectionName}", func(r chi.Router) {
 
@@ -189,6 +305,10 @@ func SetupRouter(database *gorm.DB) *chi.Mux {
 							httpresponder.SendErrorResponse(w, r, "Unknown fields: "+strings.Join(unknown, ", "), http.StatusBadRequest)
 							return
 						}
+
+						data["ID"] = uuid.NewV4()
+						data["created_at"] = time.Now()
+						data["updated_at"] = time.Now()
 
 						result := gorm.G[map[string]interface{}](database).Table(collectionName).Create(r.Context(), &data)
 
