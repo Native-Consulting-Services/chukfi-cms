@@ -55,7 +55,7 @@ func InitDatabase(schema []interface{}) {
 		Fullname:    "Chukfi Admin",
 		Password:    string(basePassword),
 		Email:       "admin@nativeconsult.io",
-		Permissions: uint(permissions.Admin),
+		Permissions: uint64(permissions.Admin),
 	}
 
 	// check if user exists
@@ -73,4 +73,7 @@ func InitDatabase(schema []interface{}) {
 	// setup :)
 	DB = db
 
+	if err := permissions.InitPermissions(db); err != nil {
+		panic("failed to initialize permissions: " + err.Error())
+	}
 }

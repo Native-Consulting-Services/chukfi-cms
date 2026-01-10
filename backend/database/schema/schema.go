@@ -25,7 +25,7 @@ type User struct {
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(255);not null"`
 
-	Permissions uint `gorm:"not null;default:1;"`
+	Permissions uint64 `gorm:"not null;default:1;"`
 
 	adminOnly string `gorm:"-:all"` // makes it so you can only access this field as admin (logged in as admin user)
 }

@@ -12,6 +12,8 @@ import (
 	"native-consult.io/chukfi-cms/database/mysql"
 	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/httpresponder"
+	"native-consult.io/chukfi-cms/src/lib/permissions"
+
 
 	// gorm
 	"gorm.io/gorm"
@@ -35,6 +37,13 @@ func main() {
 	database.InitDatabase([]interface{}{
 		&Post{},
 	})
+
+	// register custom permission
+	_, err := permissions.RegisterPermission("ViewPosts")
+	if err != nil {
+		panic("failed to register permission: " + err.Error())
+	}
+
 
 	// generate a post from schema
 	testPost := Post{
