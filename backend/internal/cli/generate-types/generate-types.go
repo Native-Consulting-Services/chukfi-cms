@@ -39,19 +39,27 @@ func printHelp() {
 Usage: %s generate-types [options]
 
 Options:
-  --schema=<path>    Path to a Go file containing your schema structs
+  --schema=<path>*    Path to a Go file containing your schema structs
                      (e.g., --schema=./schema.go)
+					 
 
   --output=<path>    Output path for generated TypeScript file
                      (default: cms.types.ts)
 
   --database=<type>  Database type (mysql/postgres)
-                     Only needed when not using --schema
+					 Only needed when the tool cannot auto-detect the database type.
+
+  --dsn=<dsn>        Database DSN connection string
+					 (e.g., --dsn="user:password@tcp(127.0.0.1:3306)/dbname")
+					 Not needed if you have DATABASE_DSN set in your environment variables.
+
+	* = required
 
 Examples:
    %s generate-types --schema=../backend-test/schema.go
    %s generate-types --schema=./myschema.go --output=./types/api.ts
-`, cmd, cmd, cmd)
+   %s generate-types --schema=./myschema.go --dsn="user:password@tcp(127.0.0.1:3306)/dbname" --output=./types/api.ts --database=mysql
+`, cmd, cmd, cmd, cmd)
 }
 
 // this is the main CLI function for generating types, do not call directly, use CLI by running the command

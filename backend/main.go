@@ -27,6 +27,15 @@ func main() {
 	case "generate-types":
 		dsn := os.Getenv("DATABASE_DSN")
 
+		if dsn == "" {
+			// check if theres a otherArgs containing --dsn=""
+			for _, arg := range otherArgs {
+				if strings.HasPrefix(arg, "--dsn=") {
+					dsn = strings.TrimPrefix(arg, "--dsn=")
+				}
+			}
+		}
+
 		cli_generate_types.CLI(dsn, []interface{}{}, otherArgs)
 	}
 }
