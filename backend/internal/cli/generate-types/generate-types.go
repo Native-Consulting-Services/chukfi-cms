@@ -38,25 +38,26 @@ func printHelp() {
 	fmt.Printf(`
 Usage: %s generate-types [options]
 
+Description:
 The generate-types command generates TypeScript types from Go schema definitions.
 The database needs to be accessible & running to fetch the schema metadata.
 
 Options:
   --schema=<path>*    Path to a Go file containing your schema structs
-                     (e.g., --schema=./schema.go)
+                      (e.g., --schema=./schema.go)
 					 
 
   --output=<path>    Output path for generated TypeScript file
                      (default: cms.types.ts)
 
   --database=<type>  Database type (mysql/postgres)
-					 Only needed when the tool cannot auto-detect the database type.
+                     Only needed when the tool cannot auto-detect the database type.
 
   --dsn=<dsn>        Database DSN connection string
-					 (e.g., --dsn="user:password@tcp(127.0.0.1:3306)/dbname")
-					 Not needed if you have DATABASE_DSN set in your environment variables.
+                     (e.g., --dsn="user:password@tcp(127.0.0.1:3306)/dbname")
+                     Not needed if you have DATABASE_DSN set in your environment variables.
 
-	* = required
+  * = required
 
 Examples:
    %s generate-types --schema=../backend-test/schema.go
