@@ -11,9 +11,11 @@ import (
 	"gorm.io/gorm"
 	defaultSchema "native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
+	"native-consult.io/chukfi-cms/src/lib/schemaregistry"
 )
 
 var DB *gorm.DB
+var Schema *[]interface{}
 
 func InitDatabase(schema []interface{}) {
 	err := godotenv.Load()
@@ -31,12 +33,14 @@ func InitDatabase(schema []interface{}) {
 		panic("failed to connect database:" + err.Error())
 	}
 
-	fullSchema := append(schema, defaultSchema.DefaultSchema...)
+	Schema := append(schema, defaultSchema.DefaultSchema...)
 
-	db.AutoMigrate(fullSchema...)
+	schemaregistry.RegisterSchemas(Schema)
+
+	db.AutoMigrate(Schema...)
 
 	// print every schema that exists
-	for _, s := range fullSchema {
+	for _, s := range Schema {
 		fmt.Printf("Database Schema: %T\n", s)
 	}
 

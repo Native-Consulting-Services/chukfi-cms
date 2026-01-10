@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net/http"
 
 	uuid "github.com/satori/go.uuid"
@@ -9,6 +8,7 @@ import (
 	// crm
 	"native-consult.io/chukfi-cms/cmd/router"
 	"native-consult.io/chukfi-cms/cmd/serve"
+	databasehelper "native-consult.io/chukfi-cms/database/helper"
 	"native-consult.io/chukfi-cms/database/mysql"
 	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/src/httpresponder"
@@ -20,22 +20,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type PostSchema struct {
+type Post struct {
 	schema.BaseModel
 	Type  string `gorm:"type:varchar(100)"`
 	Body  string `gorm:"type:text"`
 	Title string `gorm:"type:varchar(255)"`
 
 	AuthorID string `gorm:"type:char(36);index"`
+
+	// adminOnly string `gorm:"-:all"` // makes it so you can only access this field as admin (logged in as admin user)
 }
 
 func main() {
 	database.InitDatabase([]interface{}{
-		&PostSchema{},
+		&Post{},
 	})
 
 	// generate a post from schema
-	testPost := PostSchema{
+	testPost := Post{
 		Type:     "blog",
 		Body:     "This is a test post",
 		Title:    "Test Post",
@@ -43,16 +45,26 @@ func main() {
 	}
 
 	// check if test post exists
-	var existingPost PostSchema
+	result, err := databasehelper.Get[Post](database.DB).Where("title = ?", testPost.Title).Take()
+
+	/* or by just using gorm directly, either works, up to preference :)
+	var existingPost Post
 	result := database.DB.Where("title = ?", testPost.Title).First(&existingPost)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
-		err := gorm.G[PostSchema](database.DB).Create(context.Background(), &testPost)
+		err := gorm.G[Post](database.DB).Create(context.Background(), &testPost)
 		if err != nil {
 			panic("failed to create test post:" + err.Error())
 		}
 	}
+		
+	*/
 
-	r := router.SetupRouter()
+	if err != nil || result.ID == uuid.Nil {
+		// create test post
+		database.DB.Create(&testPost)
+	}
+
+	r := router.SetupRouter(database.DB)
 
 	serveConfig := serve.NewServeConfig("3000", []interface{}{}, database.DB, r)
 
@@ -61,7 +73,7 @@ func main() {
 	})
 
 	r.Get("/posts", func(w http.ResponseWriter, r *http.Request) {
-		posts, err := gorm.G[PostSchema](database.DB).Find(r.Context())
+		posts, err := gorm.G[Post](database.DB).Find(r.Context())
 		if err != nil {
 			w.Write([]byte("Error fetching posts: " + err.Error()))
 			return

@@ -20,16 +20,18 @@ func (base *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type User struct {
-	gorm.Model
+	BaseModel
 	Fullname string `gorm:"type:varchar(100);not null"`
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(255);not null"`
 
 	Permissions uint `gorm:"not null;default:1;"`
+
+	adminOnly string `gorm:"-:all"` // makes it so you can only access this field as admin (logged in as admin user)
 }
 
 type UserToken struct {
-	gorm.Model
+	BaseModel
 	UserID    uuid.UUID `gorm:"type:char(36);not null;index"`
 	Token     string    `gorm:"type:char(64);not null;uniqueIndex"`
 	ExpiresAt int64     `gorm:"not null;index"`
