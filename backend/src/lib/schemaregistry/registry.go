@@ -334,11 +334,11 @@ func GenerateTypescriptInterface(tableName string) (string, bool) {
 	}
 
 	var sb strings.Builder
-	sb.WriteString("interface " + strings.Title(singularize(tableName)) + " {\n")
+	sb.WriteString("export interface " + strings.Title(singularize(tableName)) + " {\n")
 	for _, field := range meta.Fields {
 		tsType := "any"
 		switch {
-		case strings.Contains(field.Type, "string"):
+		case strings.Contains(field.Type, "string"), strings.Contains(field.Type, "Text"), strings.Contains(field.Type, "UUID"):
 			tsType = "string"
 		case strings.Contains(field.Type, "int"), strings.Contains(field.Type, "uint"), strings.Contains(field.Type, "float"), strings.Contains(field.Type, "double"):
 			tsType = "number"

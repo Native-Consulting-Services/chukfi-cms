@@ -8,7 +8,6 @@ import (
 	// crm
 	databasehelper "native-consult.io/chukfi-cms/database/helper"
 	database "native-consult.io/chukfi-cms/database/mysql"
-	"native-consult.io/chukfi-cms/database/schema"
 	"native-consult.io/chukfi-cms/server/router"
 	"native-consult.io/chukfi-cms/server/serve"
 	"native-consult.io/chukfi-cms/src/httpresponder"
@@ -22,24 +21,6 @@ import (
 	// chi
 	"github.com/go-chi/chi/v5"
 )
-
-type APIKeys struct {
-	schema.BaseModel
-	Key        string `gorm:"type:char(64);not null;uniqueIndex"`
-	OwnerEmail string `gorm:"type:varchar(100);not null;index"`
-	ExpiresAt  int64  `gorm:"not null;index"`
-}
-
-type Post struct {
-	schema.BaseModel
-	Type  string `gorm:"type:varchar(100);not null"`
-	Body  string `gorm:"type:text;not null"`
-	Title string `gorm:"type:varchar(255);not null;index"`
-
-	AuthorID string `gorm:"type:char(36);index"`
-
-	// adminOnly string `gorm:"-:all"` // makes it so you can only access this field as admin (logged in as admin user)
-}
 
 func main() {
 	customSchema := []interface{}{
