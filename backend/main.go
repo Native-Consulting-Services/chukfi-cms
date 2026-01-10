@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	generate_types "native-consult.io/chukfi-cms/cmd/generate-types"
+	cli_generate_types "native-consult.io/chukfi-cms/internal/cli/generate-types"
 )
 
 func main() {
@@ -27,6 +27,6 @@ func main() {
 	case "generate-types":
 		dsn := os.Getenv("DATABASE_DSN")
 
-		generate_types.CLI(dsn, []interface{}{}, otherArgs)
+		cli_generate_types.CLI(dsn, []interface{}{}, otherArgs)
 	}
 }
