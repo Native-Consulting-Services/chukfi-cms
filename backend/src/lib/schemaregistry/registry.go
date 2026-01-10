@@ -23,6 +23,10 @@ type SchemaMetadata struct {
 	Fields    []FieldMetadata
 }
 
+type simpleMetadata struct {
+	AdminOnly bool
+}
+
 var (
 	registry = make(map[string]SchemaMetadata)
 	aliases  = make(map[string]string)
@@ -304,6 +308,21 @@ func ResolveTableName(name string) (string, bool) {
 	}
 
 	return "", false
+}
+
+// Returns all registered schemas with info such as table name & admin only
+func GetAllRegisteredSchemas() map[string]simpleMetadata {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	schemas := make(map[string]simpleMetadata)
+	for tableName, meta := range registry {
+		schemas[tableName] = simpleMetadata{
+			AdminOnly: meta.AdminOnly,
+		}
+	}
+
+	return schemas
 }
 
 func IsRegistered(name string) bool {

@@ -171,6 +171,34 @@ func SetupRouter(database *gorm.DB) *chi.Mux {
 	r.Route("/admin", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
 
+			r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
+				user, err := GetUserFromRequest(r, database)
+
+				if err != nil {
+					httpresponder.SendErrorResponse(w, r, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+					return
+				}
+
+				type simpleUser struct {
+					ID          string   `json:"id"`
+					Fullname    string   `json:"fullname"`
+					Email       string   `json:"email"`
+					Permissions []string `json:"permissions"`
+				}
+
+				perms := permissions.PermissionsToStrings(permissions.Permission(user.Permissions))
+
+				httpresponder.SendNormalResponse(w, r, map[string]interface{}{
+					"user": simpleUser{
+						ID:          user.ID.String(),
+						Fullname:    user.Fullname,
+						Email:       user.Email,
+						Permissions: perms,
+					},
+					"success": true,
+				})
+			})
+
 			r.Post("/login", func(w http.ResponseWriter, r *http.Request) {
 				// check if already logged in
 				authToken, ok := r.Context().Value("authToken").(string)
@@ -249,11 +277,38 @@ func SetupRouter(database *gorm.DB) *chi.Mux {
 						Email:       user.Email,
 						Permissions: perms,
 					},
+					"success": true,
 				})
 			})
 		})
 
 		r.Route("/collection", func(r chi.Router) {
+			r.Group(func(r chi.Router) {
+				r.Use(AuthMiddlewareWithDatabase(database))
+
+				r.Get("/all", func(w http.ResponseWriter, r *http.Request) {
+					// gets all
+					user, err := GetUserFromRequest(r, database)
+
+					if err != nil {
+						httpresponder.SendErrorResponse(w, r, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+						return
+					}
+
+					hasPermission := permissions.HasPermission(permissions.Permission(user.Permissions), permissions.ViewModels)
+					if !hasPermission {
+						httpresponder.SendErrorResponse(w, r, "Forbidden: You do not have permission to view models", http.StatusForbidden)
+						return
+					}
+
+					allSchemas := schemaregistry.GetAllRegisteredSchemas()
+
+					httpresponder.SendNormalResponse(w, r, map[string]interface{}{
+						"schemas": allSchemas,
+					})
+
+				})
+			})
 			r.Route("/{collectionName}", func(r chi.Router) {
 
 				// auth mandated routes

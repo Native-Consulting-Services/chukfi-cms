@@ -111,6 +111,18 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Get all collections",
+      "id": "38e215f6-b7a4-44dd-9f8a-2624dc0f601f",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
     }
   ]
 }
