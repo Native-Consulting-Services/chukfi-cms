@@ -6,13 +6,15 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	// crm
-	"native-consult.io/chukfi-cms/cmd/router"
-	"native-consult.io/chukfi-cms/cmd/serve"
 	databasehelper "native-consult.io/chukfi-cms/database/helper"
 	database "native-consult.io/chukfi-cms/database/mysql"
 	"native-consult.io/chukfi-cms/database/schema"
+	"native-consult.io/chukfi-cms/server/router"
+	"native-consult.io/chukfi-cms/server/serve"
 	"native-consult.io/chukfi-cms/src/httpresponder"
 	"native-consult.io/chukfi-cms/src/lib/permissions"
+
+	generate_types "native-consult.io/chukfi-cms/cmd/generate-types"
 
 	// gorm
 	"gorm.io/gorm"
@@ -40,16 +42,24 @@ type Post struct {
 }
 
 func main() {
-	database.InitDatabase([]interface{}{
+	customSchema := []interface{}{
 		&Post{},
 		&APIKeys{},
-	})
+	}
+	database.InitDatabase(customSchema)
 
 	// register custom permission
 	_, err := permissions.RegisterPermission("ViewPosts")
 	if err != nil {
 		panic("failed to register permission: " + err.Error())
 	}
+
+	generate_types.GenerateTypescriptTypes(
+		&generate_types.GenerateTypesConfig{
+			Schema:   customSchema,
+			Database: database.DB,
+		},
+	)
 
 	// generate a post from schema
 	testPost := Post{

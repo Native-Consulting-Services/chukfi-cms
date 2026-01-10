@@ -310,6 +310,56 @@ func ResolveTableName(name string) (string, bool) {
 	return "", false
 }
 
+func GenerateAllTypescriptInterfaces() map[string]string {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	interfaces := make(map[string]string)
+	for tableName := range registry {
+		if tsInterface, ok := GenerateTypescriptInterface(tableName); ok {
+			interfaces[tableName] = tsInterface
+		}
+	}
+
+	return interfaces
+}
+
+func GenerateTypescriptInterface(tableName string) (string, bool) {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	meta, exists := registry[tableName]
+	if !exists {
+		return "", false
+	}
+
+	var sb strings.Builder
+	sb.WriteString("interface " + strings.Title(singularize(tableName)) + " {\n")
+	for _, field := range meta.Fields {
+		tsType := "any"
+		switch {
+		case strings.Contains(field.Type, "string"):
+			tsType = "string"
+		case strings.Contains(field.Type, "int"), strings.Contains(field.Type, "uint"), strings.Contains(field.Type, "float"), strings.Contains(field.Type, "double"):
+			tsType = "number"
+		case strings.Contains(field.Type, "bool"):
+			tsType = "boolean"
+		case strings.Contains(field.Type, "Time"):
+			tsType = "Date"
+		}
+
+		optional := ""
+		if !field.Required && !field.PrimaryKey {
+			optional = "?"
+		}
+
+		sb.WriteString("  " + field.Name + optional + ": " + tsType + ";\n")
+	}
+	sb.WriteString("}\n")
+
+	return sb.String(), true
+}
+
 // Returns all registered schemas with info such as table name & admin only
 func GetAllRegisteredSchemas() map[string]simpleMetadata {
 	mu.RLock()
