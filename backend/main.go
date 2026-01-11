@@ -2,85 +2,40 @@ package main
 
 import (
 	"os"
-	"os/exec"
+	"strings"
+
+	"github.com/joho/godotenv"
+	cli_generate_types "native-consult.io/chukfi-cms/internal/cli/generate-types"
 )
 
-const version = "v0.1.1"
-
-func returnCommandNames() []string {
-	// Load all commands from the cmd folder
-	commandFolder, err := os.ReadDir("./cmd")
-	if err != nil {
-		panic(err)
-	}
-
-	// return names of all commands
-	var commandNames []string
-	for _, command := range commandFolder {
-		if command.IsDir() {
-			commandNames = append(commandNames, command.Name())
-		}
-	}
-
-	return commandNames
-}
-
-func helpMessage() {
-
-	println("Chukfi CMS Backend " + version)
-	println("Commands:")
-	println("  help        Show this help message")
-	// list all commands in cmd folder
-	names := returnCommandNames()
-	for _, name := range names {
-		println("  " + name)
-	}
-}
-
 func main() {
-	// read the args of the command line
+	godotenv.Load()
+
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		// help message
-		helpMessage()
+		println("No command provided")
+		os.Exit(0)
 		return
 	}
 
-	names := returnCommandNames()
+	command := args[0]
+	otherArgs := args[1:]
+	println(strings.Join(args, " "))
 
-	switch args[0] {
-	case "help":
-		helpMessage()
-		break
-	default:
-		// check if the command exists
-		found := false
-		for _, name := range names {
-			if args[0] == name {
-				found = true
-				break
+	switch command {
+	case "generate-types":
+		dsn := os.Getenv("DATABASE_DSN")
+
+		if dsn == "" {
+			// check if theres a otherArgs containing --dsn=""
+			for _, arg := range otherArgs {
+				if strings.HasPrefix(arg, "--dsn=") {
+					dsn = strings.TrimPrefix(arg, "--dsn=")
+				}
 			}
 		}
 
-		if found {
-			// os.Exec
-			// get my directory
-			myDir, err := os.Getwd()
-			if err != nil {
-				println("Failed to get working directory:", err.Error())
-				return
-			}
-			cmdPath := myDir + "/cmd/" + args[0] + "/main.go"
-			cmdArgs := append([]string{"run", cmdPath}, args[1:]...)
-			cmd := exec.Command("go", cmdArgs...)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Stdin = os.Stdin
-			err = cmd.Run()
-		} else {
-			println("Command not found:", args[0])
-		}
+		cli_generate_types.CLI(dsn, []interface{}{}, otherArgs)
 	}
-
 }

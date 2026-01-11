@@ -10,8 +10,8 @@ echo -e "${BLUE}Starting Chukfi CMS Development Environment${NC}"
 echo ""
 
 # Check if backend directory exists
-if [ ! -d "backend" ]; then
-    echo -e "${YELLOW}Error: backend directory not found${NC}"
+if [ ! -d "backend-test" ]; then
+    echo -e "${YELLOW}Error: backend-test directory not found${NC}"
     exit 1
 fi
 
@@ -23,8 +23,8 @@ fi
 
 # Start backend server in background
 echo -e "${GREEN}Starting backend server on port 8080...${NC}"
-cd backend
-go run cmd/server/main.go &
+cd backend-test
+go run main.go &
 BACKEND_PID=$!
 cd ..
 
@@ -42,7 +42,7 @@ echo ""
 echo -e "${GREEN}✓ Servers started successfully!${NC}"
 echo ""
 echo -e "Frontend: ${BLUE}http://localhost:4321${NC}"
-echo -e "Backend:  ${BLUE}http://localhost:8080${NC}"
+echo -e "Backend:  ${BLUE}http://localhost:3000${NC}"
 echo -e "Login:    ${BLUE}http://localhost:4321/login${NC}"
 echo ""
 echo -e "Default credentials:"

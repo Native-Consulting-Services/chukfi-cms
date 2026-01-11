@@ -1,0 +1,137 @@
+{
+  "info": {
+    "_postman_id": "7a8c6651-ede2-44fa-b8a3-61496254fa08",
+    "name": "Chukfi CMS backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "id": "549933a9-81f0-4da6-8862-864a1bde7a7e",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"admin@nativeconsult.io\",\r\n    \"password\": \"chukfi123\"\r\n}"
+        },
+        "url": {
+          "raw": "localhost:3000/admin/auth/login",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "admin",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users Collection",
+      "id": "c702e184-5452-49ad-bbe4-bb9217f952e5",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "localhost:3000/admin/collection/users/get",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "admin",
+            "collection",
+            "users",
+            "get"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users Metadata",
+      "id": "fe43a677-72e2-45b6-a690-8368f8c6abb5",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/ADMIN/collection/UserTokens/metadata",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "ADMIN",
+            "collection",
+            "UserTokens",
+            "metadata"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Post",
+      "id": "a635d554-1ef7-45b3-85b1-a9e83bc7a1b8",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"Type\": \"hello\",\r\n    \"Body\": \"hello\",\r\n    \"Title\": \"hello\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/admin/collection/posts/create",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "admin",
+            "collection",
+            "posts",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all collections",
+      "id": "38e215f6-b7a4-44dd-9f8a-2624dc0f601f",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/admin/collection/all",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "admin",
+            "collection",
+            "all"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
