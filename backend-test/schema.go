@@ -1,7 +1,7 @@
 package main
 
 import (
-	"native-consult.io/chukfi-cms/database/schema"
+	"github.com/Native-Consulting-Services/chufki-cms-backend/database/schema"
 )
 
 type APIKeys struct {

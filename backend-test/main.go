@@ -6,14 +6,14 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	// crm
-	databasehelper "native-consult.io/chukfi-cms/database/helper"
-	database "native-consult.io/chukfi-cms/database/mysql"
-	"native-consult.io/chukfi-cms/server/router"
-	"native-consult.io/chukfi-cms/server/serve"
-	"native-consult.io/chukfi-cms/src/httpresponder"
-	"native-consult.io/chukfi-cms/src/lib/permissions"
+	databasehelper "github.com/Native-Consulting-Services/chufki-cms-backend/database/helper"
+	database "github.com/Native-Consulting-Services/chufki-cms-backend/database/mysql"
+	"github.com/Native-Consulting-Services/chufki-cms-backend/server/router"
+	"github.com/Native-Consulting-Services/chufki-cms-backend/server/serve"
+	"github.com/Native-Consulting-Services/chufki-cms-backend/src/httpresponder"
+	"github.com/Native-Consulting-Services/chufki-cms-backend/src/lib/permissions"
 
-	generate_types "native-consult.io/chukfi-cms/cmd/generate-types"
+	generate_types "github.com/Native-Consulting-Services/chufki-cms-backend/cmd/generate-types"
 
 	// gorm
 	"gorm.io/gorm"

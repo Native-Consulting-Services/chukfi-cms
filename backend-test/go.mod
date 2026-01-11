@@ -1,10 +1,10 @@
 module chu-test
 
-replace native-consult.io/chukfi-cms => ../backend
+replace github.com/Native-Consulting-Services/chufki-cms-backend => ../backend
 
 go 1.25.3
 
-require native-consult.io/chukfi-cms v0.0.0
+require github.com/Native-Consulting-Services/chufki-cms-backend v0.0.0
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
